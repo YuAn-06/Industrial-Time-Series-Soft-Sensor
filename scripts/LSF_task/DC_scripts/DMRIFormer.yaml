@@ -1,0 +1,59 @@
+# configs.yaml
+
+params:
+# Data Config
+  model: 'DMRIFormer'
+  task: 'short_term_forecasting' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
+  data_name: "DC" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
+  data_path: './data/DC/debutanizer_column.csv' # type: str, default: None, help: Path to the dataset
+  target: 'y_1' # type: str, default: None, help: Target variable name
+  if_scale: True # type: bool, default: False, help: If scale the data
+  data_aug: False # type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
+  use_amp: False # type: bool, default: False, help: If use automatic mixed precision training
+  num_workers: 1 # type: int, DataLoader the number of workers
+  if_missing: False # type: bool, default: False, help: If exists Missing Data
+  missing_rate: 0 # type: float, default: 0, help: Missing data rate [0:0.5]
+  use_axliary_var: False # type: bool, default: False, help: If use mode variable for multi_mode dataset
+
+# Model Config
+  enc_in: 7  # Dimension of encoder Input
+  dec_in: 7  # Dimension of decoder Input
+  C_in: 7  # Dimension of Channel Input
+  C_out: 1  # Dimension of Channel Output
+  seq_len: 20 #
+  embed: 'TimeF'
+  freq: 's'
+  factor: 1
+  label_len: 15
+  pred_len: 1 # Prediction Length, used for the future prediction featu
+  d_model: 1024
+  n_heads: 4
+  e_layers: 2
+  d_layers: 3
+  d_ff: 1024
+  dropout: 0.1
+  n_components: 3
+
+
+# Train Config
+  batch_size: 64 #128
+  learning_rate: 0.0001 # 0.0005
+  epoch: 300
+  if_adj_lr: True
+  if_valid: True
+  patience: 20 # 25
+  lradj: 'type2' # learning rate adjustment strategy: [type1, type2, cosine]
+  annealing_steps: 20
+  use_tensorboard: False
+
+# Test Config
+  inverse: True # If the data is scaled, inverse the data to the original scale
+
+# GPU config
+  use_cuda: True
+  device: "cuda"
+  gpu: 0
+  seed: 2021
+  device_ids: [0]
+  use_multi_gpu: False
+

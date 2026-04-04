@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Nystromformer model training script
+python -u run.py --model 'Nystroformer' \
+                 --task 'soft_sensor' \
+                 --data_name "MFP" \
+                 --data_path 'C:\Study\Code\datasets\MFP\data\MFP_combined_data.csv' \
+                 --target 'PT501' \
+                 --if_scale True \
+                 --data_aug False \
+                 --use_amp False \
+                 --num_workers 1 \
+                 --if_missing False \
+                 --missing_rate 0 \
+                 --use_axliary_var False \
+                 --enc_in 16 \
+                 --dec_in 16 \
+                 --C_in 16 \
+                 --C_out 1 \
+                 --seq_len 16 \
+                 --embed 'TimeF' \
+                 --freq 's' \
+                 --factor 1 \
+                 --label_len 16 \
+                 --pred_len 6 \
+                 --d_model 512 \
+                 --d_ff 1024 \
+                 --n_heads 8 \
+                 --e_layers 1 \
+                 --d_layers 1 \
+                 --dropout 0.05 \
+                 --activation 'gelu' \
+                 --n_components 3 \
+                 --num_landmarks 10 \
+                 --batch_size 64 \
+                 --learning_rate 0.001 \
+                 --epoch 200 \
+                 --if_adj_lr True \
+                 --if_valid False \
+                 --patience 10 \
+                 --lradj 'cosine' \
+                 --annealing_steps 20 \
+                 --inverse False \
+                 --use_cuda False \
+                 --device "cuda" \
+                 --gpu 0 \
+                 --seed 2021 \
+                 --device_ids "[0]" \
+                 --use_multi_gpu False

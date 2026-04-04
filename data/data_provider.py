@@ -1,0 +1,67 @@
+"""
+Copyright (C) 2024
+@ Name: data_provider.py
+@ Time: 2024/12/10 17:42
+@ Author: YuAn_L
+@ Eamil: yuan_l1106@163.com
+@ Software: PyCharm
+"""
+from data.data_loader import Dataset_Custom, Dataset_Custom_4_Soft_Sensor, Dataset_MultiMode, Dataset_MultiMode_4_Soft_Sensor
+from torch.utils.data import DataLoader
+
+data_dict = {
+    # DC
+    'DC': Dataset_Custom, 
+    'DC_MultiMode': Dataset_MultiMode,
+    'DC_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
+    # SRU
+    'SRU': Dataset_Custom, 
+    'SRU_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
+    # PPGAS
+    'PPGAS': Dataset_Custom,
+    'PPGAS_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
+    'PPGAS_MultiMode': Dataset_MultiMode,
+    'PPGAS_MultiMode_4_Soft_Sensor': Dataset_MultiMode_4_Soft_Sensor,
+}   
+
+
+def data_provider(args, flag):
+    if 'PPGAS' in args.data_name:
+        args.data_name = 'PPGAS'
+
+    if args.task == 'soft_sensor':
+        data_name = args.data_name + '_Soft_Sensor'
+        if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
+            data_name = data_name + '_MultiMode'
+        
+    elif args.task == 'short_term_forecasting':
+        if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
+            data_name = args.data_name + '_MultiMode'
+        else:
+            data_name = args.data_name
+    else:
+        raise ValueError("Invalid task name: {}".format(args.task))
+
+    
+    Data = data_dict[data_name]
+
+    timeenc = 0 if args.embed != "timeF" else 1
+    if flag == 'test':
+        shuffle_flag = False
+        drop_last = False
+        batch_size = args.batch_size
+    else:
+        shuffle_flag = False
+        drop_last = True
+        batch_size = args.batch_size
+
+    dataset = Data(args, flag, timeenc = timeenc)
+
+
+    data_loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle_flag,
+        drop_last=drop_last,
+        )
+    return dataset, data_loader

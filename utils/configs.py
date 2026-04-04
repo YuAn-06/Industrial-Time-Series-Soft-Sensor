@@ -1,0 +1,174 @@
+import argparse
+from utils.ExpConfigs import ExpConfigs
+import yaml
+from dataclasses import asdict
+import os
+
+def Init_parser():
+
+    parser = argparse.ArgumentParser(description='Configuration for All Models')
+    # Data Configs
+    parser.add_argument('--model', type=str, default='Nystroformer',help='Model name to use')              
+    parser.add_argument('--task', type=str, default='soft_sensor',help="Task type: ['short_term_forecasting', 'soft_sensor']")
+    parser.add_argument('--data_path', type=str, default="",help="Dataset path")         
+    parser.add_argument('--data_name', type=str, default="PPGAS",help="Dataset name: ['MFP', 'DEB', 'SRU','PPGAS','PTA']")
+    parser.add_argument('--target', type=str, default="",help="Target variable name")                
+    parser.add_argument('--if_scale',  default=False,   type=bool,                 help='If scale the data')
+    parser.add_argument('--data_aug',  default=False,   type=bool,help='If use data augmentation for Deb and SRU dataset')                    
+    parser.add_argument('--use_amp',  default=False,   type=bool,help='If use automatic mixed precision training')                   
+    parser.add_argument('--num_workers', type=int, default=1,help='DataLoader the number of workers')                   
+    parser.add_argument('--if_missing',  default=False,   type=bool,help='If exists Missing Data')                  
+    parser.add_argument('--missing_rate', type=float, default=0.0,help='Missing data rate [0:0.5]')                
+    parser.add_argument('--use_condition_label',  default=False,   type=bool,help='If use mode variable for multi_mode dataset')
+    parser.add_argument('--scaler', type=str, default="StandardScaler",help="Scaler to use for data preprocessing, [StandardScaler, MinMaxScaler]")
+    parser.add_argument('--if_data_aug',  default=False,help='If use data augmentation for Deb and SRU dataset')                    
+
+    # Model Config
+    parser.add_argument('--enc_in', type=int, default=16,help='Dimension of encoder Input')               
+    parser.add_argument('--dec_in', type=int, default=16,help='Dimension of decoder Input')               
+    parser.add_argument('--C_in', type=int, default=16,help='Dimension of Channel Input')                 
+    parser.add_argument('--C_out', type=int, default=1,help='Dimension of Channel Output')              
+    parser.add_argument('--seq_len', type=int, default=32,help='Sequence length')
+    parser.add_argument('--label_len', type=int, default=10, help='Label length')                 
+    parser.add_argument('--patch_len', type=int, default=8,help='Patch length')      
+    parser.add_argument('--pred_len', type=int, default=6, help='Prediction Length, used for the future prediction feature')
+    parser.add_argument('--stride', type=int, default=1, help='Stride')
+    parser.add_argument('--embed', type=str, default='TimeF', help='Embedding type')            
+    parser.add_argument('--freq', type=str, default='s', help='Time embedding frequency')
+    parser.add_argument('--factor', type=int, default=1, help='Factor of Attention')    
+    parser.add_argument('--d_model', type=int, default=512, help='Model dimension')
+    parser.add_argument('--n_heads', type=int, default=8, help='Number of attention heads')
+    parser.add_argument('--e_layers', type=int, default=1,help='Encoder layers')
+    parser.add_argument('--d_layers', type=int, default=1,help='Decoder layers')
+    parser.add_argument('--d_ff', type=int, default=1024,help='Feed forward dimension')
+    parser.add_argument('--dropout', type=float, default=0.05,help='Dropout rate')
+    parser.add_argument('--activation', type=str, default='gelu',help='Activation function')
+    parser.add_argument('--num_landmarks', type=int, default=10,help='Number of landmarks')
+
+
+    # Train Config
+    parser.add_argument('--collate_fn', type=str, default='collate_fn',   help='Collate function to use')           
+    parser.add_argument('--batch_size', type=int, default=64,  help='Batch size for training')           
+    parser.add_argument('--learning_rate', type=float, default=0.001,  help='Learning rate for optimizer')              
+    parser.add_argument('--epoch', type=int, default=200, help='Number of training epochs')                
+    parser.add_argument('--if_adj_lr', type=bool, default=True,help='If adjust learning rate')
+    parser.add_argument('--if_valid', type=bool, default=False,help='If use validation during training')
+    parser.add_argument('--patience', type=int, default=10,help='Patience for early stopping')                  
+    parser.add_argument('--lradj', type=str, default='cosine',help="Learning rate adjustment strategy: ['type1', 'type2', 'cosine']")
+    parser.add_argument('--annealing_steps', type=int, default=20,help='Annealing steps for learning rate')
+    parser.add_argument('--weight_decay', type=float, default=0.0,help='L2 regularization weight')         
+
+    # Test Config
+    parser.add_argument('--inverse', type=bool, default=False,
+                        help='If the data is scaled, inverse the data to the original scale')
+
+    # GPU config
+    parser.add_argument('--use_cuda', default=False, help='Use CUDA for training')                
+    parser.add_argument('--device', type=str, default="cuda",help='Device to use')                  
+    parser.add_argument('--gpu', type=int, default=0,help='GPU ID to use')               
+    parser.add_argument('--seed', type=int, default=2021,help='Random seed')                
+    parser.add_argument('--device_ids', nargs='+', type=int, default=[0],help='List of GPU device IDs')                 
+    parser.add_argument('--use_multi_gpu', default=False, help='Use multiple GPUs')
+
+    # TCVAE config
+    parser.add_argument('--n_components', type=int, default=3,help='TCAVE type')
+
+    # HSAM_dGRUs CVAESMC
+    parser.add_argument('--hidden_dim', type=int, default=10,help='hidden dimension for each distributed GRU unit')
+
+    # Autoformer
+    parser.add_argument('--moving_avg', type=int, default=25,help='moving average for Autoformer')
+
+    # DLinear
+    parser.add_argument('--individual', type=bool, default=False,help='If use individual linear layer for each forecast')
+
+    # MSACNN
+    parser.add_argument('--reduction_ratio', type=float, default=16,help='Reduction ratio for MSACNN')
+
+    # Save config
+    parser.add_argument('--save_dir', type=str, default='logs',help='Directory to save logs and models')
+
+    # CVAESMC
+    parser.add_argument('--num_samples', type=int, default=10,help='Number of samples for CVAESMC')
+    parser.add_argument('--z_dim', type=int, default=10,help='Latent dimension for CVAESMC')
+    parser.add_argument('--output_type', type=str, default='mean',help='Output type for CVAESMC', choices=['mean', 'median', 'sample'])
+
+
+    # Nonstationary Transformer
+    parser.add_argument('--p_hidden_dims', type=list, default=[128, 128],help='Hidden dimensions for projection network')
+    parser.add_argument('--p_hidden_layers', type=int, default=2,help='Number of hidden layers for projection network')
+
+    # EnvFormer
+    parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer')
+
+
+    # Setting
+    parser.add_argument('--setting', type=str, default='',help='Setting to use')
+
+ 
+    args = ExpConfigs(**vars(parser.parse_args()))
+
+    return args
+
+
+def Parse_arguments(yaml_path=None):
+    args = Init_parser()
+
+
+    if yaml_path is not None:
+        if os.path.exists(yaml_path):
+            print('YAML exists')
+        else:
+            raise FileNotFoundError(f"YAML file not found: {yaml_path}")
+
+        with open(yaml_path, "r", encoding='utf-8') as file:
+            config = yaml.safe_load(file)
+        
+        # Modify the global args object directly
+        for key, value in config["params"].items():
+            setattr(args, key, value)
+
+    
+
+    if args.model == 'HSAM_dGRUs':
+        setting = "{}_{}_{}_sl{}_hd{}_bt{}_lr{}_pat{}".format(
+        args.data_name,
+        args.model,
+        args.task,
+        args.seq_len,
+        args.hidden_dim,
+        args.batch_size,
+        args.learning_rate,
+        args.patience
+    )
+
+    else:
+        setting = "{}_{}_{}_sl{}_dm{}_bt{}_lr{}_pat{}".format(
+        args.data_name,
+        args.model,
+        args.task,
+        args.seq_len,
+        args.d_model,
+        args.batch_size,
+        args.learning_rate,
+        args.patience
+    )
+
+    print(setting)
+    folder_path = f"./results/{args.model}/" + setting +"/"
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    args.save_dir = folder_path
+
+    config_dict = asdict(args)
+    # Log setting
+    
+    selected_keys = ["data_name", "model", "task", "seq_len", "label_len", "pred_len", "dropout", "activation", "batch_size", "learning_rate", "epoch","d_model","d_ff","hidden_dim", "patience"]
+    
+    args.setting = ", ".join(f"{k}: {v}" for k, v in config_dict.items() if k in selected_keys)
+    
+
+
+    return args
+
