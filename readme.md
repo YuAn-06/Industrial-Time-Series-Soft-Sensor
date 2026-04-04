@@ -20,8 +20,7 @@
         <img alt="powered by Pytorch" src="https://img.shields.io/badge/PyTorch-v2.7+-E97040?logo=pytorch&logoColor=white">
     </a>
     <a href="https://www.apache.org/licenses/">
-        <img alt="Apache 2.0 License" src="https://img.shields.io/badge/License-Apache2.0-E9BB41%3Flogo%3Dopensourceinitiative%26logoColor%3Dwhite
-		">
+        <img alt="Apache License" src="https://img.shields.io/badge/License-Apache2.0-E9BB41%3Flogo%3Dopensourceinitiative%26logoColor%3Dwhite">
     </a>
 
 
