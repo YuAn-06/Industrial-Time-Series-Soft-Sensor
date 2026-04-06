@@ -1,4 +1,4 @@
-# Industrial Time-Series Soft Sensing Framework (InduTS-SL)
+# Industrial Time-Series Soft Sensing Library (InduTS-SL)
 
 
 
