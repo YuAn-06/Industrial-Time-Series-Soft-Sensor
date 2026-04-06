@@ -6,7 +6,6 @@ python -u run.py --model 'Fredformer' \
                  --data_name "MFP" \
                  --data_path 'C:\Study\Code\datasets\MFP\data\MFP_combined_data.csv' \
                  --target 'PT501' \
-                 --if_scale True \
                  --data_aug False \
                  --use_amp False \
                  --num_workers 1 \
@@ -36,11 +35,9 @@ python -u run.py --model 'Fredformer' \
                  --batch_size 64 \
                  --learning_rate 0.001 \
                  --epoch 200 \
-                 --if_adj_lr True \
                  --if_valid False \
                  --patience 10 \
                  --lradj 'cosine' \
-                 --annealing_steps 20 \
                  --inverse False \
                  --use_cuda False \
                  --device "cuda" \

@@ -7,7 +7,6 @@ params:
   data_name: "DC" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/DC/debutanizer_column.csv' # type: str, default: None, help: Path to the dataset
   target: 'y_1' # type: str, default: None, help: Target variable name
-  if_scale: True # type: bool, default: False, help: If scale the data
   data_aug: False # type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
   use_amp: False # type: bool, default: False, help: If use automatic mixed precision training
   num_workers: 1 # type: int, DataLoader the number of workers
@@ -35,11 +34,9 @@ params:
   batch_size: 128 #128
   learning_rate: 0.01 # 0.0005
   epoch: 2000
-  if_adj_lr: False
   if_valid: True
   patience: 100 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
-  annealing_steps: 20
   weight_decay: 0.5
 
 

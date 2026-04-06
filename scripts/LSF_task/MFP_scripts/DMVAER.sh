@@ -6,7 +6,6 @@ python -u run.py --model 'DMVAER' \
                  --data_name "MFP" \
                  --data_path 'C:\Study\Code\datasets\MFP\data\MFP_combined_data.csv' \
                  --target 'PT501' \
-                 --if_scale True \
                  --data_aug False \
                  --use_amp False \
                  --num_workers 1 \
@@ -37,11 +36,9 @@ python -u run.py --model 'DMVAER' \
                  --batch_size 64 \
                  --learning_rate 0.001 \
                  --epoch 300 \
-                 --if_adj_lr True \
                  --if_valid True \
                  --patience 10 \
                  --lradj 'cosine' \
-                 --annealing_steps 20 \
                  --inverse True \
                  --use_cuda True \
                  --device "cuda" \

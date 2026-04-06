@@ -11,16 +11,14 @@ def Init_parser():
     parser.add_argument('--model', type=str, default='Nystroformer',help='Model name to use')              
     parser.add_argument('--task', type=str, default='soft_sensor',help="Task type: ['short_term_forecasting', 'soft_sensor']")
     parser.add_argument('--data_path', type=str, default="",help="Dataset path")         
-    parser.add_argument('--data_name', type=str, default="PPGAS",help="Dataset name: ['MFP', 'DEB', 'SRU','PPGAS','PTA']")
+    parser.add_argument('--data_name', type=str, default="PPGAS",help="Dataset name: [ 'DEB', 'SRU']")
     parser.add_argument('--target', type=str, default="",help="Target variable name")                
-    parser.add_argument('--if_scale',  default=False,   type=bool,                 help='If scale the data')
     parser.add_argument('--data_aug',  default=False,   type=bool,help='If use data augmentation for Deb and SRU dataset')                    
     parser.add_argument('--use_amp',  default=False,   type=bool,help='If use automatic mixed precision training')                   
     parser.add_argument('--num_workers', type=int, default=1,help='DataLoader the number of workers')                   
     parser.add_argument('--if_missing',  default=False,   type=bool,help='If exists Missing Data')                  
     parser.add_argument('--missing_rate', type=float, default=0.0,help='Missing data rate [0:0.5]')                
     parser.add_argument('--use_condition_label',  default=False,   type=bool,help='If use mode variable for multi_mode dataset')
-    parser.add_argument('--scaler', type=str, default="StandardScaler",help="Scaler to use for data preprocessing, [StandardScaler, MinMaxScaler]")
     parser.add_argument('--if_data_aug',  default=False,help='If use data augmentation for Deb and SRU dataset')                    
 
     # Model Config
@@ -43,7 +41,7 @@ def Init_parser():
     parser.add_argument('--d_ff', type=int, default=1024,help='Feed forward dimension')
     parser.add_argument('--dropout', type=float, default=0.05,help='Dropout rate')
     parser.add_argument('--activation', type=str, default='gelu',help='Activation function')
-    parser.add_argument('--num_landmarks', type=int, default=10,help='Number of landmarks')
+
 
 
     # Train Config
@@ -51,11 +49,9 @@ def Init_parser():
     parser.add_argument('--batch_size', type=int, default=64,  help='Batch size for training')           
     parser.add_argument('--learning_rate', type=float, default=0.001,  help='Learning rate for optimizer')              
     parser.add_argument('--epoch', type=int, default=200, help='Number of training epochs')                
-    parser.add_argument('--if_adj_lr', type=bool, default=True,help='If adjust learning rate')
     parser.add_argument('--if_valid', type=bool, default=False,help='If use validation during training')
     parser.add_argument('--patience', type=int, default=10,help='Patience for early stopping')                  
     parser.add_argument('--lradj', type=str, default='cosine',help="Learning rate adjustment strategy: ['type1', 'type2', 'cosine']")
-    parser.add_argument('--annealing_steps', type=int, default=20,help='Annealing steps for learning rate')
     parser.add_argument('--weight_decay', type=float, default=0.0,help='L2 regularization weight')         
 
     # Test Config
@@ -69,6 +65,9 @@ def Init_parser():
     parser.add_argument('--seed', type=int, default=2021,help='Random seed')                
     parser.add_argument('--device_ids', nargs='+', type=int, default=[0],help='List of GPU device IDs')                 
     parser.add_argument('--use_multi_gpu', default=False, help='Use multiple GPUs')
+
+    # Nystromformer config
+    parser.add_argument('--num_landmarks', type=int, default=10,help='Number of landmarks')
 
     # TCVAE config
     parser.add_argument('--n_components', type=int, default=3,help='TCAVE type')
@@ -88,11 +87,12 @@ def Init_parser():
     # Save config
     parser.add_argument('--save_dir', type=str, default='logs',help='Directory to save logs and models')
 
-    # CVAESMC
+    # CVAESMC and DMVAER config
     parser.add_argument('--num_samples', type=int, default=10,help='Number of samples for CVAESMC')
-    parser.add_argument('--z_dim', type=int, default=10,help='Latent dimension for CVAESMC')
+    parser.add_argument('--z_dim', type=int, default=10,help='Latent dimension for CVAESMC and DMVAER')
     parser.add_argument('--output_type', type=str, default='mean',help='Output type for CVAESMC', choices=['mean', 'median', 'sample'])
-
+    parser.add_argument('--z_global_dim', type=int, default=16,help='Global latent dimension for DMVAER')
+    parser.add_argument('--z_local_dim', type=int, default=16,help='Local latent dimension for DMVAER')
 
     # Nonstationary Transformer
     parser.add_argument('--p_hidden_dims', type=list, default=[128, 128],help='Hidden dimensions for projection network')
@@ -100,6 +100,8 @@ def Init_parser():
 
     # EnvFormer
     parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer')
+
+
 
 
     # Setting

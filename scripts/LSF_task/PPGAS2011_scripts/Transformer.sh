@@ -6,7 +6,6 @@ python -u run.py --model 'Transformer' \
                  --data_name "PPGAS2011" \
                  --data_path './data/PPGAS/gt_2011.csv' \
                  --target 'NOX' \
-                 --if_scale True \
                  --data_aug False \
                  --use_amp False \
                  --num_workers 1 \
@@ -32,11 +31,9 @@ python -u run.py --model 'Transformer' \
                  --batch_size 64 \
                  --learning_rate 0.001 \
                  --epoch 200 \
-                 --if_adj_lr True \
                  --if_valid False \
                  --patience 10 \
                  --lradj 'cosine' \
-                 --annealing_steps 20 \
                  --inverse False \
                  --use_cuda False \
                  --device "cuda" \

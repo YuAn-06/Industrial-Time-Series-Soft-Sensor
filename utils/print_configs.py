@@ -25,7 +25,6 @@ def print_args(args, indent=4):
         'Use AMP': getattr(args, 'use_amp', None),
         'Num Workers': getattr(args, 'num_workers', None),
         'Data Dim': getattr(args, 'data_dim', None),
-        'If Scale': getattr(args, 'if_scale', None),
         'Data Aug': getattr(args, 'data_aug', None),
         'Time Encoding': getattr(args, 'timeenc', None),
     }
@@ -52,11 +51,9 @@ def print_args(args, indent=4):
         'Batch Size': getattr(args, 'batch_size', None),
         'Learning Rate': getattr(args, 'learning_rate', None),
         'Epochs': getattr(args, 'epoch', None),
-        'Adjust LR': getattr(args, 'if_adj_lr', None),
         'Validation': getattr(args, 'if_valid', None),
         'Patience': getattr(args, 'patience', None),
         'LR Adjustment': getattr(args, 'lradj', None),
-        'Annealing Steps': getattr(args, 'annealing_steps', None),
     }
     
     test_config = {

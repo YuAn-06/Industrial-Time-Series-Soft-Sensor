@@ -398,6 +398,12 @@ class Dataset_MultiMode(Dataset):
             data_x = self.df_raw[columns_with_x].values
             data_y = self.df_raw[columns_with_x + [self.target]].values
        
+        train_data_x = data_x[border1s[0]:border2s[0]]
+        train_data_y = data_y[border1s[0]:border2s[0]]
+        self.scaler_x.fit(train_data_x)
+        self.scaler_y.fit(train_data_y)
+        data_x = self.scaler_x.transform(data_x)
+        data_y = self.scaler_y.transform(data_y)
 
 
         train_data = data_x[border1s[0]:border2s[0]]

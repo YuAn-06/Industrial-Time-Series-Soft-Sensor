@@ -7,7 +7,6 @@ class ExpConfigs:
     task: str
     data_name: str
     data_path: str
-    if_scale: bool
     data_aug: bool
     target: str
     use_amp: bool
@@ -16,7 +15,6 @@ class ExpConfigs:
     missing_rate: float
     use_condition_label: bool
     if_data_aug: bool
-    scaler: str
     
     # Model Config
     enc_in: int
@@ -45,11 +43,9 @@ class ExpConfigs:
     batch_size: int 
     learning_rate: float 
     epoch: int
-    if_adj_lr: bool 
     if_valid: bool 
     patience: int 
     lradj: str 
-    annealing_steps: int
     weight_decay: float
     save_dir: str 
 
@@ -83,10 +79,12 @@ class ExpConfigs:
     # MSACNN
     reduction_ratio: float
 
-    # CVAESMC
+    # CVAESMC and DMVAER
     num_samples: int
     z_dim: int
     output_type: str
+    z_global_dim: int
+    z_local_dim: int
 
     # Nonstationary Transformer
     p_hidden_dims: list
