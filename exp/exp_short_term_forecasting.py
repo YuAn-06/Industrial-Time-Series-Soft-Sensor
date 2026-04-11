@@ -99,8 +99,6 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             if flag == 'train':
                 return outputs
             else:
-                outputs = outputs.unsqueeze(2)
-                outputs = outputs.repeat(1, 1, self.args.C_in)
                 return outputs
         else:
             if flag == 'train':
@@ -111,7 +109,6 @@ class Exp_Short_Term_Forecasting(Exp_basic):
 
     def train(self, logger):
         
-            
             
         # 检查是否启用tensorboard，优先使用args中的设置，否则默认为False
         use_tensorboard = getattr(self.args, 'use_tensorboard', False)

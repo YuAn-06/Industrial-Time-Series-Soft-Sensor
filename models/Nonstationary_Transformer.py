@@ -95,6 +95,7 @@ class Model(nn.Module):
                 norm_layer=torch.nn.LayerNorm(configs.d_model),
                 projection=nn.Linear(configs.d_model, configs.C_out, bias=True)
             )
+        
         elif self.task == 'soft_sensor':
             self.projection = nn.Linear(configs.d_model, configs.C_out, bias=True)
 

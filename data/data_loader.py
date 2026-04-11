@@ -86,6 +86,10 @@ class Dataset_Custom(Dataset):
         train_data = data_x[border1s[0]:border2s[0]]
         self.scaler.fit(train_data)
 
+        if self.flag == 'test':
+            self.scaler_y = StandardScaler()
+            self.scaler_y.fit(self.df_raw[self.target].values)
+
         data_x = self.scaler.transform(data_x)
         data_y = self.scaler.transform(data_y)
 
@@ -157,7 +161,7 @@ class Dataset_Custom(Dataset):
         return len(self.data_x) - self.args.seq_len - self.args.pred_len + 1
     
     def inverse_transform(self, data):
-        return self.scaler.inverse_transform(data)
+        return self.scaler_y.inverse_transform(data)
 
 class Dataset_Custom_4_Soft_Sensor(Dataset):
     ## Soft Sensor Forecasting Task: For single step forecasting, we only use the last point of the sequence as the target value.

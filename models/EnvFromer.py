@@ -66,8 +66,6 @@ class Model(nn.Module):
         else:
             self.decoder = nn.Linear(configs.d_model, configs.C_out, bias=True)
         
-        if self.configs.task == 'short_term_forecasting':
-            self.projection = nn.Linear(self.configs.d_model,self.configs.C_out)
         
     def short_term_forecasting(self,x_enc,x_mark_enc,x_dec,x_mark_dec):
         B, L , D = x_enc.size()
