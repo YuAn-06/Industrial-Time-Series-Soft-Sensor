@@ -88,7 +88,8 @@ class Dataset_Custom(Dataset):
 
         if self.flag == 'test':
             self.scaler_y = StandardScaler()
-            self.scaler_y.fit(self.df_raw[self.target].values)
+            train_data_y = data_y[border1s[0]:border2s[0],-self.args.C_out:]
+            self.scaler_y.fit(train_data_y)
 
         data_x = self.scaler.transform(data_x)
         data_y = self.scaler.transform(data_y)

@@ -78,7 +78,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             if flag == 'train':
                 return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
             else:
-                return batch_y[:,-self.args.pred_len:] # for inverse, not select target dimension
+                return batch_y[:,-self.args.pred_len:, -self.args.C_out:] # for inverse, not select target dimension
            
         
         
@@ -104,7 +104,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             if flag == 'train':
                 return outputs[:, -self.args.pred_len:, -self.args.C_out:]
             else:
-                return outputs[:, -self.args.pred_len:]
+                return outputs[:, -self.args.pred_len:, -self.args.C_out:]
     
 
     def train(self, logger):

@@ -28,7 +28,7 @@ from utils.configs import Parse_arguments
 
 if __name__ == '__main__':
 
-    yaml_name = "LSF_task/PPGAS2011_scripts/DMRIFormer.yaml"
+    yaml_name = "LSF_task/PPGAS2011_scripts/iTransformer.yaml"
     yaml_path = f"./scripts/{yaml_name}"
     
 
