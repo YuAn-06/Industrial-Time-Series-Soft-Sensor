@@ -5,15 +5,19 @@ import pandas as pd
 
 data = pd.read_csv('data\DC\debutanizer_column.csv')
 
-X = data.values
+X = ['NOX', 'CO']
+X = X.pop('NOX')
+print(X)
 
-X_train = X[:2000,]
+# X = data.values
 
-kmeans = KMeans(n_clusters=3, init='k-means++', max_iter=300, random_state=42)
+# X_train = X[:2000,]
 
-# 训练模型
-kmeans.fit(X_train)
-kmeans.fit_predict(X)
-labels = kmeans.labels_
+# kmeans = KMeans(n_clusters=3, init='k-means++', max_iter=300, random_state=42)
 
-np.savetxt('data/DC/mode_labels.txt', labels)
+# # 训练模型
+# kmeans.fit(X_train)
+# kmeans.fit_predict(X)
+# labels = kmeans.labels_
+
+# np.savetxt('data/DC/mode_labels.txt', labels)

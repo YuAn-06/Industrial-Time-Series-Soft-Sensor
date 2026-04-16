@@ -68,15 +68,18 @@ class Dataset_Custom(Dataset):
 
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
+        if 'PPGAS' in self.data_name:
+            del_col = 'NOX' if self.target == 'CO' else 'CO'
+        else:
+            del_col = None
+        
         if columns_with_x == []:
-            columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode"
-            ]
+            columns_with_x = [col for col in self.df_raw.columns if col != del_col and col != "date" and col!="mode"]
 
         if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
-        
+      
 
         data_x = self.df_raw[columns_with_x + [self.target]].values
         data_y = self.df_raw[columns_with_x + [self.target]].values
@@ -180,7 +183,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         
         self.data = self.df_raw.values
         
-        print(np.isnan(self.data).any())
+        # print(np.isnan(self.data).any())
         
         self.flag = flag
 
@@ -214,11 +217,16 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
+        if 'PPGAS' in self.data_name:
+            del_col = 'NOX' if self.target == 'CO' else 'CO'
+        else:
+            del_col = None
+
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
         if columns_with_x == []:
             columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode"
+                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
             ]
 
         
@@ -369,14 +377,17 @@ class Dataset_MultiMode(Dataset):
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
-        
+        if 'PPGAS' in self.data_name:
+            del_col = 'NOX' if self.target == 'CO' else 'CO'
+        else:
+            del_col = None
 
         
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
         if columns_with_x == []:
             columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode"
+                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
             ]
         
         if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:
@@ -533,9 +544,14 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
 
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
+        if 'PPGAS' in self.data_name:
+            del_col = 'NOX' if self.target == 'CO' else 'CO'
+        else:
+            del_col = None
+
         if columns_with_x == []:
             columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode"
+                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
             ]
         
         if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:

@@ -5,7 +5,7 @@ import copy
 import time
 from exp.exp_basic import Exp_basic
 from data.data_loader import Dataset
-from exp.losses import Losses
+from exp.losses import Losses, TensorboardObserver
 
 
 
@@ -30,9 +30,9 @@ class Exp_Soft_Sensor(Exp_basic):
         
         self.loss = Losses(args)
 
-        use_tensorboard = getattr(self.args, 'use_tensorboard', False)
-        if use_tensorboard:
-            self.writer = TensorboardObserver(folder_path)
+        # use_tensorboard = getattr(self.args, 'use_tensorboard', False)
+        # if use_tensorboard:
+        #     self.writer = TensorboardObserver(folder_path)
 
 
     
@@ -76,10 +76,15 @@ class Exp_Soft_Sensor(Exp_basic):
             return outputs
     
 
-    def train(self,logger):
+    def train(self, logger):
+        
         folder_path = self.args.save_dir
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
+
+        use_tensorboard = getattr(self.args, 'use_tensorboard', False)
+        if use_tensorboard:
+            self.writer = TensorboardObserver(self.args.save_dir)
         
         train_data, train_loader = self._get_data(flag='train')
         val_data, val_loader = self._get_data(flag='valid')

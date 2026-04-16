@@ -22,6 +22,9 @@ data_dict = {
     'PPGAS_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
     'PPGAS_MultiMode': Dataset_MultiMode,
     'PPGAS_MultiMode_4_Soft_Sensor': Dataset_MultiMode_4_Soft_Sensor,
+    # Ironmaking
+    'Ironmaking': Dataset_Custom,
+    'Ironmaking_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
 }   
 
 
