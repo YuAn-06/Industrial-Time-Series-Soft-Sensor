@@ -8,10 +8,10 @@ def Init_parser():
 
     parser = argparse.ArgumentParser(description='Configuration for All Models')
     # Data Configs
-    parser.add_argument('--model', type=str, default='Nystroformer',help='Model name to use')              
-    parser.add_argument('--task', type=str, default='soft_sensor',help="Task type: ['short_term_forecasting', 'soft_sensor']")
+    parser.add_argument('--model', type=str, default='ARDNN',help='Model name to use')
+    parser.add_argument('--task', type=str, default='short_term_forecasting',help="Task type: ['short_term_forecasting', 'soft_sensor']")
     parser.add_argument('--data_path', type=str, default="",help="Dataset path")         
-    parser.add_argument('--data_name', type=str, default="PPGAS",help="Dataset name: [ 'DEB', 'SRU']")
+    parser.add_argument('--data_name', type=str, default="DC",help="Dataset name: [ 'DEB', 'SRU']")
     parser.add_argument('--target', type=str, default="",help="Target variable name")                
     parser.add_argument('--data_aug',  default=False,   type=bool,help='If use data augmentation for Deb and SRU dataset')                    
     parser.add_argument('--use_amp',  default=False,   type=bool,help='If use automatic mixed precision training')                   
@@ -25,7 +25,7 @@ def Init_parser():
     parser.add_argument('--enc_in', type=int, default=16,help='Dimension of encoder Input')               
     parser.add_argument('--dec_in', type=int, default=16,help='Dimension of decoder Input')               
     parser.add_argument('--C_in', type=int, default=16,help='Dimension of Channel Input')                 
-    parser.add_argument('--C_out', type=int, default=1,help='Dimension of Channel Output')              
+    parser.add_argument('--C_out', type=int, default=4,help='Dimension of Channel Output')
     parser.add_argument('--seq_len', type=int, default=32,help='Sequence length')
     parser.add_argument('--label_len', type=int, default=10, help='Label length')                 
     parser.add_argument('--patch_len', type=int, default=8,help='Patch length')      

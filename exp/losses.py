@@ -244,7 +244,9 @@ class DMVAER_Loss(BaseLoss):
         # KL divergence c label
         log_qc = torch.log(c_pred + 1e-12)
         log_pc = torch.log(c_true + 1e-12)
-        kl_c = torch.sum(c_pred * (log_qc - log_pc), dim=-1).mean()
+        #kl_c = torch.sum(c_pred * (log_qc - log_pc), dim=-1).mean()
+        T_pred = c_pred.size(1)
+        kl_c = torch.sum(c_pred * (log_qc - log_pc[:, :T_pred, :]), dim=-1).mean()
         balance = [ 0.1, 1, 1, 1, 0.01]
         loss = recon_x_loss + recon_y_loss + kl_zt + kl_zs + kl_c
         loss = balance[0] * recon_x_loss + balance[1] * recon_y_loss + balance[2] * kl_zt + balance[3] * kl_zs + balance[4] * kl_c

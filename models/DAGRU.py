@@ -23,7 +23,7 @@ class Encoder(nn.Module):
         self.Zt = nn.Parameter(torch.randn(args.seq_len, 1))
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=1)
-    def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_dec_mark=None):
+    def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None):
         B, T, D = x_enc.shape
         x = x_enc[:, :, :-1]  # [batch_size, seq_len, C_in]
         y = x_enc[:, :, -1:]  # [batch_size, seq_len, C_out]
@@ -108,7 +108,8 @@ class Decoder_LSF(nn.Module):
         self.args = args
 
         self.decoder = nn.GRUCell(args.d_model, hidden_size=args.d_ff)
-        self.Wd = nn.Linear(args.d_ff, args.d_model, bias=False)
+        self.Wd = nn.Linear( args.d_ff, args.d_model, bias=False)
+        #self.Wd = nn.Linear(2*args.d_ff, args.d_model, bias=False)
         self.Ud = nn.Linear(args.d_model, args.d_model, bias=False)
 
         self.Vd = nn.Parameter(torch.randn(args.d_model, 1))
@@ -116,7 +117,6 @@ class Decoder_LSF(nn.Module):
 
         self.GRU_decoder = nn.GRUCell(args.d_model+args.C_out, hidden_size=args.d_ff)
         self.projection_y = nn.Linear(args.d_ff, args.C_out, bias=False)
-        
         self.projection = nn.Linear(args.d_ff + args.d_model, args.C_out)
         
     def forward(self, H, y_mark):
@@ -174,7 +174,7 @@ class Model(nn.Module):
 
         return dec_output  # [batch_size, pred_len, C_out]
 
-    def short_term_forecasting(self, x_enc, x_mark_enc=None, x_dec=None, x_dec_mark=None):
+    def short_term_forecasting(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None):
 
         enc_output, y_mark = self.encoder(x_enc, x_mark_enc)
         
@@ -184,7 +184,7 @@ class Model(nn.Module):
 
         return dec_output  # [batch_size, pred_len, C_out]
 
-    def forward(self, x_enc,x_enc_mark,x_dec,x_dec_mark, batch_y, flag='train'):
+    def forward(self, x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         """
         x:  [batch_size, seq_len, C_in]
         """
