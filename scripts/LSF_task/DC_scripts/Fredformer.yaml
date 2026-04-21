@@ -15,9 +15,9 @@ params:
   use_axliary_var: False # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
 # Model Config
-  enc_in: 10  # Dimension of encoder Input
-  dec_in: 10  # Dimension of decoder Input
-  C_in: 10  # Dimension of Channel Input
+  enc_in: 8  # Dimension of encoder Input
+  dec_in: 8  # Dimension of decoder Input
+  C_in: 8  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
   seq_len: 32 #
   patch_len: 16

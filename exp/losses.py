@@ -376,7 +376,7 @@ class HuberLoss(BaseLoss):
         return loss
     
 losses_dict = {
-    'Nystroformer': MSE_Loss,
+    'Nystromformer': MSE_Loss,
     'DAGRU': MSE_Loss,
     'DMVAER': DMVAER_Loss,
     'VRNN': VRNN_loss,

@@ -40,9 +40,9 @@ class FullAttention(nn.Module):
             return (V.contiguous(), None)
         
    
-class NystroAttention(nn.Module):
+class NystromAttention(nn.Module):
     def __init__(self, mask_flag=False, factor=5, scale=None, attention_dropout=0.1, output_attention=True, num_landmarks = 5, init_option = 'modified'):
-        super(NystroAttention, self).__init__()
+        super(NystromAttention, self).__init__()
         self.num_landmarks = num_landmarks
         self.mask_flag = mask_flag
         self.output_attention = output_attention

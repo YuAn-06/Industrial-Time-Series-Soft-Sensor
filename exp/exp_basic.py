@@ -9,7 +9,7 @@
 import os
 import torch
 from models import (
-    Nystroformer,
+    Nystromformer,
     DAGRU,
     DMVAER,
     VRNN,
@@ -37,7 +37,7 @@ class Exp_basic(object):
         self.device = self._acquire_device()
         
         self.model_dict = {
-            'Nystroformer': Nystroformer,
+            'Nystromformer': Nystromformer,
             'DAGRU': DAGRU,
             'DMVAER': DMVAER,
             'VRNN': VRNN,
