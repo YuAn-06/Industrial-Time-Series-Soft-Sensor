@@ -184,7 +184,7 @@ class Model(nn.Module):
 
         return dec_output  # [batch_size, pred_len, C_out]
 
-    def forward(self, x_enc,x_enc_mark,x_dec,x_dec_mark, batch_y, flag='train'):
+    def forward(self, x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         """
         x:  [batch_size, seq_len, C_in]
         """
