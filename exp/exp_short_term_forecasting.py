@@ -60,12 +60,12 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         elif self.args.model in ['DMVAER']: # DMVAER 
             if flag == 'train':
                 return {
-                    'y_true': batch_y[:,-self.args.pred_len:],
+                    'y_true': batch_y[:,-self.args.pred_len:,-self.args.C_out:],
                     'x_true': batch_x,
                     'c_true': batch_c
             }
             else:
-                return batch_y[:,-self.args.pred_len:]
+                return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
 
         elif self.args.model in ['CVAESMC']:
             if flag == 'train':

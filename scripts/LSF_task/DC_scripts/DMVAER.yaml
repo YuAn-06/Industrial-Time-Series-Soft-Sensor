@@ -24,24 +24,24 @@ params:
   freq: 's'
   factor: 1
   label_len: 16
-  pred_len: 2     # type: int, default: 6, help: Prediction Length, used for the future prediction feature
+  pred_len: 6     # type: int, default: 6, help: Prediction Length, used for the future prediction feature
   d_model: 32
   d_ff: 64        # type: int, fast-forward network dimension
-  z_global_dim: 16
-  z_local_dim: 16
-  z_dim: 16       # type: int, Embedding dimension of X
-  n_heads: 2
+  z_global_dim: 32
+  z_local_dim: 32
+  z_dim: 32      # type: int, Embedding dimension of X
+  n_heads: 8 
   e_layers: 1
   d_layers: 1
   dropout: 0.05
-  activation: 'relu'
+  activation: 'GELU'
   n_components: 3
 
 
 # Train Config
   batch_size: 64 #128
   learning_rate: 0.001 # 0.0005
-  epoch: 100
+  epoch: 500
   if_valid: True
   patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]

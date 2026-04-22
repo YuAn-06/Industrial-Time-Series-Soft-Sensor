@@ -20,6 +20,8 @@ from torch.utils.data import Dataset, DataLoader
 from utils.timefeatures import time_features
 from torch import nn
 
+import matplotlib.pyplot as plt
+
 preprocess_data_dict = {
     'DC': DC_preprocess,
     'SRU': SRU_preprocess
@@ -347,7 +349,7 @@ class Dataset_MultiMode(Dataset):
 
         self.df_raw = pd.read_csv(self.data_path)
         self.data = self.df_raw.values
-        
+        self.flag = flag
 
         assert flag in ['train', 'test', 'valid']
         type_map = {'train': 0, 'valid': 1, 'test': 2}
@@ -407,7 +409,7 @@ class Dataset_MultiMode(Dataset):
         
         if self.args.model not in ['DMRIFormer']:
             data_x = self.df_raw[columns_with_x + [self.target]].values
-            data_y = self.df_raw[columns_with_x + [self.target]].values.reshape(-1,1)
+            data_y = self.df_raw[columns_with_x + [self.target]].values
         
         else:
             # DMRI use process variables to predict quality variables (multi-step forecasting) without using labels
@@ -416,17 +418,18 @@ class Dataset_MultiMode(Dataset):
        
         train_data_x = data_x[border1s[0]:border2s[0]]
         train_data_y = data_y[border1s[0]:border2s[0]]
+
+        if self.flag == 'test':
+            self.scaler_only_y = StandardScaler()
+
+            self.scaler_only_y.fit(train_data_y[:,-self.args.C_out:])
+        
         self.scaler_x.fit(train_data_x)
         self.scaler_y.fit(train_data_y)
+
         data_x = self.scaler_x.transform(data_x)
         data_y = self.scaler_y.transform(data_y)
 
-
-        train_data = data_x[border1s[0]:border2s[0]]
-        train_data_y = data_y[border1s[0]:border2s[0]]
-        
-        self.scaler_x.fit(train_data)
-        self.scaler_y.fit(train_data_y)
 
         if "date" in self.df_raw.columns:
             df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
@@ -452,6 +455,7 @@ class Dataset_MultiMode(Dataset):
         
         self.data_x = data_x[border1:border2]
         self.data_y = data_y[border1:border2]
+  
         # self.data_stamp = data_stamp
 
 
@@ -501,7 +505,7 @@ class Dataset_MultiMode(Dataset):
         return len(self.data_x) - self.args.seq_len - self.args.pred_len + 1
     
     def inverse_transform(self, data):
-        return self.scaler_y.inverse_transform(data)
+        return self.scaler_only_y.inverse_transform(data)
     
 
 class Dataset_MultiMode_4_Soft_Sensor(Dataset):
@@ -587,29 +591,37 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
 
         
 
-        df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
-        df_stamp["date"] = pd.to_datetime(df_stamp.date)
-        if self.timeenc == 0:
-            df_stamp["month"] = df_stamp.date.apply(lambda row: row.month, 1)
-            df_stamp["day"] = df_stamp.date.apply(lambda row: row.day, 1)
-            df_stamp["weekday"] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-            df_stamp["hour"] = df_stamp.date.apply(lambda row: row.hour, 1)
-            data_stamp = df_stamp.drop(labels=["date"], axis=1).values
+        if "date" in self.df_raw.columns:
+            df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
+            df_stamp["date"] = pd.to_datetime(df_stamp.date)
+            if self.timeenc == 0:
+                df_stamp["month"] = df_stamp.date.apply(lambda row: row.month, 1)
+                df_stamp["day"] = df_stamp.date.apply(lambda row: row.day, 1)
+                df_stamp["weekday"] = df_stamp.date.apply(lambda row: row.weekday(), 1)
+                df_stamp["hour"] = df_stamp.date.apply(lambda row: row.hour, 1)
+                data_stamp = df_stamp.drop(labels=["date"], axis=1).values
 
-        elif self.args.timeenc == 1:
-            data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.args.freq)
-            data_stamp = data_stamp.transpose(1, 0)
+            elif self.args.timeenc == 1:
+                data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.args.freq)
+                data_stamp = data_stamp.transpose(1, 0)
+
+            self.data_stamp = data_stamp
+            self.use_stamp = True
+        
+        else:
+            self.data_stamp = torch.empty((0, 0), dtype=torch.int)
+            self.use_stamp = False
 
 
 
         
         self.data_x = data_x[border1:border2]
         self.data_y = data_y[border1:border2]
-        self.data_stamp = data_stamp
+        # self.data_stamp = data_stamp
         self.label_mode = self.label_mode[border1:border2]
-        if self.args.if_missing:
-            self.mask_label = pd.read_csv(self.args.missing_path).values
-            self.mask_label = self.mask_label[border1:border2]
+        # if self.args.if_missing:
+        #     self.mask_label = pd.read_csv(self.args.missing_path).values
+        #     self.mask_label = self.mask_label[border1:border2]
         
 
     def __getitem__(self, index):
@@ -631,6 +643,9 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
         c_enc = torch.Tensor(seq_c).long()
         
         c_enc = nn.functional.one_hot(c_enc, self.args.n_components)
+
+        dec_inp = np.zeros_like(seq_y[ -self.args.pred_len:, :])
+        dec_inp = np.concatenate([seq_y[ :self.args.label_len, :], dec_inp], axis=0)
         
         if self.use_stamp:
             seq_x_mark = self.data_stamp[s_begin:s_end]
