@@ -80,7 +80,7 @@ class Model(nn.Module):
     def soft_sensor(self, x_enc):
         x_dec = self.encoder(x_enc) # [B,P,D]
         x_dec = self.projection(x_dec) # [B,P,C_out]
-        return x_dec
+        return x_dec[:,-1,:] ###exp_soft_sensor要求二维输出
 
     
 

@@ -76,7 +76,7 @@ class Dataset_Custom(Dataset):
         if columns_with_x == []:
             columns_with_x = [col for col in self.df_raw.columns if col != del_col and col != "date" and col!="mode"]
 
-        if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:
+        if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
       
@@ -231,7 +231,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
 
         
         
-        if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:
+        if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
 
@@ -390,7 +390,7 @@ class Dataset_MultiMode(Dataset):
                 col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
             ]
         
-        if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:
+        if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
         
@@ -554,7 +554,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
                 col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
             ]
         
-        if self.data_name in ['DC', 'SRU'] and self.args.if_data_aug:
+        if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
         if 'mode' in self.df_raw.columns:
