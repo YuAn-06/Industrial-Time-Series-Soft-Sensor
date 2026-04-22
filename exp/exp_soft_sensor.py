@@ -22,6 +22,8 @@ from utils.tools import mean_interpolate_zeros
 from itertools import chain
 import warnings
 warnings.filterwarnings('ignore')
+import matplotlib
+matplotlib.use('TkAgg')
 
 class Exp_Soft_Sensor(Exp_basic):
     
@@ -104,7 +106,7 @@ class Exp_Soft_Sensor(Exp_basic):
             for i, batch in enumerate(train_loader):
 
                 batch = {k: v.to(self.device) for k, v in batch.items()}
-                
+                model_optim.zero_grad()  ##梯度清零
 
                 outputs = self.model(**batch)
 
