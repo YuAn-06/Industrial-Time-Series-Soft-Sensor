@@ -133,7 +133,7 @@ class Model(nn.Module):
         self.adaptive_pool = nn.AdaptiveAvgPool1d(1)
         # 6. 输出回归层
         self.fc = nn.Linear(self.d_model, self.output_dim)
-
+        self.lsf_fc = nn.Linear(self.d_model, config.pred_len * self.output_dim)
     def soft_sensor(self, x_enc):
         
         """
@@ -185,11 +185,7 @@ class Model(nn.Module):
         x = self.dropout(x)
 
         pred_len = self.config.pred_len  # 需确保 config 传入
-
-        if not hasattr(self, 'projection'):
-            self.projection = nn.Linear(self.d_model, pred_len * self.output_dim).to(x.device)
-
-        out = self.projection(x)
+        out = self.lsf_fc(x)
         out = out.reshape(-1, pred_len, self.output_dim)  # [B, pred_len, output_dim]
 
         return out

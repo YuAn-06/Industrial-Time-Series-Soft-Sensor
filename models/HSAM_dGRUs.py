@@ -86,7 +86,10 @@ class Model(nn.Module):
         self.norm = nn.LayerNorm(configs.d_model)  # 添加层归一化以稳定训练
         
         self.projection = nn.Linear(configs.n_heads * configs.hidden_dim, configs.C_out)
-        
+        self.lsf_projection = nn.Linear(
+            configs.n_heads * configs.hidden_dim,
+            configs.pred_len * configs.C_out
+        )
 
     def soft_sensor(self, x_enc, x_mark_enc, y_enc):
 
@@ -99,10 +102,18 @@ class Model(nn.Module):
         x_dec = torch.sigmoid(x_dec)
         return  x_dec
 
-    
     def short_term_forecasting(self, x_enc, x_mark_enc, y_enc):
 
-        return
+        x_enc_out, attn = self.encoder(x_enc, y_enc)
+
+        x_dec_out = self.decoder(x_enc_out)
+
+        dec_out = self.lsf_projection(x_dec_out)
+
+        dec_out = dec_out.reshape(dec_out.shape[0], self.configs.pred_len, self.configs.C_out)
+
+        return dec_out
+
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y, flag='train'):
 
@@ -116,15 +127,13 @@ class Model(nn.Module):
         # new_y_enc[:, 1:] = y_enc[:, :-1] # 将原 tensor 的 [:-1] 部分赋给新 tensor 的 [1:]
         # new_y_enc[:, 0] = y_enc[:, 0]
         # y_enc = new_y_enc
-        y_enc = y_enc.squeeze(-1)
-        y_enc = y_enc[:,-2:-1]
-
+        y_enc = y_enc[:, -1:, :].squeeze(-1)
         y_enc = y_enc.repeat(1, T)
 
         if self.configs.task == 'soft_sensor':
             return self.soft_sensor(x_enc, x_mark_enc, y_enc)
         elif self.configs.task == 'short_term_forecasting':
-            return self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y)
+            return self.short_term_forecasting(x_enc, x_mark_enc, y_enc)
 
         else:
             raise NameError(

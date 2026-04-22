@@ -117,17 +117,12 @@ class Model(nn.Module):
         self.encoder = Encoder(configs.C_in, configs.C_out, configs.seq_len, configs.z_dim, configs.hidden_dim, configs.activation, configs.num_samples)
         self.decoder = Decoder(configs.C_in, configs.C_out, configs.seq_len, configs.z_dim, configs.hidden_dim, configs.num_samples, configs.activation)
         self.output_type = configs.output_type
-
-        if self.configs.pred_len > 1:
-            raise ValueError('Only support pred_len = 1 for now')
     
     @torch.no_grad()
     def generate(self, dec_inp, num_samples):
 
         B,  C = dec_inp.shape
         
-
-
         z_prior = torch.randn(num_samples, B, self.z_dim, device=dec_inp.device) 
 
         mean_dec, logvar_dec = self.decoder(z_prior, dec_inp)

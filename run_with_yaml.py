@@ -28,7 +28,8 @@ from utils.configs import Parse_arguments
 
 if __name__ == '__main__':
 
-    yaml_name = "LSF_task/DC_scripts/LDCNN.yaml"
+    yaml_name = "LSF_task/DC_scripts/CVAESMC.yaml"
+    #yaml_name = "SS_task/DC_scripts/DAGRU.yaml"
     yaml_path = f"./scripts/{yaml_name}"
     
 

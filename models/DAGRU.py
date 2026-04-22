@@ -108,44 +108,16 @@ class Decoder_LSF(nn.Module):
         self.args = args
 
         self.decoder = nn.GRUCell(args.d_model, hidden_size=args.d_ff)
-        #self.Wd = nn.Linear( args.d_ff, args.d_model, bias=False)
         self.Wd = nn.Linear(2*args.d_ff, args.d_model, bias=False)
         self.Ud = nn.Linear(args.d_model, args.d_model, bias=False)
 
         self.Vd = nn.Parameter(torch.randn(args.d_model, 1))
         self.GRU_attn = nn.GRU(args.d_model, hidden_size=args.d_ff)
 
-        # self.GRU_decoder = nn.GRUCell(args.d_model+args.C_out, hidden_size=args.d_ff)
-        # self.projection_y = nn.Linear(args.d_ff, args.C_out, bias=False)
-        # self.projection = nn.Linear(args.d_ff + args.d_model, args.C_out)
         self.projection_y = nn.Linear(args.d_model + args.C_out, args.C_out, bias=False)
         self.GRU_decoder = nn.GRUCell(args.d_model + args.C_out, hidden_size=args.d_ff)
         self.projection = nn.Linear(args.d_ff + args.d_model, args.C_out)
     def forward(self, H, y_mark):
-
-        # B, T, _ = y_mark.shape # [batch_size, seq_len, C_out]
-        # zeros = torch.zeros(B, 1, self.args.C_out).to(H.device)
-        # y_mark = torch.concat((zeros, y_mark[:, 1:]), dim=1) # [batch_size, seq_len, C_out]
-        # d_t = torch.randn(B, self.args.d_ff).to(H.device)
-        # s_t = torch.randn(B, self.args.d_ff).to(H.device)
-        # d_t_list = []
-        # c_t_list = []
-        # # Layer 0
-        # for i in range(T):
-        #     L_t = torch.tanh(self.Wd(torch.concat((d_t, s_t), dim=-1)) + self.Ud(H)) @ self.Vd
-        #     beta_t = torch.softmax(L_t, dim=1)
-        #     c_t = beta_t * H
-        #     c_t = torch.sum(c_t, dim=1)
-        #     y_t = self.projection_y(torch.concat((c_t, y_mark[:,i]), dim=-1))
-        #     d_t = self.GRU_decoder(torch.concat((c_t, y_t), dim=-1))
-        #     d_t_list.append(d_t)
-        #     c_t_list.append(c_t)
-        #
-        # d_t = torch.concat(d_t_list, dim=1)
-        # c_t = torch.concat(c_t_list, dim=1)
-        # dec_out = torch.concat((d_t, c_t), dim=-1)
-        # dec_out = self.projection(dec_out)
-        # return dec_out # [batch_size, seq_len, C_out + C_in]
         B, T, _ = y_mark.shape
         zeros = torch.zeros(B, 1, self.args.C_out).to(H.device)
         y_mark = torch.cat((zeros, y_mark[:, :-1, :]), dim=1)
@@ -201,12 +173,6 @@ class Model(nn.Module):
         return dec_output  # [batch_size, pred_len, C_out]
 
     def short_term_forecasting(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None):
-
-        # enc_output, y_mark = self.encoder(x_enc, x_mark_enc)
-        #
-        # dec_output = self.decoder(enc_output, y_mark)
-        #
-        # dec_output = self.projection(dec_output)  # [batch_size, pred_len, output_dim]
 
         enc_output, y_mark = self.encoder(x_enc, x_mark_enc)
         dec_output = self.decoder(enc_output, y_mark)
