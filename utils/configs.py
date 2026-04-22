@@ -19,7 +19,7 @@ def Init_parser():
     parser.add_argument('--if_missing',  default=False,   type=bool,help='If exists Missing Data')                  
     parser.add_argument('--missing_rate', type=float, default=0.0,help='Missing data rate [0:0.5]')                
     parser.add_argument('--use_condition_label',  default=False,   type=bool,help='If use mode variable for multi_mode dataset')
-    parser.add_argument('--if_data_aug',  default=False,help='If use data augmentation for Deb and SRU dataset')                    
+    # parser.add_argument('--if_data_aug',  default=False,help='If use data augmentation for Deb and SRU dataset')                    
 
     # Model Config
     parser.add_argument('--enc_in', type=int, default=16,help='Dimension of encoder Input')               
@@ -93,6 +93,8 @@ def Init_parser():
     parser.add_argument('--output_type', type=str, default='mean',help='Output type for CVAESMC', choices=['mean', 'median', 'sample'])
     parser.add_argument('--z_global_dim', type=int, default=16,help='Global latent dimension for DMVAER')
     parser.add_argument('--z_local_dim', type=int, default=16,help='Local latent dimension for DMVAER')
+    parser.add_argument('--DMVAER_loss_weight', type=list, default=[0.1, 1, 1, 1, 0.01],help='0: x reconstruction, 1: y reconstruction, 2: KL_zt, 3: KL_zs, 4: KL_C')
+
 
     # Nonstationary Transformer
     parser.add_argument('--p_hidden_dims', type=list, default=[128, 128],help='Hidden dimensions for projection network')

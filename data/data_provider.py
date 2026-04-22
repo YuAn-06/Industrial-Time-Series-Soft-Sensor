@@ -14,6 +14,7 @@ data_dict = {
     'DC': Dataset_Custom, 
     'DC_MultiMode': Dataset_MultiMode,
     'DC_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
+    'DC_MultiMode_Soft_Sensor': Dataset_MultiMode_4_Soft_Sensor,
     # SRU
     'SRU': Dataset_Custom, 
     'SRU_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
@@ -21,7 +22,7 @@ data_dict = {
     'PPGAS': Dataset_Custom,
     'PPGAS_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
     'PPGAS_MultiMode': Dataset_MultiMode,
-    'PPGAS_MultiMode_4_Soft_Sensor': Dataset_MultiMode_4_Soft_Sensor,
+    'PPGAS_MultiMode_Soft_Sensor': Dataset_MultiMode_4_Soft_Sensor,
     # Ironmaking
     'Ironmaking': Dataset_Custom,
     'Ironmaking_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
@@ -29,21 +30,31 @@ data_dict = {
 
 
 def data_provider(args, flag):
-    if 'PPGAS' in args.data_name:
-        args.data_name = 'PPGAS'
+    data_name = args.data_name
+    if 'PPGAS' in data_name:
+        data_name = 'PPGAS'
 
-    if args.task == 'soft_sensor':
-        data_name = args.data_name + '_Soft_Sensor'
-        if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
-            data_name = data_name + '_MultiMode'
-        
-    elif args.task == 'short_term_forecasting':
-        if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
-            data_name = args.data_name + '_MultiMode'
+    if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
+        data_name = data_name + '_MultiMode'
+        if args.task == 'soft_sensor':
+            data_name = data_name + '_Soft_Sensor'
+        elif args.task == 'short_term_forecasting':
+            pass
         else:
-            data_name = args.data_name
-    else:
-        raise ValueError("Invalid task name: {}".format(args.task))
+            raise ValueError("Invalid task name: {}".format(args.task))
+
+    # if args.task == 'soft_sensor':
+    #     data_name = data_name + '_Soft_Sensor'
+    #     if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
+    #         data_name = data_name + '_MultiMode'
+        
+    # elif args.task == 'short_term_forecasting':
+    #     if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
+    #         data_name = data_name + '_MultiMode'
+    #     else:
+    #         data_name = data_name
+    # else:
+    #     raise ValueError("Invalid task name: {}".format(args.task))
 
     
     Data = data_dict[data_name]

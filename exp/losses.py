@@ -171,7 +171,7 @@ class DMVAER_Loss(BaseLoss):
         self._register_loss_list('c_kl_loss')
         self._register_loss_list('x_recon_loss')
         self._register_loss_list('y_recon_loss')
-    
+        self.balance = self.args.DMVAER_loss_weight
     @property
     def mean_zs_kl_loss(self):
         """计算z_s KL损失的平均值"""
@@ -201,13 +201,13 @@ class DMVAER_Loss(BaseLoss):
     
     def print_loss_details(self):
         """打印DMVAER模型的详细损失信息"""
-        print(f'z_s KL Loss: {self.mean_zs_kl_loss:.4f}, z_t KL Loss: {self.mean_zt_kl_loss:.4f}, c KL Loss: {self.mean_c_kl_loss:.4f}, x Recon Loss: {self.mean_x_recon_loss:.4f}, y Recon Loss: {self.mean_y_recon_loss:.4f}')
-    
+        # print(f'z_s KL Loss: {self.mean_zs_kl_loss:.4f}, z_t KL Loss: {self.mean_zt_kl_loss:.4f}, c KL Loss: {self.mean_c_kl_loss:.4f}, x Recon Loss: {self.mean_x_recon_loss:.4f}, y Recon Loss: {self.mean_y_recon_loss:.4f}')
+        print(f'x Recon Loss: {self.mean_x_recon_loss:.4f}, y Recon Loss: {self.mean_y_recon_loss:.4f}, zt KL Loss: {self.mean_zt_kl_loss:.4f}, zs KL Loss: {self.mean_zs_kl_loss:.4f}, c KL Loss: {self.mean_c_kl_loss:.4f}')
     def forward(self, preds, true, flag = 'train'):
         x_true = true['x_true']
         y_true = true['y_true']
         c_true = true['c_true']
-        
+        c_true = c_true[:,:-self.args.pred_len,:]
         x_pred = preds['x_pred']
         y_pred = preds['y_pred']
         c_pred = preds['c_pred']
@@ -216,14 +216,16 @@ class DMVAER_Loss(BaseLoss):
         zs_mu_p = preds['mu_zs']
         zs_logvar_p = preds['logvar_zs']
         
-        recon_x_loss = self.MSEloss(x_pred, x_true)
-        recon_y_loss = self.MSEloss(y_pred, y_true)
+        recon_x_loss = self.balance[0] * self.MSEloss(x_pred, x_true)
+        recon_y_loss = self.balance[1] * self.MSEloss(y_pred, y_true)
         
         # KL Divergence for z_t
         kl_zt = 0.0
         for mu,logvar in zip(mu_zt, logvar_zt):
             kl_zt += torch.sum(-0.5 * (1 + logvar - mu ** 2 - logvar.exp()), dim=1).mean()
-        
+
+        kl_zt = self.balance[2] * kl_zt
+
         # KL Divergence for z_s
         kl_zs = 0.0
         for k in range(self.args.n_components):
@@ -233,21 +235,24 @@ class DMVAER_Loss(BaseLoss):
             mu_p, logvar_p = torch.zeros_like(mu_q), torch.zeros_like(logvar_q)
 
             
-            kl = 0.5 * torch.sum( c_pred[:, :,k] * (
+            kl = 0.5 * torch.sum( c_pred[:, -1, k:k+1] * (
                     logvar_p - logvar_q +
                     (logvar_q.exp() + (mu_q - mu_p).pow(2)) / logvar_p.exp() - 1),
                     dim=-1
                 )
             kl_zs += kl.mean()
 
-   
+        kl_zs = self.balance[3] * kl_zs
+
         # KL divergence c label
         log_qc = torch.log(c_pred + 1e-12)
         log_pc = torch.log(c_true + 1e-12)
         kl_c = torch.sum(c_pred * (log_qc - log_pc), dim=-1).mean()
-        balance = [ 0.1, 1, 1, 1, 0.01]
+        kl_c = self.balance[4] * kl_c
+        # balance = [ 0.1, 1, 1, 1, 0.01]
+ 
         loss = recon_x_loss + recon_y_loss + kl_zt + kl_zs + kl_c
-        loss = balance[0] * recon_x_loss + balance[1] * recon_y_loss + balance[2] * kl_zt + balance[3] * kl_zs + balance[4] * kl_c
+
         
         if flag == 'train':
             self._append_loss('loss', loss.item())
