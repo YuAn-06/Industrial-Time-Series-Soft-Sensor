@@ -80,6 +80,8 @@ class Model(nn.Module):
         c = self.q_c(h)
         return c
     
+
+
     def encoder(self, x_enc):
         """
         Encoder for the DMVAER model
@@ -114,7 +116,7 @@ class Model(nn.Module):
             #     zs = zs_samples[k]
             #     q_c = q_c[:, :, k]
             #     zs = q_c[:, :, k:k+1] * zs_samples[k]
-        zs = sum([q_c[:,:, k] * zs_samples[k] for k in range(self.n_components)])  # weighted avg
+        zs = sum([q_c[:,-1, k:k+1] * zs_samples[k] for k in range(self.n_components)])  # weighted avg
         # zs = sum([q_c[:, k:k+1] * zs_samples[k] for k in range(self.n_components)])  # weighted avg
 
         # Dynamic z_t

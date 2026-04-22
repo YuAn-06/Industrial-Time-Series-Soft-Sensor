@@ -5,7 +5,7 @@ params:
   data_name: 'DC'
   data_path: './data/DC/debutanizer_column.csv'
   target: 'y_1'
-  data_aug: False
+  data_aug: True
   use_amp: False
   num_workers: 1
   if_missing: False

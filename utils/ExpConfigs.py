@@ -14,7 +14,7 @@ class ExpConfigs:
     if_missing: bool
     missing_rate: float
     use_condition_label: bool
-    if_data_aug: bool
+    # if_data_aug: bool
     
     # Model Config
     enc_in: int
@@ -85,6 +85,7 @@ class ExpConfigs:
     output_type: str
     z_global_dim: int
     z_local_dim: int
+    DMVAER_loss_weight: list
 
     # Nonstationary Transformer
     p_hidden_dims: list
