@@ -112,7 +112,7 @@ class Exp_Soft_Sensor(Exp_basic):
 
                 
                 trues = self._select_gt(**batch)
-                
+
                 loss = self.loss.calculate_loss(outputs, trues, flag = 'train')
                 
                 
