@@ -92,4 +92,4 @@ class Model(nn.Module):
             dec_out = self.soft_sensor(x_enc)
             return dec_out
         else: 
-            raise Exception("Invalid task name")
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')

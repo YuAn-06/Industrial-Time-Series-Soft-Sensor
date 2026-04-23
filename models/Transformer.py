@@ -15,6 +15,7 @@ class Model(nn.Module):
         self.dec_embedding = DataEmbedding(configs.dec_in, configs.d_model, configs.embed, configs.freq,
                                                configs.dropout)
         self.configs = configs
+        self.task = configs.task
         self.encoder =  Encoder(
             [
                 EncoderLayer(
@@ -80,9 +81,11 @@ class Model(nn.Module):
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
  
         # Embedding
-        if self.configs.task == 'short_term_forecasting':                                                                                                                      
+        if self.task == 'short_term_forecasting':                                                                                                                      
             return self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec)
         
-        elif self.configs.task == 'soft_sensor':
+        elif self.task == 'soft_sensor':
             return self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec)
         
+        else:
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')

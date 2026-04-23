@@ -145,4 +145,5 @@ class Model(nn.Module):
         elif self.task == 'soft_sensor':
             return self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec)
         else:
-            raise ValueError("task type not supported")
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
+

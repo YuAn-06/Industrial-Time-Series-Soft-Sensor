@@ -170,4 +170,4 @@ class Model(nn.Module):
             dec_out = self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y, flag='train')
             return dec_out  # [B, 1, D]
         else:
-            raise ValueError("Invalid task type")
+            raise ValueError(f'Invalid task type: {self.task_name}. Supporting short_term_forecasting and soft_sensor')

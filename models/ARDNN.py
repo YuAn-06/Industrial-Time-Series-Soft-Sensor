@@ -82,20 +82,20 @@ class AttentionBlock(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, config):
+    def __init__(self, configs):
         super(Model, self).__init__()
-        self.config = config
-        self.task = config.task
-        self.C_out = config.C_out
+        self.configs = configs
+        self.task = configs.task
+        self.C_out = configs.C_out
         if self.task == 'short_term_forecasting':
-            self.in_channels = config.C_in
+            self.in_channels = configs.C_in
         elif self.task == 'soft_sensor':
-            self.in_channels = config.C_in
+            self.in_channels = configs.C_in
         else:
-            self.in_channels = config.C_out + config.C_in
+            self.in_channels = configs.C_out + configs.C_in
         self.attention_block_list = nn.ModuleList(
-            [AttentionBlock(self.in_channels, config.seq_len, config.pred_len, config.d_model, config.C_out) for _ in
-             range(config.e_layers)])
+            [AttentionBlock(self.in_channels, configs.seq_len, configs.pred_len, configs.d_model, configs.C_out) for _ in
+             range(configs.e_layers)])
 
     def short_term_forecasting(self, x_enc):
 
@@ -140,5 +140,5 @@ class Model(nn.Module):
         elif self.task == 'soft_sensor':
             return self.soft_sensor(x_enc)
         else:
-            raise NameError(
-                f'Invalid task name \'{self.task} \'. Please Checkout task name')
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
+

@@ -22,6 +22,8 @@ class Model(nn.Module):
         self.C_out = configs.C_out
         self.d_model = configs.d_model
         self.configs = configs
+        self.task = configs.task
+        
 
         num_modes = configs.n_components
         # q(c | x_1:T)
@@ -193,11 +195,14 @@ class Model(nn.Module):
         return dec_out
 
     def forward(self, x_enc, x_mark_enc, c_enc, batch_y, x_dec=None, x_mark_dec=None, flag='train'):
-        if self.configs.task ==  'soft_sensor':
+        if self.task ==  'soft_sensor':
             dec_out = self.soft_sensor(x_enc, x_dec, c_enc, x_mark_enc, x_mark_dec)
-        elif self.configs.task == 'short_term_forecasting':
+            return dec_out
+        elif self.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(x_enc, x_dec, c_enc, x_mark_enc, x_mark_dec)
-        return dec_out
+            return dec_out
+        else:
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
     
 
 

@@ -20,6 +20,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.configs = configs
         # self.c_dim = configs.c_dim
+        self.task = configs.task
         try:
             self.activation = getattr(nn, self.configs.activation)()
         except:
@@ -155,15 +156,15 @@ class Model(nn.Module):
         return outputs
 
     def forward(self, x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y,flag = 'train'):
-        if self.configs.task == 'short_term_forecasting':
+        if self.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(
                 x_enc, x_mark_enc, x_dec, x_mark_dec)
 
             return dec_out
 
         else:
-            raise ValueError(
-                "Invalid task type. Please choose 'short_term_forecasting'.")
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting')
+
 
 
 def reparameterize(mean, logvar):

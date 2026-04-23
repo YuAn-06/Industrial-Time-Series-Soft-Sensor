@@ -398,6 +398,7 @@ losses_dict = {
     'LDCNN': MSE_Loss,
     'Nonstationary_Transformer': MSE_Loss,
     'DMRIFormer': MSE_Loss,
+    'Informer': MSE_Loss,
 }
 
 

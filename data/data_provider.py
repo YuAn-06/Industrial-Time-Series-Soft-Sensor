@@ -42,19 +42,15 @@ def data_provider(args, flag):
             pass
         else:
             raise ValueError("Invalid task name: {}".format(args.task))
+    else:
+        if args.task == 'soft_sensor':
+            data_name = data_name + '_Soft_Sensor'
+        elif args.task == 'short_term_forecasting':
+            pass
+        else:
+            raise ValueError("Invalid task name: {}".format(args.task))
 
-    # if args.task == 'soft_sensor':
-    #     data_name = data_name + '_Soft_Sensor'
-    #     if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
-    #         data_name = data_name + '_MultiMode'
-        
-    # elif args.task == 'short_term_forecasting':
-    #     if args.model in ['DMVAER', 'DMRIFormer'] or args.use_condition_label:
-    #         data_name = data_name + '_MultiMode'
-    #     else:
-    #         data_name = data_name
-    # else:
-    #     raise ValueError("Invalid task name: {}".format(args.task))
+
 
     
     Data = data_dict[data_name]
