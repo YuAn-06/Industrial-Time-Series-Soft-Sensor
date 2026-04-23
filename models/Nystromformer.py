@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from layers.Transformer_EncDec import Decoder, DecoderLayer, Encoder, EncoderLayer, Decoder, DecoderLayer
 from layers.SelfAttention_Family import FullAttention, AttentionLayer
-from layers.NystroAttention import NystroAttention
+from layers.NystromAttention import NystromAttention
 from layers.Embedding import DataEmbedding
 import numpy as np
 
@@ -22,7 +22,7 @@ class Model(nn.Module):
             [
                 EncoderLayer(
                     AttentionLayer(
-                        NystroAttention(False, configs.factor, attention_dropout=configs.dropout,
+                        NystromAttention(False, configs.factor, attention_dropout=configs.dropout,
                                       output_attention=False, num_landmarks=configs.num_landmarks), configs.d_model, configs.n_heads),
                     configs.d_model,
                     configs.d_ff,

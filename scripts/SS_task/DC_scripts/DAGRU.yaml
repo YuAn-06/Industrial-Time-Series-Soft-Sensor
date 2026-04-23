@@ -5,7 +5,7 @@ params:
   data_name: 'DC'
   data_path: './data/DC/debutanizer_column.csv'
   target: 'y_1'
-  data_aug: False
+  data_aug: True
   use_amp: False
   num_workers: 1
   if_missing: False
@@ -13,7 +13,7 @@ params:
   use_axliary_var: False
 
   # Model Config
-  enc_in: 7
+  enc_in: 13
   dec_in: 7
   C_in: 7
   C_out: 1
@@ -25,13 +25,13 @@ params:
   freq: 's'
   factor: 1
   n_components: 5
-  d_model: 64
-  n_heads: 4
+  d_model: 16
+  n_heads: 2
   e_layers: 1
   d_layers: 1
   d_ff: 128
   dropout: 0.05
-  activation: 'gelu'
+  activation: 'relu'
 
   # Train Config
   batch_size: 64
@@ -39,7 +39,7 @@ params:
   weight_decay: 0.0
   epoch: 300
   if_valid: True
-  patience: 10
+  patience: 20
   lradj: 'cosine'
   use_tensorboard: False
 

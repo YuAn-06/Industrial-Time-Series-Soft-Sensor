@@ -97,7 +97,7 @@ class Model(nn.Module):
     """
     def __init__(self, config):
         super(Model, self).__init__()
-        
+        self.config = config
         self.input_dim = config.C_in
         self.output_dim = config.C_out
         self.d_model = config.d_model
@@ -133,7 +133,7 @@ class Model(nn.Module):
         self.adaptive_pool = nn.AdaptiveAvgPool1d(1)
         # 6. 输出回归层
         self.fc = nn.Linear(self.d_model, self.output_dim)
-
+        self.lsf_fc = nn.Linear(self.d_model, config.pred_len * self.output_dim)
     def soft_sensor(self, x_enc):
         
         """
@@ -165,8 +165,30 @@ class Model(nn.Module):
         out = self.fc(x)        # [B, output_dim]
 
         return out
-        
 
+    def short_term_forecasting(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
+        """
+        x_enc: [batch_size, seq_len, input_dim]
+        """
+        x = self.input_proj(x_enc)
+        x = self.pos_embed(x)
+
+        x = self.temporal_attention(x)
+        x = self.dropout(x)
+
+        x = x.transpose(1, 2)
+
+        for block in self.conv_blocks:
+            x = block(x)
+
+        x = self.adaptive_pool(x).squeeze(-1)
+        x = self.dropout(x)
+
+        pred_len = self.config.pred_len  # 需确保 config 传入
+        out = self.lsf_fc(x)
+        out = out.reshape(-1, pred_len, self.output_dim)  # [B, pred_len, output_dim]
+
+        return out
 
 
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):

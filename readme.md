@@ -205,7 +205,7 @@ If you use these datasets in your paper, please remember to cite the following p
 	|──	SelfAttention_Family.py
 	|── Transformer_EncDec.py
 	|── DMRIFormer_EncDec.py
-	|── NystroAttention.py, etc
+	|── NystromAttention.py, etc
 ├── models/             # Model implementations
 │   ├── ARDNN.py
 │   ├── Autoformer.py

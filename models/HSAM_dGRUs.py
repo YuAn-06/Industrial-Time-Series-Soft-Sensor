@@ -86,7 +86,7 @@ class Model(nn.Module):
         self.norm = nn.LayerNorm(configs.d_model)  # 添加层归一化以稳定训练
         
         self.projection = nn.Linear(configs.n_heads * configs.hidden_dim, configs.C_out)
-        
+
 
     def soft_sensor(self, x_enc, x_mark_enc, y_enc):
 
@@ -99,7 +99,7 @@ class Model(nn.Module):
         x_dec = torch.sigmoid(x_dec)
         return  x_dec
 
-    
+
     def short_term_forecasting(self, x_enc, x_mark_enc, y_enc):
 
         return

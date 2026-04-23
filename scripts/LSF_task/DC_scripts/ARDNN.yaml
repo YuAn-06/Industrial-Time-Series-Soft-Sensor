@@ -18,8 +18,8 @@ params:
 # Model Config
   enc_in: 8  
   dec_in: 8  
-  C_in: 8  
-  C_out: 1  
+  C_in: 8
+  C_out: 1
   seq_len: 30 
   label_len: 30
   pred_len: 5

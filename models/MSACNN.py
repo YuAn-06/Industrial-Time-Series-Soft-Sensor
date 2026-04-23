@@ -145,13 +145,15 @@ class ChannelAttentionModule(nn.Module):
 class Model(nn.Module):
     def __init__(self, config):
         super(Model, self).__init__()
+        self.config = config
         self.task = config.task
         self.out_ch_per_channel = [5, 8, 10, 12]
         self.kernel_sizes = [3, 5, 7]
         self.multiscale_conv_list = nn.ModuleList()
         self.input_height = config.seq_len
         self.input_width = config.C_in
-        self.fc_nums= [324, 1]
+
+        self.fc_nums = [324, config.pred_len * config.C_out]
 
         current_channels = 1
         height = self.input_height
@@ -198,22 +200,24 @@ class Model(nn.Module):
 
     def short_term_forecasting(self, x_enc):
         for layer in self.multiscale_conv_list:
-            x = layer(x)
+            x_enc = layer(x_enc)
         
         # Flatten for FC layers
-        x = torch.flatten(x, 1)
+        x_enc = torch.flatten(x_enc, 1)
         
         # Pass through FC layers
         for fc_layer in self.fc_layers:
-            x = fc_layer(x)
-        
-        return x
+            x_enc = fc_layer(x_enc)
+
+        x_enc = x_enc.view(-1, self.config.pred_len, self.config.C_out)
+
+        return x_enc
         
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         x_enc = x_enc.unsqueeze(1) # [B, 1, T, D]
 
         if self.task == 'short_term_forecasting':
-            return self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec)
+            return self.short_term_forecasting(x_enc)
         elif self.task == 'soft_sensor':
             return self.soft_sensor(x_enc)
         else:

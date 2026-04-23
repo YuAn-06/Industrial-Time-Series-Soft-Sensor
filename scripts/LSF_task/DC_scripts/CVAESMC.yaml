@@ -19,10 +19,10 @@ params:
   enc_in: 8  
   dec_in: 8  
   C_in: 8  
-  C_out: 1  
+  C_out: 1
   seq_len: 5 
   label_len: 5
-  pred_len: 1
+  pred_len: 5
   e_layers: 3
   activation: 'LeakyReLU'
   num_samples: 100

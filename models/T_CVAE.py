@@ -154,7 +154,7 @@ class Model(nn.Module):
 
         return outputs
 
-    def forward(self, x_enc,x_enc_mark,x_dec,x_dec_mark, batch_y,flag = 'train'):
+    def forward(self, x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y,flag = 'train'):
         if self.configs.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(
                 x_enc, x_mark_enc, x_dec, x_mark_dec)
