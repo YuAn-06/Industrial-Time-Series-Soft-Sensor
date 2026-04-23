@@ -73,6 +73,9 @@ class ExpConfigs:
     # Autoformer
     moving_avg: int
 
+    # Informer
+    distil: bool
+
     # DLinear
     individual: bool
 

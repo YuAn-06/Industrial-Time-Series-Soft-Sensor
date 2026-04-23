@@ -38,6 +38,7 @@ class Model(nn.Module):
         except:
             raise NameError(f'Invalid activation name \'{configs.activation} \'. Please Checkout activation name')
         self.configs = configs
+        self.task = configs.task
         
         self.GRUcell_Decoder = nn.GRUCell(configs.z_embed_dim+configs.x_embed_dim, configs.d_model)
     
@@ -191,14 +192,15 @@ class Model(nn.Module):
     
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         
-        if self.configs.task == 'soft_sensor':
+        if self.task == 'soft_sensor':
             dec_out = self.soft_sensor(x_enc,x_mark_enc, x_dec, x_mark_dec)
             return dec_out
-        elif self.configs.task == 'short_term_forecasting':
+        elif self.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(x_enc,x_mark_enc, x_dec, x_mark_dec)
             return dec_out
         else:
-            raise ValueError('Invalid task name')
+            raise ValueError(f'Invalid task type: {self.task_name}. Supporting short_term_forecasting and soft_sensor')
+
         
         
 

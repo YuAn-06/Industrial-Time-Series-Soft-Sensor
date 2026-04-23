@@ -120,4 +120,5 @@ class Model(nn.Module):
             return deC_out[:, -1, :]
 
         else:
-            raise ValueError('Not implemented task name')
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
+

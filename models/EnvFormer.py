@@ -16,6 +16,7 @@ class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()
         self.configs = configs
+        self.task = configs.task
         self.enc_embedding = DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq, configs.dropout)
         self.dec_embedding = DataEmbedding_wo_pos(configs.dec_in, configs.d_model, configs.embed, configs.freq,configs.dropout)
         self.EnvD = EnvDecomp(configs.kernel_size)
@@ -103,13 +104,14 @@ class Model(nn.Module):
         
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
        
-        if self.configs.task == 'short_term_forecasting':
+        if self.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec) # [B, L/2 + Pred_len, d_model]
             
         
             return dec_out
-        elif self.configs.task == 'soft_sensor':
+        elif self.task == 'soft_sensor':
             dec_out = self.soft_sensor(x_enc, x_mark_enc)
             return dec_out
         else:
-            raise ValueError('Not implemented task, Envformer only supports short term forecasting task')
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
+

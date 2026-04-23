@@ -143,26 +143,26 @@ class ChannelAttentionModule(nn.Module):
         return output
 
 class Model(nn.Module):
-    def __init__(self, config):
+    def __init__(self, configs):
         super(Model, self).__init__()
-        self.config = config
-        self.task = config.task
+        self.configs = configs
+        self.task = configs.task
         self.out_ch_per_channel = [5, 8, 10, 12]
         self.kernel_sizes = [3, 5, 7]
         self.multiscale_conv_list = nn.ModuleList()
-        self.input_height = config.seq_len
-        self.input_width = config.C_in
+        self.input_height = configs.seq_len
+        self.input_width = configs.C_in
 
-        self.fc_nums = [324, config.pred_len * config.C_out]
+        self.fc_nums = [324, configs.pred_len * configs.C_out]
 
         current_channels = 1
         height = self.input_height
         width = self.input_width
         for i in range(len(self.out_ch_per_channel)):
 
-            self.multiscale_conv_list.append(MultiscaleConvLayer(current_channels, self.out_ch_per_channel[i], self.kernel_sizes, config.stride))
+            self.multiscale_conv_list.append(MultiscaleConvLayer(current_channels, self.out_ch_per_channel[i], self.kernel_sizes, configs.stride))
             current_channels = self.out_ch_per_channel[i] * len(self.kernel_sizes)
-            self.multiscale_conv_list.append(ChannelAttentionModule(current_channels, config.reduction_ratio))
+            self.multiscale_conv_list.append(ChannelAttentionModule(current_channels, configs.reduction_ratio))
             if i < len(self.out_ch_per_channel) - 1:
                 self.multiscale_conv_list.append(nn.MaxPool2d(kernel_size=2, stride=2))
                 height = int(height // 2)
@@ -209,7 +209,7 @@ class Model(nn.Module):
         for fc_layer in self.fc_layers:
             x_enc = fc_layer(x_enc)
 
-        x_enc = x_enc.view(-1, self.config.pred_len, self.config.C_out)
+        x_enc = x_enc.view(-1, self.configs.pred_len, self.configs.C_out)
 
         return x_enc
         
@@ -221,7 +221,8 @@ class Model(nn.Module):
         elif self.task == 'soft_sensor':
             return self.soft_sensor(x_enc)
         else:
-            raise ValueError("task type not supported")
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
+
 
 
 def check_nan(x, name):

@@ -81,6 +81,9 @@ def Init_parser():
     # DLinear
     parser.add_argument('--individual', type=bool, default=False,help='If use individual linear layer for each forecast')
 
+    # Informer
+    parser.add_argument('--distil', type=bool, default=False,help='whether to use distilling in encoder, using this argument means not using distilling')
+    
     # MSACNN
     parser.add_argument('--reduction_ratio', type=float, default=16,help='Reduction ratio for MSACNN')
 
