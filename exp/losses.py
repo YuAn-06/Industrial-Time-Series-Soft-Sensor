@@ -399,6 +399,11 @@ losses_dict = {
     'Nonstationary_Transformer': MSE_Loss,
     'DMRIFormer': MSE_Loss,
     'Informer': MSE_Loss,
+    'VALSTM': MSE_Loss,
+    'Crossformer': MSE_Loss,
+    'LSTM': MSE_Loss,
+    'TimeMixer': MSE_Loss,
+    'TimesNet': MSE_Loss,
 }
 
 
