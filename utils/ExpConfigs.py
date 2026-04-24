@@ -67,7 +67,7 @@ class ExpConfigs:
     # TCVAE
     n_components: int
 
-    # HSAM_dGRUs
+    # HSAM_dGRUs VALSTM
     hidden_dim: int
 
     # Autoformer
@@ -96,6 +96,12 @@ class ExpConfigs:
 
     # EnvFormer
     kernel_size: int
+
+    # TimesNet
+    down_sampling_window: int
+    channel_independence: bool
+    top_k: int
+    num_kernels: int
 
     # Setting
     setting: str

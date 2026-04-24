@@ -14,7 +14,7 @@ class Model(nn.Module):
                                                     configs.dropout)
 
         self.configs = configs
-
+        self.task = configs.task
         self.encoder = Encoder(
             [
                 EncoderLayer(
@@ -36,7 +36,7 @@ class Model(nn.Module):
             self.projection = nn.Linear(configs.C_in, configs.C_out, bias=True)
 
 
-    def short_term_forecasting(self, x_enc, x_dec, x_mark_enc, x_mark_dec):
+    def short_term_forecasting(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         means = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - means
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
@@ -55,7 +55,7 @@ class Model(nn.Module):
 
         return dec_out
 
-    def soft_sensor(self, x_enc, x_dec, x_mark_enc, x_mark_dec):
+    def soft_sensor(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         means = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - means
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
@@ -84,11 +84,11 @@ class Model(nn.Module):
         
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y, flag='train'):
          
-        if self.configs.task == 'short_term_forecasting':
-            dec_out = self.short_term_forecasting(x_enc, x_dec, x_mark_enc, x_mark_dec)
+        if self.task == 'short_term_forecasting':
+            dec_out = self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out
-        elif self.configs.task == 'soft_sensor':
-            dec_out = self.soft_sensor(x_enc, x_dec, x_mark_enc, x_mark_dec)
+        elif self.task == 'soft_sensor':
+            dec_out = self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out
         else:
             raise ValueError(f'Invalid task type: {self.task_name}. Supporting short_term_forecasting and soft_sensor')

@@ -72,7 +72,7 @@ def Init_parser():
     # TCVAE config
     parser.add_argument('--n_components', type=int, default=3,help='TCAVE type')
 
-    # HSAM_dGRUs CVAESMC
+    # HSAM_dGRUs CVAESMC VA-LSTM
     parser.add_argument('--hidden_dim', type=int, default=10,help='hidden dimension for each distributed GRU unit')
 
     # Autoformer
@@ -106,8 +106,12 @@ def Init_parser():
     # EnvFormer
     parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer')
 
-
-
+    # TimesNet
+    parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesNet')
+    parser.add_argument('--channel_independence', type=bool, default=False,help='if channel independence for TimesNet')
+    parser.add_argument('--top_k', type=int, default=5,help='Top k for TimesNet')
+    parser.add_argument('--num_kernels', type=int, default=5,help='Number of kernels for TimesNet')
+    
 
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')
