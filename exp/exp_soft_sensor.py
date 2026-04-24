@@ -62,7 +62,7 @@ class Exp_Soft_Sensor(Exp_basic):
                     'x_true': batch_x  
             }
             else:
-                return batch_y
+                return batch_y[:, -1, :]
         elif self.args.model in ['DMVAER']:
             if flag == 'Train':
                 return {
