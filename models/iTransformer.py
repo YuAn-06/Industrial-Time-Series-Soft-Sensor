@@ -86,10 +86,13 @@ class Model(nn.Module):
          
         if self.configs.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(x_enc, x_dec, x_mark_enc, x_mark_dec)
+            return dec_out
         elif self.configs.task == 'soft_sensor':
             dec_out = self.soft_sensor(x_enc, x_dec, x_mark_enc, x_mark_dec)
-        
-        return dec_out
-       
+            return dec_out
+        else:
+            raise ValueError(f'Invalid task type: {self.task_name}. Supporting short_term_forecasting and soft_sensor')
+
+
 
         

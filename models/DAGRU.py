@@ -14,20 +14,20 @@ Thanks to authors: Liangjun Feng, Chunhui Zhao, Youxian Sun
 
 
 class Encoder(nn.Module):
-    def __init__(self, args):
+    def __init__(self, configs):
         super(Encoder, self).__init__()
-        self.args = args
-        self.encoder = nn.GRUCell(args.enc_in, hidden_size=args.d_model)
-        self.Wt = nn.Linear(args.d_model, args.seq_len, bias=False)
-        self.Ut = nn.Linear(args.seq_len, args.seq_len, bias=False)
-        self.Zt = nn.Parameter(torch.randn(args.seq_len, 1))
+        self.configs = configs
+        self.encoder = nn.GRUCell(configs.enc_in, hidden_size=configs.d_model)
+        self.Wt = nn.Linear(configs.d_model, configs.seq_len, bias=False)
+        self.Ut = nn.Linear(configs.seq_len, configs.seq_len, bias=False)
+        self.Zt = nn.Parameter(torch.randn(configs.seq_len, 1))
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=1)
     def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None):
         B, T, D = x_enc.shape
         x = x_enc[:, :, :-1]  # [batch_size, seq_len, C_in]
         y = x_enc[:, :, -1:]  # [batch_size, seq_len, C_out]
-        ht = torch.randn(B, self.args.d_model).to(x.device)
+        ht = torch.randn(B, self.configs.d_model).to(x.device)
         H = []
         for t in range(T):
             # [batch_size,C_in,  hidden_dim]
@@ -48,27 +48,27 @@ class Encoder(nn.Module):
 
 
 class Decoder_SS(nn.Module):
-    def __init__(self, args):
+    def __init__(self, configs):
         super(Decoder_SS, self).__init__()
-        self.args = args
-        self.decoder = nn.GRUCell(args.d_model, hidden_size=args.d_ff)
-        self.Wd = nn.Linear(args.d_ff, args.d_model, bias=False)
-        self.Ud = nn.Linear(args.d_model, args.d_model, bias=False)
+        self.configs = configs
+        self.decoder = nn.GRUCell(configs.d_model, hidden_size=configs.d_ff)
+        self.Wd = nn.Linear(configs.d_ff, configs.d_model, bias=False)
+        self.Ud = nn.Linear(configs.d_model, configs.d_model, bias=False)
 
-        self.Vd = nn.Parameter(torch.randn(args.d_model, 1))
+        self.Vd = nn.Parameter(torch.randn(configs.d_model, 1))
         self.GRU_decoder_l0 = nn.GRU(
-            args.d_model, args.d_ff,  batch_first=True)
+            configs.d_model, configs.d_ff,  batch_first=True)
         self.GRU_decoder_l1 = nn.GRU(
-            args.d_model, args.d_ff,  batch_first=True)
-        self.GRU_list = [nn.GRU(args.d_model+1, args.d_ff, 1, batch_first=True)
-                         for _ in range(self.args.C_out - 1)]
+            configs.d_model, configs.d_ff,  batch_first=True)
+        self.GRU_list = [nn.GRU(configs.d_model+1, configs.d_ff, 1, batch_first=True)
+                         for _ in range(self.configs.C_out - 1)]
         
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=1)
-        self.projection = nn.Linear(args.d_ff, args.C_out)
+        self.projection = nn.Linear(configs.d_ff, configs.C_out)
     def forward(self, H, y_mark):
         B, _, _ = H.shape
-        st = torch.randn(B, self.args.d_ff).to(H.device)
+        st = torch.randn(B, self.configs.d_ff).to(H.device)
         y_pred_list = []
 
         # Layer 0
@@ -88,7 +88,7 @@ class Decoder_SS(nn.Module):
         v = torch.sum(v, dim=1)  # [batch_size, hidden_dim]
 
         # Layer 2 and so on
-        for i in range(self.args.C_out-1):
+        for i in range(self.configs.C_out-1):
             vy = torch.cat((v, y_pred), dim=-1)
             s_t, _ = self.GRU_list[i](vy.unsqueeze(1))
             y_pred = self.projection(s_t)
@@ -103,26 +103,26 @@ class Decoder_SS(nn.Module):
 
 
 class Decoder_LSF(nn.Module):
-    def __init__(self, args):
+    def __init__(self, configs):
         super(Decoder_LSF, self).__init__()
-        self.args = args
+        self.configs = configs
 
-        self.decoder = nn.GRUCell(args.d_model, hidden_size=args.d_ff)
-        self.Wd = nn.Linear(2*args.d_ff, args.d_model, bias=False)
-        self.Ud = nn.Linear(args.d_model, args.d_model, bias=False)
+        self.decoder = nn.GRUCell(configs.d_model, hidden_size=configs.d_ff)
+        self.Wd = nn.Linear(2*configs.d_ff, configs.d_model, bias=False)
+        self.Ud = nn.Linear(configs.d_model, configs.d_model, bias=False)
 
-        self.Vd = nn.Parameter(torch.randn(args.d_model, 1))
-        self.GRU_attn = nn.GRU(args.d_model, hidden_size=args.d_ff)
+        self.Vd = nn.Parameter(torch.randn(configs.d_model, 1))
+        self.GRU_attn = nn.GRU(configs.d_model, hidden_size=configs.d_ff)
 
-        self.projection_y = nn.Linear(args.d_model + args.C_out, args.C_out, bias=False)
-        self.GRU_decoder = nn.GRUCell(args.d_model + args.C_out, hidden_size=args.d_ff)
-        self.projection = nn.Linear(args.d_ff + args.d_model, args.C_out)
+        self.projection_y = nn.Linear(configs.d_model + configs.C_out, configs.C_out, bias=False)
+        self.GRU_decoder = nn.GRUCell(configs.d_model + configs.C_out, hidden_size=configs.d_ff)
+        self.projection = nn.Linear(configs.d_ff + configs.d_model, configs.C_out)
     def forward(self, H, y_mark):
         B, T, _ = y_mark.shape
-        zeros = torch.zeros(B, 1, self.args.C_out).to(H.device)
+        zeros = torch.zeros(B, 1, self.configs.C_out).to(H.device)
         y_mark = torch.cat((zeros, y_mark[:, :-1, :]), dim=1)
-        d_t = torch.randn(B, self.args.d_ff).to(H.device)
-        s_t = torch.randn(B, self.args.d_ff).to(H.device)
+        d_t = torch.randn(B, self.configs.d_ff).to(H.device)
+        s_t = torch.randn(B, self.configs.d_ff).to(H.device)
         dec_outs = []
         for i in range(T):
             attn_input = self.Wd(torch.cat((d_t, s_t), dim=-1)).unsqueeze(1)  # [B, 1, d_model]
@@ -144,20 +144,20 @@ class Decoder_LSF(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, args):
+    def __init__(self, configs):
         super(Model, self).__init__()
-        self.args = args
-
-        self.encoder = Encoder(args)
+        self.configs = configs
+        self.task = configs.task
+        self.encoder = Encoder(configs)
        
 
-        if self.args.task == 'short_term_forecasting':
-            self.decoder = Decoder_LSF(args)
+        if self.configs.task == 'short_term_forecasting':
+            self.decoder = Decoder_LSF(configs)
             self.projection = nn.Linear(
-                args.seq_len, args.pred_len )
+                configs.seq_len, configs.pred_len )
 
-        elif self.args.task == 'soft_sensor':
-            self.decoder = Decoder_SS(args)
+        elif self.configs.task == 'soft_sensor':
+            self.decoder = Decoder_SS(configs)
             
 
         else:
@@ -185,12 +185,12 @@ class Model(nn.Module):
         """
         x:  [batch_size, seq_len, C_in]
         """
-        if self.args.task == 'soft_sensor':
+        if self.task == 'soft_sensor':
             return self.soft_sensor(x_enc, x_dec, x_mark_enc, x_mark_dec)
-        elif self.args.task == 'short_term_forecasting':
+        elif self.task == 'short_term_forecasting':
             dec_out = self.short_term_forecasting(x_enc, x_dec, x_mark_enc, x_mark_dec)
-            return dec_out[:,-self.args.pred_len:]
+            return dec_out[:,-self.configs.pred_len:]
         else:
-            raise ValueError("Invalid task type. Supported tasks are 'soft_sensor' and 'short_term_forecasting'. Please check your configuration.")
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
 
 

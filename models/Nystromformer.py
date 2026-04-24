@@ -75,12 +75,13 @@ class Model(nn.Module):
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         if self.task == 'short_term_forecasting':
             enc_out = self.shor_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec) # [batch_size, seq_len, C_out]
-            
+            return enc_out
         elif self.task == 'soft_sensor':
             enc_out = self.soft_sensor(x_enc, x_mark_enc,x_dec, x_mark_dec) #[batch_size, 1, C_out]
+            return enc_out
         
-        
-        return enc_out
+        else:
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
     
     
 

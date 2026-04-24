@@ -26,13 +26,31 @@ def MSE(pred, true):
 def RMSE(pred, true):
     return np.sqrt(MSE(pred, true))
 
-def MAPE(pred, true):
-    return np.mean(np.abs((pred - true) / true))
+def MAPE(pred : np.array, true : np.array, true_mask : np.array = None):
+
+    zero_mask = ~np.isclose(true, 0, atol=1e-5)
+
+    mape = np.abs((pred - true) / (true))
+
+    mape *= zero_mask
+
+    mape = np.nan_to_num(mape)
+    
+
+    return np.mean(mape)
 
 def MSPE(pred, true):
-    return np.mean(np.square((pred - true) / true))
+
+    zero_mask = ~np.isclose(true, 0, atol=1e-5)
+
+    mspe = np.square((pred - true) / (true))
+
+    mspe *= zero_mask
+
+    return np.mean(mspe)
 
 def R2(pred, true):
+    
     return r2_score(pred, true)
 
 def metric(pred, true):
@@ -43,4 +61,3 @@ def metric(pred, true):
     mspe = MSPE(pred, true)
 
     return mae,mse,rmse,mape,mspe
-    # return mse, rmse,  r2

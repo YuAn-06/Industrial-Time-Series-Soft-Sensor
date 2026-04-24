@@ -185,7 +185,6 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         
         self.data = self.df_raw.values
         
-        # print(np.isnan(self.data).any())
         
         self.flag = flag
 

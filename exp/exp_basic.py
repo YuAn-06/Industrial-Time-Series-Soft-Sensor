@@ -28,6 +28,7 @@ from models import (
     LDCNN,
     Nonstationary_Transformer,
     DMRIFormer,
+    Informer,
 )
 
 class Exp_basic(object):
@@ -56,6 +57,7 @@ class Exp_basic(object):
             'LDCNN':LDCNN,
             'Nonstationary_Transformer': Nonstationary_Transformer,
             'DMRIFormer': DMRIFormer,
+            'Informer': Informer,
         }
     
 

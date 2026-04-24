@@ -12,57 +12,57 @@ Thanks to authors: Diju Liu, Yalin Wang, et al"""
 
 
 class Model(nn.Module):
-    def __init__(self, config):
+    def __init__(self, configs):
         super(Model, self).__init__()
-        self.config = config
-        self.task = config.task
-        self.C_in = config.C_in
-        self.C_out = config.C_out
-        self.d_model = config.d_model
+        self.configs = configs
+        self.task = configs.task
+        self.C_in = configs.C_in
+        self.C_out = configs.C_out
+        self.d_model = configs.d_model
 
-        self.enc_embedding = DataEmbedding(config.enc_in, config.d_model, config.embed, config.freq,
-                                           config.dropout)
+        self.enc_embedding = DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq,
+                                           configs.dropout)
 
         self.encoder = Encoder(
             [
                 EncoderLayer(
                     DMRIAttentionLayer(
-                        DMRIAttention(False, config.factor, attention_dropout=config.dropout,
-                                      output_attention=False), config.d_model, config.n_heads),
-                    config.d_model,
-                    config.d_ff,
-                    dropout=config.dropout,
-                    activation=config.activation
-                ) for l in range(config.e_layers)
+                        DMRIAttention(False, configs.factor, attention_dropout=configs.dropout,
+                                      output_attention=False), configs.d_model, configs.n_heads),
+                    configs.d_model,
+                    configs.d_ff,
+                    dropout=configs.dropout,
+                    activation=configs.activation
+                ) for l in range(configs.e_layers)
             ],
-            norm_layer=torch.nn.LayerNorm(config.d_model)
+            norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         
 
-        self.dec_embedding = DataEmbedding(config.dec_in, config.d_model, config.embed, config.freq,
-                                            config.dropout)
+        self.dec_embedding = DataEmbedding(configs.dec_in, configs.d_model, configs.embed, configs.freq,
+                                            configs.dropout)
 
         if self.task == 'short_term_forecasting':
             self.decoder = Decoder(
                 [
                     DecoderLayer(
                         DMRIAttentionLayer(
-                            DMRIAttention(False, config.factor, attention_dropout=config.dropout,
+                            DMRIAttention(False, configs.factor, attention_dropout=configs.dropout,
                                         output_attention=False),
-                            config.d_model, config.n_heads),
+                            configs.d_model, configs.n_heads),
                         DMRIAttentionLayer(
-                            DMRIAttention(False, config.factor, attention_dropout=config.dropout,
+                            DMRIAttention(False, configs.factor, attention_dropout=configs.dropout,
                                         output_attention=False),
-                            config.d_model, config.n_heads),
-                        config.d_model,
-                        config.d_ff,
-                        dropout=config.dropout,
-                        activation=config.activation,
+                            configs.d_model, configs.n_heads),
+                        configs.d_model,
+                        configs.d_ff,
+                        dropout=configs.dropout,
+                        activation=configs.activation,
                     )
-                    for l in range(config.d_layers)
+                    for l in range(configs.d_layers)
                 ],
-                norm_layer=torch.nn.LayerNorm(config.d_model),
-                projection=nn.Linear(config.d_model, config.C_out, bias=True)
+                norm_layer=torch.nn.LayerNorm(configs.d_model),
+                projection=nn.Linear(configs.d_model, configs.C_out, bias=True)
             )
         else:
             self.decoder = nn.Linear(self.d_model, self.C_out)
@@ -92,8 +92,8 @@ class Model(nn.Module):
     def forward(self, x_enc,x_mark_enc, c_enc, x_dec,x_mark_dec, batch_y, flag='train'):
         c_enc = torch.argmax(c_enc, dim=-1) # convert one-hot to index
 
-        c_dec = c_enc[:,self.config.seq_len-self.config.label_len:,]
-        c_enc = c_enc[:, : self.config.seq_len]
+        c_dec = c_enc[:,self.configs.seq_len-self.configs.label_len:,]
+        c_enc = c_enc[:, : self.configs.seq_len]
 
         x_dec = x_dec[:,:, :-self.C_out]
         if self.task == 'short_term_forecasting':
@@ -104,7 +104,7 @@ class Model(nn.Module):
             dec_out = self.soft_sensor(x_enc,x_mark_enc, c_enc, x_dec,x_mark_dec, batch_y, flag='train')
             return dec_out
         else:
-            raise ValueError("task is not defined")
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
 
 
         

@@ -112,6 +112,7 @@ class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()
         self.configs = configs
+        self.task = configs.task
         self.C_out = configs.C_out
         self.z_dim = configs.z_dim
         self.encoder = Encoder(configs.C_in, configs.C_out, configs.seq_len, configs.z_dim, configs.hidden_dim, configs.activation, configs.num_samples)
@@ -181,14 +182,17 @@ class Model(nn.Module):
 
 
 
-        if self.configs.task == 'soft_sensor':
+        if self.task == 'soft_sensor':
             raise ValueError('Only support short_term_forecasting task for now')
 
-        elif self.configs.task == 'short_term_forecasting':
+        elif self.task == 'short_term_forecasting':
             if flag == 'train':
                 return self.short_term_forecasting(x_enc,dec_inp)
             else:
                 with torch.no_grad():
                     return self.generate(dec_inp, self.configs.num_samples)
+
+        else:
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting')
 
 

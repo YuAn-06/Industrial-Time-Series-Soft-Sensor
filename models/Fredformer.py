@@ -16,6 +16,7 @@ class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()
         self.configs = configs
+        self.task = configs.task
         self.enc_embedding = DataEmbedding(configs.enc_in, configs.d_model, configs.embed, configs.freq, configs.dropout)
         self.dec_embedding = DataEmbedding_wo_pos(configs.dec_in, configs.d_model, configs.embed, configs.freq,configs.dropout)
         
@@ -126,8 +127,11 @@ class Model(nn.Module):
 
 
     def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
-        if self.configs.task == 'short_term_forecasting':
+        if self.task == 'short_term_forecasting':
             return self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec)
 
-        else:
+        elif self.task == 'soft_sensor':
             return self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec)[:,:,-self.configs.C_out]
+
+        else:
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')

@@ -95,23 +95,23 @@ class Model(nn.Module):
     """
     完整的 LDCNN 模型架构
     """
-    def __init__(self, config):
+    def __init__(self, configs):
         super(Model, self).__init__()
-        self.config = config
-        self.input_dim = config.C_in
-        self.output_dim = config.C_out
-        self.d_model = config.d_model
-        self.num_blocks = config.e_layers
-        self.task = config.task
+        self.configs = configs
+        self.input_dim = configs.C_in
+        self.output_dim = configs.C_out
+        self.d_model = configs.d_model
+        self.num_blocks = configs.e_layers
+        self.task = configs.task
         # 1. 输入投影层 (将输入变量映射到 d_model 维度)
         self.input_proj = nn.Linear(self.input_dim, self.d_model)
         max_len = 100
         
         # 2. 位置嵌入
-        self.pos_embed = PositionalEmbedding(max_len=max_len, d_model=config.d_model)
+        self.pos_embed = PositionalEmbedding(max_len=max_len, d_model=configs.d_model)
         
 
-        self.temporal_attention = SimplifiedTemporalAttention(config.d_model)
+        self.temporal_attention = SimplifiedTemporalAttention(configs.d_model)
         
         dilation_list = [1, 2, 4, 8]
 
@@ -127,13 +127,13 @@ class Model(nn.Module):
 
             self.conv_blocks.append(DilatedConvBlock(in_ch, out_ch, kernel_size=2, dilation=dilation, padding=padding_flag))
             
-        self.dropout = nn.Dropout(config.dropout)
+        self.dropout = nn.Dropout(configs.dropout)
         
 
         self.adaptive_pool = nn.AdaptiveAvgPool1d(1)
         # 6. 输出回归层
         self.fc = nn.Linear(self.d_model, self.output_dim)
-        self.lsf_fc = nn.Linear(self.d_model, config.pred_len * self.output_dim)
+        self.lsf_fc = nn.Linear(self.d_model, configs.pred_len * self.output_dim)
     def soft_sensor(self, x_enc):
         
         """
@@ -184,7 +184,7 @@ class Model(nn.Module):
         x = self.adaptive_pool(x).squeeze(-1)
         x = self.dropout(x)
 
-        pred_len = self.config.pred_len  # 需确保 config 传入
+        pred_len = self.configs.pred_len  # 需确保 configs 传入
         out = self.lsf_fc(x)
         out = out.reshape(-1, pred_len, self.output_dim)  # [B, pred_len, output_dim]
 

@@ -31,8 +31,8 @@ class Encoder(nn.Module):
 
             )
 
-        d_keys = self.configs.d_model // self.configs.n_heads
-        d_values =  self.configs.d_model // self.configs.n_heads
+        # d_keys = self.configs.d_model // self.configs.n_heads
+        # d_values =  self.configs.d_model // self.configs.n_heads
    
 
         self.QRSAM_List = nn.ModuleList([QualityRelatedAttention(configs) for i in range(self.configs.n_heads)])
@@ -72,6 +72,7 @@ class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()
         self.configs = configs
+        self.task = configs.task
         try:
             self.activation = getattr(nn, self.configs.activation)()
         except:
@@ -127,6 +128,6 @@ class Model(nn.Module):
             return self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y)
 
         else:
-            raise NameError(
-                f'Invalid task name \'{self.configs.task} \'. Please Checkout task name')
+            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
+
     
