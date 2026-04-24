@@ -84,7 +84,7 @@ class Model(nn.Module):
 
         enc_out = self.enc_embedding(x_enc, x_mark_enc, c_enc)
         enc_out, attn = self.encoder(enc_out, c_enc, attn_mask=None)
-        dec_out = self.decoder(dec_out)
+        dec_out = self.decoder(enc_out)
 
         return dec_out
 
