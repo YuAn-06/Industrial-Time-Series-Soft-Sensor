@@ -29,7 +29,7 @@ def Init_parser():
     parser.add_argument('--seq_len', type=int, default=32,help='Sequence length')
     parser.add_argument('--label_len', type=int, default=10, help='Label length')                 
     parser.add_argument('--patch_len', type=int, default=8,help='Patch length')      
-    parser.add_argument('--pred_len', type=int, default=6, help='Prediction Length, used for the future prediction feature')
+    parser.add_argument('--pred_len', type=int, default=6, help='Prediction Length,re')
     parser.add_argument('--stride', type=int, default=1, help='Stride')
     parser.add_argument('--embed', type=str, default='TimeF', help='Embedding type')            
     parser.add_argument('--freq', type=str, default='s', help='Time embedding frequency')
@@ -106,17 +106,33 @@ def Init_parser():
     # EnvFormer
     parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer')
 
-    # TimesNet
-    parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesNet')
+    # TimesMixer
+    parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesMixer')
     parser.add_argument('--channel_independence', type=bool, default=False,help='if channel independence for TimesNet')
     parser.add_argument('--top_k', type=int, default=5,help='Top k for TimesNet')
-    parser.add_argument('--num_kernels', type=int, default=5,help='Number of kernels for TimesNet')
+    parser.add_argument('--num_kernels', type=int, default=5,help='Number of kernels for TimesMixer')
+    parser.add_argument('--decomp_method', type=str, default='none',help='[moving_avg, dft_decomp]')
+    parser.add_argument('--down_sampling_layers', type=int, default=2,help='Number of down sampling layers for TimesMixer')
+    parser.add_argument('--use_norm', type=bool, default=False,help='If use normalization for TimesMixer')
+    parser.add_argument('--down_sampling_method', type=str, default='max_pooling',help='[max, avg, conv')
+
+    # GTFTS
+    parser.add_argument('--latent_dim', type=int, default=10,help='Latent dimension for GTFTS')
+    parser.add_argument('--n_fft', type=int, default=8,help='nfft dimension in STFT for GTFTS')
+    # SparseTSF
+    parser.add_argument('--model_type', type=str, default='linear',help='[linear, mlp]')
+    parser.add_argument('--period_len', type=int, default=10,help='Period length for SparseTSF')
     
+
+    
+
 
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')
 
- 
+
+
+
     args = ExpConfigs(**vars(parser.parse_args()))
 
     return args

@@ -100,6 +100,11 @@ class Exp_Short_Term_Forecasting(Exp_basic):
                 return outputs
             else:
                 return outputs
+        elif self.args.model in ['GTFTS']:
+            if flag == 'train':
+                return outputs
+            else:
+                return outputs['y_pred']
         else:
             if flag == 'train':
                 return outputs[:, -self.args.pred_len:, -self.args.C_out:]

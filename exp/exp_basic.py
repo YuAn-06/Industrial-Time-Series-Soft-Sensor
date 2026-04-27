@@ -34,6 +34,9 @@ from models import (
     Crossformer,
     TimeMixer,
     TimesNet,
+    GTFTS,
+    SparseTSF,
+    
 )
 
 class Exp_basic(object):
@@ -67,7 +70,9 @@ class Exp_basic(object):
             'VALSTM': VALSTM,
             'Crossformer': Crossformer,
             'TimeMixer': TimeMixer,
-            'TimesNet': TimesNet
+            'TimesNet': TimesNet,
+            'GTFTS': GTFTS,
+            'SparseTSF': SparseTSF,
         }
     
 
