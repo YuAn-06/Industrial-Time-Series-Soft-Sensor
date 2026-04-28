@@ -163,7 +163,7 @@ class Model(nn.Module):
         else:
             raise ValueError("Invalid task type. Supported tasks are 'soft_sensor' and 'short_term_forecasting'. Please check your configuration.")
 
-    def soft_sensor(self, x_enc, x_mark_enc=None, x_dec=None, x_dec_mark=None):
+    def soft_sensor(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
 
         enc_output, y_mark = self.encoder(x_enc, x_mark_enc)
         # [batch_size, seq_len, hidden_dim + x_dim]
@@ -172,7 +172,7 @@ class Model(nn.Module):
 
         return dec_output  # [batch_size, pred_len, C_out]
 
-    def short_term_forecasting(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None):
+    def short_term_forecasting(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
 
         enc_output, y_mark = self.encoder(x_enc, x_mark_enc)
         dec_output = self.decoder(enc_output, y_mark)
@@ -186,9 +186,9 @@ class Model(nn.Module):
         x:  [batch_size, seq_len, C_in]
         """
         if self.task == 'soft_sensor':
-            return self.soft_sensor(x_enc, x_dec, x_mark_enc, x_mark_dec)
+            return self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec)
         elif self.task == 'short_term_forecasting':
-            dec_out = self.short_term_forecasting(x_enc, x_dec, x_mark_enc, x_mark_dec)
+            dec_out = self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out[:,-self.configs.pred_len:]
         else:
             raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')

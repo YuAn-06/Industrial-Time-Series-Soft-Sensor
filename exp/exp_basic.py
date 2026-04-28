@@ -29,6 +29,11 @@ from models import (
     Nonstationary_Transformer,
     DMRIFormer,
     Informer,
+    VALSTM,
+    LSTM,
+    Crossformer,
+    TimeMixer,
+    TimesNet,
 )
 
 class Exp_basic(object):
@@ -58,6 +63,11 @@ class Exp_basic(object):
             'Nonstationary_Transformer': Nonstationary_Transformer,
             'DMRIFormer': DMRIFormer,
             'Informer': Informer,
+            'LSTM': LSTM,
+            'VALSTM': VALSTM,
+            'Crossformer': Crossformer,
+            'TimeMixer': TimeMixer,
+            'TimesNet': TimesNet
         }
     
 
