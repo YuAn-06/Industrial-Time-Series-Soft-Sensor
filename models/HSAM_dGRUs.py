@@ -88,6 +88,7 @@ class Model(nn.Module):
         
         self.projection = nn.Linear(configs.n_heads * configs.hidden_dim, configs.C_out)
 
+        self.lsf_projection = nn.Linear(configs.n_heads * configs.hidden_dim, configs.pred_len * configs.C_out)
 
     def soft_sensor(self, x_enc, x_mark_enc, y_enc):
 
@@ -100,34 +101,36 @@ class Model(nn.Module):
         x_dec = torch.sigmoid(x_dec)
         return  x_dec
 
+    def short_term_forecasting(self, x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y):
+        B, T, D = x_enc.shape
 
-    def short_term_forecasting(self, x_enc, x_mark_enc, y_enc):
+        y_enc_query = x_enc[:, -1, -1:].repeat(1, T)
 
-        return
+        f_list, attn = self.encoder(x_enc, y_enc_query)
+
+        x_dec = self.decoder(f_list)
+
+        x_dec = self.lsf_projection(x_dec)
+
+        #  [B, T, D]
+        B = x_enc.shape[0]
+        x_dec = x_dec.view(B, self.configs.pred_len, self.configs.C_out)
+
+        return x_dec
+
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y, flag='train'):
 
-        B, T, D = x_enc.shape
-        
-        y_enc = x_enc[:,:, -self.configs.C_out:]
-        x_enc = x_enc[:,:, :-self.configs.C_out]
+        x_features = x_enc[:, :, :self.configs.enc_in]
+        y_label = x_enc[:, :, -self.configs.C_out:]
 
-
-        # new_y_enc = torch.zeros_like(y_enc)
-        # new_y_enc[:, 1:] = y_enc[:, :-1] # 将原 tensor 的 [:-1] 部分赋给新 tensor 的 [1:]
-        # new_y_enc[:, 0] = y_enc[:, 0]
-        # y_enc = new_y_enc
-        y_enc = y_enc.squeeze(-1)
-        y_enc = y_enc[:,-2:-1]
-
-        y_enc = y_enc.repeat(1, T)
+        y_enc_query = y_label.squeeze(-1)  # [B, T]
 
         if self.configs.task == 'soft_sensor':
-            return self.soft_sensor(x_enc, x_mark_enc, y_enc)
+            y_query_single = y_enc_query[:, -1:].repeat(1, x_features.shape[1])
+            return self.soft_sensor(x_features, x_mark_enc, y_query_single)
+
         elif self.configs.task == 'short_term_forecasting':
-            return self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y)
-
+            return self.short_term_forecasting(x_features, x_mark_enc, x_dec, x_mark_dec, batch_y)
         else:
-            raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
-
-    
+             raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')
