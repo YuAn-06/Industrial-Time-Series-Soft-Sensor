@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from layers.Autoformer_EncDec import series_decomp
 from layers.Embedding import DataEmbedding_wo_pos
-from layers.Normlization import StandardNorm
+from layers.Normalization import StandardNorm
 
 
 class DFT_series_decomp(nn.Module):

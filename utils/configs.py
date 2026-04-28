@@ -103,8 +103,8 @@ def Init_parser():
     parser.add_argument('--p_hidden_dims', type=list, default=[128, 128],help='Hidden dimensions for projection network')
     parser.add_argument('--p_hidden_layers', type=int, default=2,help='Number of hidden layers for projection network')
 
-    # EnvFormer
-    parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer')
+    # EnvFormer & TCN
+    parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer & TCN')
 
     # TimesMixer
     parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesMixer')
@@ -124,8 +124,14 @@ def Init_parser():
     parser.add_argument('--period_len', type=int, default=10,help='Period length for SparseTSF')
     
 
-    
+    # TCN
+    parser.add_argument('--num_channels', type=list, default=[16, 32, 64],help='Number of channels for TCN')
 
+
+    # TimeFilter
+    parser.add_argument('--alpha', type=float, default=0.1, help='KNN for Graph Construction')
+    parser.add_argument('--top_p', type=float, default=0.5, help='Dynamic Routing in MoE')
+    parser.add_argument('--pos', type=int, choices=[0, 1], default=1, help='Positional Embedding. Set pos to 0 or 1')
 
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')

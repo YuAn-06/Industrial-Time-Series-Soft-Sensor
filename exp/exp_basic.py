@@ -36,7 +36,8 @@ from models import (
     TimesNet,
     GTFTS,
     SparseTSF,
-    
+    TCN,
+    TimeFilter
 )
 
 class Exp_basic(object):
@@ -73,6 +74,8 @@ class Exp_basic(object):
             'TimesNet': TimesNet,
             'GTFTS': GTFTS,
             'SparseTSF': SparseTSF,
+            'TCN': TCN,
+            'TimeFilter': TimeFilter
         }
     
 

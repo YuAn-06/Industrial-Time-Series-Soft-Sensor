@@ -460,6 +460,8 @@ losses_dict = {
     'TimesNet': MSE_Loss,
     'GTFTS': GTFTS_Loss,
     'SparseTSF': MSE_Loss,
+    'TCN': MSE_Loss,
+    'TimeFilter': MSE_Loss,
 }
 
 

@@ -113,6 +113,14 @@ class ExpConfigs:
     latent_dim: int
     n_fft: int
 
+    # TimeFilter
+    alpha: float
+    top_p: float
+    pos: int
+
+    # TCN
+    num_channels: list
+
     # SparseTSF
     model_type: str
     period_len: int

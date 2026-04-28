@@ -230,7 +230,5 @@ class Model(nn.Module):
         if self.task == 'short_term_forecasting':
             return self.short_term_forecasting(x_enc,batch_y, flag)
            
-        elif self.task == 'soft_sensor':
-            pass
         else:
             raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting')
