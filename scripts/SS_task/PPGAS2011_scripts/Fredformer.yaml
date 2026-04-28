@@ -26,7 +26,7 @@ params:
   freq: 's'
   factor: 1
   label_len: 16
-  pred_len: 1 # Prediction Length, used for the future prediction featu
+  pred_len: 1 # Prediction Length,
   d_model: 32
   pd_model: 32 # patch embedding dimension after encoder
   n_heads: 8

@@ -53,7 +53,7 @@ class Dataset_Custom(Dataset):
         if self.args.if_missing:
             self.scaler = ZeroMaskStandardScaler()
         else:
-            if self.args.model in ['HSAM_dGRUs','ARDNN']:
+            if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS']:
                 self.scaler = MinMaxScaler()
             else:
                 self.scaler = StandardScaler()  # 
