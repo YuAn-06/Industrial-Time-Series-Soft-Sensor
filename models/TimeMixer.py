@@ -217,7 +217,7 @@ class Model(nn.Module):
             ]
         )
 
-        if self.task == 'long_term_forecast' or self.task == 'short_term_forecast':
+        if self.task == 'long_term_forecasting' or self.task == 'short_term_forecasting':
             self.predict_layers = torch.nn.ModuleList(
                 [
                     torch.nn.Linear(
@@ -233,7 +233,7 @@ class Model(nn.Module):
                     configs.d_model, 1, bias=True)
             else:
                 self.projection_layer = nn.Linear(
-                    configs.d_model, configs.c_out, bias=True)
+                    configs.d_model, configs.C_out, bias=True)
 
                 self.out_res_layers = torch.nn.ModuleList([
                     torch.nn.Linear(
@@ -259,7 +259,7 @@ class Model(nn.Module):
                     configs.d_model, 1, bias=True)
             else:
                 self.projection_layer = nn.Linear(
-                    configs.d_model, configs.c_out, bias=True)
+                    configs.d_model, configs.C_out, bias=True)
         if self.task == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
@@ -383,7 +383,7 @@ class Model(nn.Module):
                 dec_out = self.predict_layers[i](enc_out.permute(0, 2, 1)).permute(
                     0, 2, 1)  # align temporal dimension
                 dec_out = self.projection_layer(dec_out)
-                dec_out = dec_out.reshape(B, self.configs.c_out, self.pred_len).permute(0, 2, 1).contiguous()
+                dec_out = dec_out.reshape(B, self.configs.C_out, self.pred_len).permute(0, 2, 1).contiguous()
                 dec_out_list.append(dec_out)
 
         else:

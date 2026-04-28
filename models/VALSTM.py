@@ -27,7 +27,7 @@ class Model(nn.Module):
         elif configs.task == 'short_term_forecasting':
             self.projection = nn.Sequential(
                 nn.Linear(configs.hidden_dim, configs.d_model, bias=True),
-                Permute(-1,-2),
+                Permute(0, 2, 1),
                 nn.Linear(1, configs.pred_len, bias=True))
         
 

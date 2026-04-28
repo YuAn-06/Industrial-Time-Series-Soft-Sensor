@@ -34,7 +34,13 @@ params:
   dropout: 0.05
   activation: 'gelu'
   num_landmarks: 8
-
+  down_sampling_layers: 3
+  down_sampling_window: 2
+  down_sampling_method: 'avg'
+  decomp_method: moving_avg
+  moving_avg: 25
+  top_k: 5
+  use_norm: 1
 
 # Train Config
   batch_size: 64 #128

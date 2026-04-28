@@ -20,9 +20,9 @@ class Model(nn.Module):
         else:
             self.projection = nn.Sequential(
                 nn.Linear(configs.hidden_dim, configs.C_out, bias=True),
-                Permute(-1,-2),
+                Permute(0, 2, 1),
                 nn.Linear(1, configs.pred_len, bias=True),
-                Permute(-1,-2)
+                Permute(0, 2, 1)
             )
 
     def soft_sensor(self, x_enc):

@@ -54,10 +54,11 @@ class Model(nn.Module):
 
         # permute and denorm
         y = y.permute(0, 2, 1) + seq_mean
+        return y
 
-    def forward(self, x):
+    def forward(self, x_enc, **kwargs):
         if self.task == 'short_term_forecasting':
-            return self.short_term_forecasting(x)
+            return self.short_term_forecasting(x_enc)
 
         else:
             raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting')

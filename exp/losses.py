@@ -404,6 +404,7 @@ losses_dict = {
     'LSTM': MSE_Loss,
     'TimeMixer': MSE_Loss,
     'TimesNet': MSE_Loss,
+    'SparseTSF': MSE_Loss,
 }
 
 
