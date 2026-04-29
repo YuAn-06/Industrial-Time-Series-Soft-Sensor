@@ -15,12 +15,9 @@ import argparse
 import numpy as np
 import os
 
-from exp.exp_factory import get_exp_by_model_and_task
-from utils.print_configs import print_args
-from utils.tools import *
-from utils.print_configs import print_args
-from utils.configs import Init_parser, Parse_arguments
-from utils.logger import Logger
+from exp import get_exp_by_model_and_task
+
+from utils import Parse_arguments, setup_seed, Logger,print_args
 
 if __name__ == '__main__':
 

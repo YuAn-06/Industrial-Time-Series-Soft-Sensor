@@ -37,7 +37,10 @@ from models import (
     GTFTS,
     SparseTSF,
     TCN,
-    TimeFilter
+    TimeFilter,
+    STALSTM,
+    Koopa,
+    TimeKAN,
 )
 
 class Exp_basic(object):
@@ -75,7 +78,10 @@ class Exp_basic(object):
             'GTFTS': GTFTS,
             'SparseTSF': SparseTSF,
             'TCN': TCN,
-            'TimeFilter': TimeFilter
+            'TimeFilter': TimeFilter,
+            'STALSTM': STALSTM,
+            'Koopa': Koopa,
+            'TimeKAN': TimeKAN,
         }
     
 

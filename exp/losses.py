@@ -462,6 +462,9 @@ losses_dict = {
     'SparseTSF': MSE_Loss,
     'TCN': MSE_Loss,
     'TimeFilter': MSE_Loss,
+    'STALSTM': MSE_Loss,
+    'Koopa': MSE_Loss,
+    'TimeKAN': MSE_Loss,
 }
 
 
