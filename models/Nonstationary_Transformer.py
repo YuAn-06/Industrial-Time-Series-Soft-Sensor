@@ -137,6 +137,7 @@ class Model(nn.Module):
     def soft_sensor(self, x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         x_raw = x_enc.clone().detach()
 
+        mask = torch.ones_like(x_enc)
         # Normalization
         mean_enc = torch.sum(x_enc, dim=1) / torch.sum(mask == 1, dim=1)
         mean_enc = mean_enc.unsqueeze(1).detach()

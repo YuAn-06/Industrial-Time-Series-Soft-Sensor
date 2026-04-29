@@ -2,7 +2,7 @@
 
 params:
 # Data Config
-  model: 'VRNN'
+  model: 'MSACNN'
   task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "PPGAS" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/PPGAS/gt_2011.csv' # type: str, default: None, help: Path to the dataset
@@ -14,41 +14,32 @@ params:
   missing_rate: 0 # type: float, default: 0, help: Missing data rate [0:0.5]
   use_axliary_var: False # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
+
 # Model Config
-  enc_in: 9  # type: int, default: 17
-  dec_in: 9  # Dimension of decoder Input
+  enc_in: 9  # Dimension of encoder Input
+  dec_in: 9 # Dimension of decoder Input
   C_in: 9  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
-  seq_len: 16 #
-  embed: 'TimeF'
-  freq: 's'
-  factor: 1
-  label_len: 16
-  pred_len: 1     # type: int, default: 6, help: Prediction Length, used for the future prediction feature
+  seq_len: 72 # type: int, default: 12, help: Sequence Length
   d_model: 16
-  d_ff: 32        # type: int, fast-forward network dimension
-  x_embed_dim: 16 # type: int, Embedding dimension of X
-  z_embed_dim: 16 # type: int, Embedding dimension of Z 
-  z_dim: 16       # type: int, Embedding dimension of X
-  n_heads: 8 
-  e_layers: 1
-  d_layers: 1
-  dropout: 0.05
+  stride: 1
+  pred_len: 1
+  label_len: 24
   activation: 'GELU'
-  num_landmarks: 4
+  reduction_ratio: 32 #8
 
-
-# Train Config
-  batch_size: 64 #128
-  learning_rate: 0.001 # 0.0005
-  epoch: 100
+# Train Configs
+  batch_size: 32 #128
+  learning_rate: 0.0001 # 0.0005
+  epoch: 400
   if_valid: True
-  patience: 10 # 25
+  patience: 20 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
-  use_tensorboard: False
+  weight_decay: 0.0001
+
 
 # Test Config
-  inverse: False # If the data is scaled, inverse the data to the original scale
+  inverse: True # If the data is scaled, inverse the data to the original scale
 
 # GPU config
   use_cuda: True

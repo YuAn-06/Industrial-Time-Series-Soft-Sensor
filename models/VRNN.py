@@ -173,14 +173,25 @@ class Model(nn.Module):
         return outputs
         
         
-    def soft_sensor(self, x_enc,x_mark_enc, x_dec, x_mark_dec):
-        dec_out = self.encoder(x_enc,x_mark_enc, x_dec, x_mark_dec)
-        hd = dec_out['hd'][:, -1, :] # [batch_size, d_model]
-        
-        y_pred = self.projection(hd)
+    # def soft_sensor(self, x_enc,x_mark_enc, x_dec, x_mark_dec):
+    #     dec_out = self.encoder(x_enc,x_mark_enc, x_dec, x_mark_dec)
+    #     hd = dec_out['hd'][:, -1, :] # [batch_size, d_model]
+    #
+    #     y_pred = self.projection(hd)
+    #     dec_out['y_pred'] = y_pred
+    #     return dec_out
+    def soft_sensor(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
+        dec_out = self.encoder(x_enc, x_mark_enc, x_dec, x_mark_dec)
+
+        hd = dec_out['hd']
+        B = hd.shape[0]
+
+        y_pred = self.dense_output_y(hd.reshape(B, -1))
+        y_pred = y_pred.view(B, self.configs.pred_len, self.configs.C_out)
+        y_pred = y_pred[:, -1, :]
+
         dec_out['y_pred'] = y_pred
         return dec_out
-    
     def short_term_forecasting(self, x_enc,x_mark_enc, x_dec, x_mark_dec):
         dec_out = self.encoder(x_enc,x_mark_enc, x_dec, x_mark_dec)
         hd = dec_out['hd']# [batch_size, pred_len, d_model]

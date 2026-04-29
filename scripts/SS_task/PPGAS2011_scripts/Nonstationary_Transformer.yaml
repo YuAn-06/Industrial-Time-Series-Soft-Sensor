@@ -1,11 +1,11 @@
 params:
   # Data Config
-  model: 'DAGRU'   # 如果你在 model_dict 里注册的名字不是这个，就改成你的实际名字
+  model: 'Nonstationary_Transformer'
   task: 'soft_sensor'
-  data_name: 'DC'
-  data_path: './data/DC/debutanizer_column.csv'
-  target: 'y_1'
-  data_aug: True
+  data_name: 'PPGAS'
+  data_path: './data/PPGAS/gt_2011.csv'
+  target: 'NOX'
+  data_aug: False
   use_amp: False
   num_workers: 1
   if_missing: False
@@ -13,18 +13,18 @@ params:
   use_axliary_var: False
 
   # Model Config
-  enc_in: 13
-  dec_in: 13
-  C_in: 13
+  enc_in: 9
+  dec_in: 9
+  C_in: 9
   C_out: 1
   seq_len: 16
-  label_len: 16
+  label_len: 1
   pred_len: 1
 
   embed: 'TimeF'
   freq: 's'
   factor: 1
-  n_components: 5
+
   d_model: 64
   n_heads: 4
   e_layers: 1
@@ -32,6 +32,10 @@ params:
   d_ff: 128
   dropout: 0.05
   activation: 'gelu'
+
+  # Nonstationary Transformer specific
+  p_hidden_dims: [128, 128]
+  p_hidden_layers: 2
 
   # Train Config
   batch_size: 64

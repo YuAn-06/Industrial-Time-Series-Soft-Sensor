@@ -3,10 +3,10 @@
 params:
 # Data Config
   model: 'Transformer'
-  task: 'short_term_forecasting' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
-  data_name: "MFP" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
+  task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
+  data_name: "PPGAS" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/PPGAS/gt_2011.csv' # type: str, default: None, help: Path to the dataset
-  target: 'PT501' # type: str, default: None, help: Target variable name
+  target: 'NOX' # type: str, default: None, help: Target variable name
   data_aug: False # type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
   use_amp: False # type: bool, default: False, help: If use automatic mixed precision training
   num_workers: 1 # type: int, DataLoader the number of workers
@@ -15,16 +15,16 @@ params:
   use_axliary_var: False # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
 # Model Config
-  enc_in: 17  # Dimension of encoder Input
-  dec_in: 17  # Dimension of decoder Input
-  C_in: 17  # Dimension of Channel Input
+  enc_in: 9  # Dimension of encoder Input
+  dec_in: 9  # Dimension of decoder Input
+  C_in: 9 # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
   seq_len: 16 #
   embed: 'TimeF'
   freq: 's'
   factor: 1
   label_len: 10
-  pred_len: 6 # Prediction Length,
+  pred_len: 1 # Prediction Length, used for the future prediction featu
   n_components: 5
   d_model: 64
   n_heads: 8

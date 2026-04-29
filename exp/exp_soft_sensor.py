@@ -3,15 +3,23 @@ import torch
 import numpy as np
 import copy
 import time
-from exp import Exp_basic, Losses, TensorboardObserver
-from utils import metric, adjust_learning_rate, EarlyStopping
+from exp.exp_basic import Exp_basic
+from data.data_loader import Dataset
+from exp.losses import Losses, TensorboardObserver
+
 
 
 from torch import optim, nn
-from data import data_provider
+from torch.utils.data import DataLoader
+from data.data_provider import data_provider
 from matplotlib import pyplot as plt
-
-
+from data.data_loader import *
+from utils.tools import *
+from utils.metrics import metric
+from sklearn.metrics import r2_score
+from sklearn.metrics import accuracy_score
+from utils.tools import mean_interpolate_zeros
+from itertools import chain
 import warnings
 warnings.filterwarnings('ignore')
 import matplotlib
@@ -23,6 +31,10 @@ class Exp_Soft_Sensor(Exp_basic):
         super(Exp_Soft_Sensor, self).__init__(args)
         
         self.loss = Losses(args)
+
+        # use_tensorboard = getattr(self.args, 'use_tensorboard', False)
+        # if use_tensorboard:
+        #     self.writer = TensorboardObserver(folder_path)
 
 
     
@@ -50,7 +62,7 @@ class Exp_Soft_Sensor(Exp_basic):
                     'x_true': batch_x  
             }
             else:
-                return batch_y
+                return batch_y[:, -1, :]
         elif self.args.model in ['DMVAER']:
             if flag == 'Train':
                 return {
@@ -62,7 +74,6 @@ class Exp_Soft_Sensor(Exp_basic):
                 return batch_y.squeeze(1)
         else:
             return batch_y.squeeze(1)
-            
     def _select_pred(self, outputs):
         if self.args.model in ['VRNN']:
             return outputs['y_pred']
@@ -85,7 +96,7 @@ class Exp_Soft_Sensor(Exp_basic):
         train_data, train_loader = self._get_data(flag='train')
         val_data, val_loader = self._get_data(flag='valid')
 
-        train_time = 0.0
+        time_now = time.time()
         train_steps = len(train_loader)
 
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
@@ -114,9 +125,8 @@ class Exp_Soft_Sensor(Exp_basic):
                 model_optim.step()
                 
             vali_loss = self.vali(val_data, val_loader)
-            epoch_time = time.time() - epoch_time
-            train_time += epoch_time  # Add epoch time to train_time
-            logger.info("Epoch: {} cost time: {}".format(epoch + 1, epoch_time))
+            # print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time), logger.info)
+            logger.info("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             
             # 记录验证损失和训练损失到TensorBoard
             if hasattr(self, 'writer'):
@@ -131,8 +141,8 @@ class Exp_Soft_Sensor(Exp_basic):
                 break
 
             adjust_learning_rate(model_optim, epoch + 1, self.args)
-        
-        logger.info("Training time: {:.4f}".format(train_time))
+            
+            
         best_model_path = self.args.save_dir + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
 
