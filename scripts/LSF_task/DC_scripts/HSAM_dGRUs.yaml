@@ -20,10 +20,10 @@ params:
   dec_in: 7  # Dimension of decoder Input
   C_in: 7  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
-  seq_len: 8 # type: int, default: 12, help: Sequence Length
+  seq_len: 10 # type: int, default: 12, help: Sequence Length
   pred_len: 5
   d_model: 32
-  n_heads: 4 
+  n_heads: 4
   e_layers: 1
   d_layers: 1
   activation: 'GELU'
@@ -32,7 +32,7 @@ params:
 
 # Train Configs
   batch_size: 128 #128
-  learning_rate: 0.001 # 0.0005
+  learning_rate: 0.01 # 0.0005
   epoch: 100
   if_valid: True
   patience: 30 # 25

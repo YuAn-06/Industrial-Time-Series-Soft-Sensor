@@ -38,8 +38,9 @@ params:
   d_ff: 128
   dropout: 0.05
   activation: 'gelu'
-
-
+  down_sampling_layers: 3
+  top_k: 5
+  use_norm: 1
 
 # Train Config
   batch_size: 64 #128
