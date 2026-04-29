@@ -264,7 +264,7 @@ class DMVAER_Loss(BaseLoss):
         return loss
 
 
-class TCVAE_loss(BaseLoss):
+class TCVAE_Loss(BaseLoss):
     def __init__(self, args):
         super().__init__(args)
         self.MSEloss = nn.MSELoss(reduction='mean')
@@ -307,7 +307,7 @@ class TCVAE_loss(BaseLoss):
             self._append_loss('KL_loss', KL_loss.item())
         return loss
     
-class VRNN_loss(BaseLoss):
+class VRNN_Loss(BaseLoss):
     
     def __init__(self, args):
         super().__init__(args)
@@ -364,6 +364,60 @@ class VRNN_loss(BaseLoss):
             self._append_loss('recon_loss_y', recon_y_loss.item())
             self._append_loss('KL_loss', KL_loss.item())
         return loss
+
+class GTFTS_Loss(BaseLoss):
+    
+    def __init__(self, args):
+        super().__init__(args)
+        self.MSEloss = nn.MSELoss(reduction='mean')
+        self._register_loss_list('loss')
+        self._register_loss_list('MRMC_loss_1')
+        self._register_loss_list('MRMC_loss_2')
+        self._register_loss_list('pred_loss')
+    
+
+    @property
+    def MRMC2_loss(self):
+        """计算y重建损失的平均值"""
+
+        return np.mean(self._loss_lists['MRMC_loss_2'])
+
+    
+    @property
+    def MRMC1_loss(self):
+        """计算KL散度损失的平均值"""
+        return np.mean(self._loss_lists['MRMC_loss_1'])
+    
+    @property
+    def pred_loss(self):
+        """计算KL散度损失的平均值"""
+        return np.mean(self._loss_lists['pred_loss'])
+
+    
+    def print_loss_details(self):
+        """打印VRNN模型的详细损失信息"""
+        print(f'Pred Loss: {self.pred_loss:.4f}, MRMC Loss 1: {self.MRMC1_loss:.4f}, MRMC Loss 2: {self.MRMC2_loss:.4f}')
+    
+    def forward(self, preds, trues, trues_rec=None, flag = 'train'):
+        y_pred = preds['y_pred']
+
+        y_true = trues
+        
+       
+        
+        pred_loss = self.MSEloss(y_pred, y_true)
+        
+        MRMC_loss_1 = preds['L1']
+        MRMC_loss_2 = 0.001 * preds['L2']
+        
+        loss = pred_loss + MRMC_loss_1 +  MRMC_loss_2
+        
+        if flag == 'train':
+            self._append_loss('loss', loss.item())
+            self._append_loss('MRMC_loss_1', MRMC_loss_1.item())
+            self._append_loss('MRMC_loss_2', MRMC_loss_2.item())
+            self._append_loss('pred_loss', pred_loss.item())
+        return loss
     
 
 
@@ -382,8 +436,8 @@ losses_dict = {
     'Nystroformer': MSE_Loss,
     'DAGRU': MSE_Loss,
     'DMVAER': DMVAER_Loss,
-    'VRNN': VRNN_loss,
-    'TCVAE': TCVAE_loss,
+    'VRNN': VRNN_Loss,
+    'TCVAE': TCVAE_Loss,
     'iTransformer': MSE_Loss,
     'Transformer': MSE_Loss,
     'EnvFormer': MSE_Loss,
@@ -404,7 +458,13 @@ losses_dict = {
     'LSTM': MSE_Loss,
     'TimeMixer': MSE_Loss,
     'TimesNet': MSE_Loss,
+    'GTFTS': GTFTS_Loss,
     'SparseTSF': MSE_Loss,
+    'TCN': MSE_Loss,
+    'TimeFilter': MSE_Loss,
+    'STALSTM': MSE_Loss,
+    'Koopa': MSE_Loss,
+    'TimeKAN': MSE_Loss,
 }
 
 

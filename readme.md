@@ -61,16 +61,22 @@ Due to the increasingly large scale of modern process industries, it has become 
 
 Unlike mathematical and mechanistic models, data-driven models utilize process and quality data sampled from industrial processes to construct a black-box model for modeling industrial objects.
 
+First, we give some definitions of variables:
+- **Process Variables ($u_t$):** Denoted as $u_t \in \mathbb{R}^{N_x}$, where $N_x$ is the number of process variables. These represent high-frequency measurements from industrial sensors (e.g., temperature, pressure, flow rate).
+- **Quality Variables ($y_t$):** Denoted as $y_t \in \mathbb{R}^{N_y}$, where $N_y$ is the number of quality indicators. These represent key product properties (e.g., concentration, purity) that are often difficult, costly, or time-delayed to measure.
+- **Mode Labels ($m_t$):** Denoted as $m_t \in \{1, \dots, K\}$, where $K$ is the number of operating modes. These labels characterize different industrial regimes, such as steady-state, transitions, or fault conditions.
+
 
 
 Specifically, based on currently published articles on soft sensor modeling, we define the task as follows:
 
-1. **Classical Definition:** Given a length-$T$ sequence $X =[X_1,X_2,...,X_T] \in \mathbb{R}^{T\times C_x}$ including $C_x$ easily measurable process variables, the goal is to build a model that predicts the quality variables  $Y_{T} \in \mathbb{R}^{C_y}$ at time T.
-2. **Another Definition:** Given a length-$T$ sequence ${X} =[(X_1,Y_1), (X_2,Y2)...,(X_T,Y_T) ] \in \mathbb{R}^{T\times (C_x+C_y)}$ including $C_x$ easy-measure process variables and $C_y$ quality variables, the goal is to build a model that forecasts the future quality trajectory $Y=[Y_{T+1},Y_{T+2},...,Y_{T+H}]$ over a prediction horizon of $H$ steps.
+1. **Soft Sensor Regression:** Given a historical sequence of process variables of length $T$, denoted as $\mathbf{X}_R = \{\mathbf{u}_t\}_{t=1}^T \in \mathbb{R}^{T \times N_x}$, the objective is to learn a mapping to infer the **synchronous** quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$ at the current time step $T$.
+2. **Soft Sensor Forecasting:** Given a historical sequence of length $T$ containing both process and quality variables, denoted as $\mathbf{X}_F = \{(\mathbf{u}_t, \mathbf{y}_t)\}_{t=1}^T \in \mathbb{R}^{T \times (N_x + N_y)}$, the objective is to learn a mapping $f$ that forecasts the future quality variables $\hat{\mathbf{Y}} = \{\hat{\mathbf{y}}_{t}\}_{t=T+1}^{T+H} \in \mathbb{R}^{H \times N_y}$ over a look-ahead horizon $H$.
+3. **Soft Sensor Sequential Estimation:** Given a historical sequence consisting of process variables up to time $T$ and past quality variables up to $T-1$, denoted as $\mathbf{X}_S = \{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\}$, the objective is to learn a mapping $f$ to estimate the **current** quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$.
 
 
 
-The first formulation aligns closely with the classical definition of soft sensing: it aims to estimate the current value of one or more quality variables $Y_T$ using only the contemporaneous (or historical) measurements of easily accessible process variables $X$. This setting is typical in real-time monitoring scenarios where physical analyzers are unavailable or too slow, and an instantaneous prediction is required for process control or decision-making.
+The first formulation aligns closely with the classical definition of soft sensing: it aims to estimate the current value of one or more quality variables $Y$ using only the contemporaneous (or historical) measurements of easily accessible process variables $\bm{U}$. This setting is typical in real-time monitoring scenarios where physical analyzers are unavailable or too slow, and an instantaneous prediction is required for process control or decision-making.
 
 The second formulation extends this idea to multi-step-ahead forecasting. It assumes that both process variables and quality variables have been jointly observed over a historical window $[1, T]$, and leverages this combined sequence to predict a future trajectory of quality variables $Y = [Y_{T+1}, Y_{T+2}, \ldots, Y_{T+H}]$ over a horizon of H steps. This setup is particularly relevant when the underlying industrial process operates near steady state, where quality measurements—though not continuously available in practice—are assumed to evolve smoothly and can be sampled at regular intervals in the training data. Such a formulation supports applications like predictive quality control, early fault warning, and planning under uncertainty.
 
@@ -103,32 +109,50 @@ The second formulation extends this idea to multi-step-ahead forecasting. It ass
 
 ## ✨ Available Models for Soft Sensors
 
-We have assigned two abbreviated labels to the two definitions mentioned above, to better indicate which definition each available model is specifically designed to serve, Definition (1) : classical soft sensor (C), Definition: (2) long-short-term forecasting (LSF).
+**We would like to thank the original authors for their pioneering research. Please note that several models in this library are independent reimplementations. Due to differences in deep learning frameworks and environments (e.g., migrating from Matlab or TensorFlow), performance may vary slightly from the originally reported results. We kindly ask users to cite the relevant articles. If you have any questions or suggestions, please feel free to contact us.**
 
 
 
-| Models                                                       | Journal/Conference | Type (LSF) | Type (C) | Remark                                            | Status                                                       |
-| ------------------------------------------------------------ | ------------------ | ---------- | -------- | ------------------------------------------------- | ------------------------------------------------------------ |
-| [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al) | ICLR 2024          | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al)     | ICLR 2023          | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al)  | KDD 2024           | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu, etal) | NeurlPS2022        | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al)    | ICLR 2021          | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al)     | AAAI 2023          | ✅          |          | A MLP-based time-series foundation model          |                                                              |
-| [Nystroformer](https://arxiv.org/abs/2102.03902) (Xiong et al) | AAAI 2021          | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al) | IJCAI 2019         | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al) | NIPS 2017          | ✅          |          | A Transformer-based time-series foundation model  |                                                              |
-| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al) | IEEE TC 2026       | ✅          |          | A CNN-based time-series soft sensor model         | The model debugging is not yet complete.                     |
-| [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al)       | NIPS 2015          | ✅          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al) | IEEE Sensor J 2025 | ✅          |          | A MLP-based time-series soft sensor model         |                                                              |
-| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al) | IEEE TIM 2024      | ✅          |          | A Transformer-based time-series soft sensor model |                                                              |
-| [MSACNN ](https://ieeexplore.ieee.org/document/10465636) (Yuan et al) | IEEE TC 2024       |            | ✅        | A CNN-based time-series soft sensor model         | The model debugging is not yet complete.                     |
-| [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al) | IEEE TASE 2024     |            | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al) | IEEE TII 2023      | ✅          |          | A VAE-based time series soft sensor model         | SMC sampling for multi-step prediction is not yet available. |
-| [DMRIFormer](10.1109/TII.2022.3227731) (Liu et al)           | IEEE TII 2022      | ✅          | ✅        | A Transformer-based time-series soft sensor model |                                                              |
-| [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al) | IEEE TII 2022      |            | ✅        | A DVAE-based time-series soft sensor model        |                                                              |
+We have assigned two abbreviated labels to the two definitions mentioned above, to better indicate which definition each available model is specifically designed to serve, Definition (1) Soft Sensor Regression (R), Definition (2):  Soft Sensor Forecasting (F). Additionally, some models have been modified to perform two tasks simultaneously; please check the `Models`  for details.
 
-If you use these models, please cite the relevant articles.
+
+
+| Models                                                       | Journal/Conference | Type (F) | Type (R) | Remark                                            | Status                                                       |
+| ------------------------------------------------------------ | ------------------ | -------- | -------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al) | IEEE TPAMI 2026    | ✅        |          | A MLP-based time-series foundation model          |                                                              |
+| [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al)    | ICLR 2025          | ✅        | ✅        | A KAN-based time-series foundation model          |                                                              |
+| [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al)    | ICML 2025          | ✅        | ✅        | A GNN-based time-series foundation model          |                                                              |
+| [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al) | ICLR 2024          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al) | AAAI 2024          | ✅        | ✅        | A GNN-based time-series foundation model          |                                                              |
+| [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al) | ICLR 2024          | ✅        | ✅        | A MLP-based time-series foundation model          |                                                              |
+| [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al)  | KDD 2024           | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al) | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al) | ICLR 2023          | ✅        | ✅        | A TCN-based time-series foundation model          |                                                              |
+| [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al)     | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al)     | AAAI 2023          | ✅        | ✅        | A MLP-based time-series foundation model          |                                                              |
+| [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al)        | NeurlPS 2023       | ✅        |          |                                                   |                                                              |
+| [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu, etal) | NeurlPS 2022       | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al)    | ICLR 2021          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [Nystroformer](https://arxiv.org/abs/2102.03902) (Xiong et al) | AAAI 2021          | ✅        |          | A Transformer-based time-series foundation model  |                                                              |
+| [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al) | IJCAI 2019         | ✅        |          | A Transformer-based time-series foundation model  |                                                              |
+| [TCN](https://arxiv.org/abs/1803.01271) (Bai et al)          | arXiv 2018         | ✅        | ✅        |                                                   |                                                              |
+| [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al) | NIPS 2017          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
+| [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al)       | NIPS 2015          | ✅        | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+| [LSTM ](https://ieeexplore.ieee.org/abstract/document/6795963) (Sepp Hochreiter) | NC 1997            | ✅        | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al) | IEEE TC 2026       |          | ✅        | A CNN-based time-series soft sensor model         | The model debugging is not yet complete.                     |
+| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al) | IEEE TC 2026       | ✅        |          | A GNN-based time-series soft sensor model         |                                                              |
+| [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al) | IEEE Sensor J 2025 | ✅        |          | A MLP-based time-series soft sensor model         |                                                              |
+| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al) | IEEE TIM 2024      | ✅        |          | A Transformer-based time-series soft sensor model |                                                              |
+| [MSACNN ](https://ieeexplore.ieee.org/document/10465636) (Yuan et al) | IEEE TC 2024       |          | ✅        | A CNN-based time-series soft sensor model         | The model debugging is not yet complete.                     |
+| [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al) | IEEE TASE 2024     |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al) | IEEE TII 2023      | ✅        |          | A VAE-based time series soft sensor model         | SMC sampling for multi-step prediction is not yet available. |
+| [DMRIFormer](10.1109/TII.2022.3227731) (Liu et al)           | IEEE TII 2022      | ✅        |          | A Transformer-based time-series soft sensor model |                                                              |
+| [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al) | IEEE TII 2022      |          | ✅        | A DVAE-based time-series soft sensor model        |                                                              |
+| [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (yuan et al) | IEEE TII 2021      |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+| [DAGRU](https://www.bing.com/ck/a?!&&p=d38b94cc62cf6a6ce44ac9bfbe5faf9b931f122ce2afd1f02f626697340fe8faJmltdHM9MTc3NzA3NTIwMA&ptn=3&ver=2&hsh=4&fclid=30f06e45-5093-6f12-3215-786c519b6e75&u=a1aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkxNzQ3Njc) (Feng et al) | IEEE TNNLS 2020    |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+| [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan, et al) | CJCE 2019          |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+
+
 
 
 
@@ -140,7 +164,7 @@ We have provided two classic benchmarks, including **debutanizer column  (DC)** 
 
 ###  🏭 Debutanizer Column  (DC)
 
-The **Debutanizer Column ** is a critical unit in the desulfurization and naphtha splitter plant within petroleum refining processes. Its primary function is to remove propane and butane as overhead products from the naphtha stream. Since the butane content in the debutanizer bottom must be minimized—and direct measurement of this concentration is challenging—an accurate soft sensor for bottom butane concentration is highly valuable for enhancing process control performance.
+The **Debutanizer Column** is a critical unit in the desulfurization and naphtha splitter plant within petroleum refining processes. Its primary function is to remove propane and butane as overhead products from the naphtha stream. Since the butane content in the debutanizer bottom must be minimized—and direct measurement of this concentration is challenging—an accurate soft sensor for bottom butane concentration is highly valuable for enhancing process control performance.
 
 
 

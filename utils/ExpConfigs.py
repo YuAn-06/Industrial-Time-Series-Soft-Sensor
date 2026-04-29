@@ -67,10 +67,10 @@ class ExpConfigs:
     # TCVAE
     n_components: int
 
-    # HSAM_dGRUs VALSTM
+    # HSAM_dGRUs & VALSTM
     hidden_dim: int
 
-    # Autoformer
+    # Autoformer & TimesNet
     moving_avg: int
 
     # Informer
@@ -102,6 +102,35 @@ class ExpConfigs:
     channel_independence: bool
     top_k: int
     num_kernels: int
+    decomp_method: str
+    down_sampling_layers: int
+    use_norm: bool
+    down_sampling_method: str
+
+    
+
+    # GTFTS
+    latent_dim: int
+    n_fft: int
+
+    # TimeFilter
+    alpha: float
+    top_p: float
+    pos: int
+
+    # TCN
+    num_channels: list
+
+    # SparseTSF
+    model_type: str
+    period_len: int
+
+    # STALSTM
+    SA_dim: int
+    TA_dim: int
+
+    # TimeKAN
+    begin_order: bool
 
     # Setting
     setting: str

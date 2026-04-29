@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from layers.Autoformer_EncDec import series_decomp
 from layers.Embedding import DataEmbedding_wo_pos
-from layers.Normlization import StandardNorm
+from layers.Normalization import StandardNorm
 
 
 class DFT_series_decomp(nn.Module):
@@ -217,7 +217,7 @@ class Model(nn.Module):
             ]
         )
 
-        if self.task == 'long_term_forecasting' or self.task == 'short_term_forecasting':
+        if self.task == 'short_term_forecasting':
             self.predict_layers = torch.nn.ModuleList(
                 [
                     torch.nn.Linear(
@@ -252,19 +252,9 @@ class Model(nn.Module):
                         for i in range(configs.down_sampling_layers + 1)
                     ]
                 )
-
-        if self.task == 'imputation' or self.task == 'anomaly_detection':
-            if self.channel_independence:
-                self.projection_layer = nn.Linear(
-                    configs.d_model, 1, bias=True)
-            else:
-                self.projection_layer = nn.Linear(
-                    configs.d_model, configs.C_out, bias=True)
-        if self.task == 'classification':
-            self.act = F.gelu
-            self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class)
+        else:
+            self.projection_layer = nn.Linear(
+                configs.d_model, configs.C_out, bias=True)
 
     def out_projection(self, dec_out, i, out_res):
         dec_out = self.projection_layer(dec_out)
@@ -374,6 +364,50 @@ class Model(nn.Module):
         dec_out = torch.stack(dec_out_list, dim=-1).sum(-1)
         dec_out = self.normalize_layers[0](dec_out, 'denorm')
         return dec_out
+    
+    def soft_sensor(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
+        x_enc, x_mark_enc = self.__multi_scale_process_inputs(x_enc, x_mark_enc)
+
+        x_list = []
+        x_mark_list = []
+        if x_mark_enc is not None:
+            for i, x, x_mark in zip(range(len(x_enc)), x_enc, x_mark_enc):
+                B, T, N = x.size()
+                x = self.normalize_layers[i](x, 'norm')
+                if self.channel_independence:
+                    x = x.permute(0, 2, 1).contiguous().reshape(B * N, T, 1)
+                    x_list.append(x)
+                    x_mark = x_mark.repeat(N, 1, 1)
+                    x_mark_list.append(x_mark)
+                else:
+                    x_list.append(x)
+                    x_mark_list.append(x_mark)
+        else:
+            for i, x in zip(range(len(x_enc)), x_enc, ):
+                B, T, N = x.size()
+                x = self.normalize_layers[i](x, 'norm')
+                if self.channel_independence:
+                    x = x.permute(0, 2, 1).contiguous().reshape(B * N, T, 1)
+                x_list.append(x)
+
+        # embedding
+        enc_out_list = []
+        x_list = self.pre_enc(x_list)
+        if x_mark_enc is not None:
+            for i, x, x_mark in zip(range(len(x_list[0])), x_list[0], x_mark_list):
+                enc_out = self.enc_embedding(x, x_mark)  # [B,T,C]
+                enc_out_list.append(enc_out)
+        else:
+            for i, x in zip(range(len(x_list[0])), x_list[0]):
+                enc_out = self.enc_embedding(x, None)  # [B,T,C]
+                enc_out_list.append(enc_out)
+
+        enc_out = enc_out_list[0]
+        dec_out = self.projection_layer(enc_out)
+
+
+        return dec_out
+
 
     def future_multi_mixing(self, B, enc_out_list, x_list):
         dec_out_list = []
@@ -403,6 +437,7 @@ class Model(nn.Module):
             dec_out = self.short_term_forecasting(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out
         elif self.task == 'soft_sensor':
-            pass
+            dec_out = self.soft_sensor(x_enc, x_mark_enc, x_dec, x_mark_dec)
+            return dec_out
         else:
             raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')

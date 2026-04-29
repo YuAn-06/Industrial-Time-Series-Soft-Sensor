@@ -18,6 +18,10 @@ class Model(nn.Module):
         self.seg_num_x = self.seq_len // self.period_len
         self.seg_num_y = self.pred_len // self.period_len
 
+        if self.pred_len // self.period_len <= 1:
+            raise ValueError(f'pred_len must be greater than period_len, pred_len: {self.pred_len}, period_len: {self.period_len}')
+
+
         self.conv1d = nn.Conv1d(in_channels=1, out_channels=1, kernel_size=1 + 2 * (self.period_len // 2),
                                 stride=1, padding=self.period_len // 2, padding_mode="zeros", bias=False)
 
@@ -50,13 +54,15 @@ class Model(nn.Module):
             y = self.mlp(x)
 
         # upsampling: bc,w,m -> bc,m,w -> b,c,s
-        y = y.permute(0, 2, 1).reshape(batch_size, self.enc_in, self.pred_len)
+        y = y.permute(0, 2, 1)
+        y = y.reshape(batch_size, self.enc_in, self.pred_len)
+        
 
         # permute and denorm
         y = y.permute(0, 2, 1) + seq_mean
         return y
 
-    def forward(self, x_enc, **kwargs):
+    def forward(self,x_enc,x_mark_enc,x_dec,x_mark_dec, batch_y, flag='train'):
         if self.task == 'short_term_forecasting':
             return self.short_term_forecasting(x_enc)
 

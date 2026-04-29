@@ -7,9 +7,8 @@
 
 
 
-from exp.exp_short_term_forecasting import Exp_Short_Term_Forecasting
+from exp import Exp_Short_Term_Forecasting, Exp_Soft_Sensor
 
-from exp.exp_soft_sensor import Exp_Soft_Sensor
 
 
 

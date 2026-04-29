@@ -3,20 +3,14 @@ import torch
 import numpy as np
 import datetime
 import time
-from exp.exp_basic import Exp_basic
-from data.data_loader import Dataset
-from exp.losses import Losses, TensorboardObserver
 
+from exp import Exp_basic, Losses, TensorboardObserver
+from data import data_provider
+from utils import metric, adjust_learning_rate, EarlyStopping, select_tensorboard_hparams
 
 from torch import optim, nn
-from torch.utils.data import DataLoader
-from data.data_provider import data_provider
 from matplotlib import pyplot as plt
-from data.data_loader import *
-from utils.tools import *
-from utils.metrics import metric
-from sklearn.metrics import r2_score
-from itertools import chain
+
 
 
 class Exp_Short_Term_Forecasting(Exp_basic):
@@ -100,6 +94,11 @@ class Exp_Short_Term_Forecasting(Exp_basic):
                 return outputs
             else:
                 return outputs
+        elif self.args.model in ['GTFTS']:
+            if flag == 'train':
+                return outputs
+            else:
+                return outputs['y_pred']
         else:
             if flag == 'train':
                 return outputs[:, -self.args.pred_len:, -self.args.C_out:]
@@ -119,7 +118,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         train_data, train_loader = self._get_data(flag='train')
         val_data, val_loader = self._get_data(flag='valid')
 
-        time_now = time.time()
+        train_time = 0.0
         train_steps = len(train_loader)
 
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
@@ -150,7 +149,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
                 model_optim.step()
                
             vali_loss = self.vali(val_data, val_loader)
-              
+            train_time += time.time() - epoch_time
             logger.info("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             
             # 记录验证损失和训练损失到TensorBoard
@@ -171,7 +170,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
 
             adjust_learning_rate(model_optim, epoch + 1, self.args)
             
-            
+        logger.info("Training time: {:.4f}".format(train_time))
         best_model_path = self.args.save_dir + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
         
@@ -239,10 +238,10 @@ class Exp_Short_Term_Forecasting(Exp_basic):
       
         print('test shape:', preds.shape, 'trues shape:', trues.shape)
         
-        mae,mse,rmse,mape,mspe = metric(preds, trues)
-        logger.info(f"mae:{mae:.4f}, mse:{mse:.4f}, rmse:{rmse:.4f}, mape:{mape:.4f}, mspe:{mspe:.4f}")
+        mae,mse,rmse,mape,mspe,corr = metric(preds, trues, self.args.task)
+        logger.info(f"mae:{mae:.4f}, mse:{mse:.4f}, rmse:{rmse:.4f}, mape:{mape:.4f}, mspe:{mspe:.4f}, corr:{corr:.4f}")
         
-        np.save(self.args.save_dir + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
+        np.save(self.args.save_dir + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe, corr]))
         np.save(self.args.save_dir + 'pred.npy', preds)
         np.save(self.args.save_dir + 'true.npy', trues)
 

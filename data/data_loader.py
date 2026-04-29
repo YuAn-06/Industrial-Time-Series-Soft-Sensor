@@ -7,17 +7,14 @@ Copyright (C) 2024
 @ Software: PyCharm
 """
 
-import os
+
 import numpy as np
 import pandas as pd
-from sympy.polys.specialpolys import dup_from_raw_dict
 import torch
 
-from utils.scaler import StandardScaler, ZeroMaskStandardScaler, MinMaxScaler
-from utils.tools import  DC_preprocess, SRU_preprocess
-from torch.utils.data import Dataset, DataLoader
 
-from utils.timefeatures import time_features
+from utils import  *
+from torch.utils.data import Dataset
 from torch import nn
 
 import matplotlib.pyplot as plt
@@ -53,7 +50,7 @@ class Dataset_Custom(Dataset):
         if self.args.if_missing:
             self.scaler = ZeroMaskStandardScaler()
         else:
-            if self.args.model in ['HSAM_dGRUs','ARDNN']:
+            if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS']:
                 self.scaler = MinMaxScaler()
             else:
                 self.scaler = StandardScaler()  # 
