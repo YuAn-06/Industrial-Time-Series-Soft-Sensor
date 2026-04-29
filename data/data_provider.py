@@ -6,7 +6,7 @@ Copyright (C) 2024
 @ Eamil: yuan_l1106@163.com
 @ Software: PyCharm
 """
-from data.data_loader import Dataset_Custom, Dataset_Custom_4_Soft_Sensor, Dataset_MultiMode, Dataset_MultiMode_4_Soft_Sensor
+from data import Dataset_Custom, Dataset_Custom_4_Soft_Sensor, Dataset_MultiMode, Dataset_MultiMode_4_Soft_Sensor
 from torch.utils.data import DataLoader
 
 data_dict = {

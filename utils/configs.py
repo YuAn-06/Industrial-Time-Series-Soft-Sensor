@@ -107,7 +107,7 @@ def Init_parser():
     parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer & TCN')
 
     # TimesMixer
-    parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesMixer')
+    parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesMixer and TimeKAN ')
     parser.add_argument('--channel_independence', type=bool, default=False,help='if channel independence for TimesNet')
     parser.add_argument('--top_k', type=int, default=5,help='Top k for TimesNet')
     parser.add_argument('--num_kernels', type=int, default=5,help='Number of kernels for TimesMixer')
@@ -123,7 +123,6 @@ def Init_parser():
     parser.add_argument('--model_type', type=str, default='linear',help='[linear, mlp]')
     parser.add_argument('--period_len', type=int, default=10,help='Period length for SparseTSF')
     
-
     # TCN
     parser.add_argument('--num_channels', type=list, default=[16, 32, 64],help='Number of channels for TCN')
 
@@ -132,6 +131,15 @@ def Init_parser():
     parser.add_argument('--alpha', type=float, default=0.1, help='KNN for Graph Construction')
     parser.add_argument('--top_p', type=float, default=0.5, help='Dynamic Routing in MoE')
     parser.add_argument('--pos', type=int, choices=[0, 1], default=1, help='Positional Embedding. Set pos to 0 or 1')
+
+    # STALSTM
+    parser.add_argument('--SA_dim', type=int, default=10, help='Spatial Attention dimension for TimeFilter')
+    parser.add_argument('--TA_dim', type=int, default=10, help='Temporal Attention dimension for TimeFilter')
+
+
+    # TimeKAN
+    parser.add_argument('--begin_order', type=bool, default=False,help='If use future temporal feature for TimeKAN')
+
 
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')

@@ -125,6 +125,13 @@ class ExpConfigs:
     model_type: str
     period_len: int
 
+    # STALSTM
+    SA_dim: int
+    TA_dim: int
+
+    # TimeKAN
+    begin_order: bool
+
     # Setting
     setting: str
 

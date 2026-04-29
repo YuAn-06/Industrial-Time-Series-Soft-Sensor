@@ -6,15 +6,23 @@
 # @Software: PyCharm
 
 import numpy as np
-from sklearn.metrics import r2_score,mean_squared_error
+import torch
 
 def RSE(pred, true):
     return np.sqrt(np.sum((true-pred)**2)) / np.sqrt(np.sum((true-true.mean())**2))
 
-def CORR(pred, true):
-    u = ((true-true.mean(0))*(pred-pred.mean(0))).sum(0)
-    d = np.sqrt(((true-true.mean(0))**2*(pred-pred.mean(0))**2).sum(0))
-    return (u/d).mean(-1)
+def CORR(pred, true, task):
+
+    pred_mean = np.mean(pred, axis=0)
+    true_mean = np.mean(true, axis=0)
+
+    pred_dev = pred - pred_mean
+    true_dev = true - true_mean
+
+    numerator = np.sum(pred_dev * true_dev, axis=0)
+    denominator = np.sqrt(np.sum(pred_dev**2, axis=0) * np.sum(true_dev**2, axis=0))
+    return np.mean(numerator / (denominator + 1e-6))
+        
 
 def MAE(pred, true):
     return np.mean(np.abs(pred-true))
@@ -51,13 +59,24 @@ def MSPE(pred, true):
 
 def R2(pred, true):
     
-    return r2_score(pred, true)
+    mean = np.mean(true, axis=0)
+    sse = np.sum(np.pow(pred - true, 2), axis=0)
+    sst = np.sum(np.pow(true - mean, 2), axis=0)
 
-def metric(pred, true):
+    r2 = 1 - sse/(sst + 1e-6)
+
+    return np.mean(r2)
+
+def metric(pred, true, task):
     mae = MAE(pred, true)
     mse = MSE(pred, true)
     rmse = RMSE(pred, true)
     mape = MAPE(pred, true)
     mspe = MSPE(pred, true)
-
-    return mae,mse,rmse,mape,mspe
+    corr = CORR(pred, true, task)
+    if task == 'soft_sensor':
+        r2 = R2(pred, true)
+        return mae,mse,rmse,mape,mspe,r2,corr
+    elif task == 'short_term_forecasting':
+        return mae,mse,rmse,mape,mspe,corr
+    
