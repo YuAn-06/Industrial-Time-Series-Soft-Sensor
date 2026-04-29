@@ -34,14 +34,20 @@ def plot_time_series(data, columns):
 
 def plot_acf_lag(data, columns):
     N, D = data.shape
-    fig, axes = plt.subplots(D//3 +1, 3, figsize=(24, 18))
+    fig, axes = plt.subplots(D//3 +1, 3, figsize=(18, 12))
     axes = axes.flatten()  # 将二维数组展平成一维，便于索引
     for i in range(D):
         # 绘制ACF，lags=60表示显示前60个滞后
         plot_acf(data[:,i], ax=axes[i], lags=60, alpha=0.05, label=columns[i])
         axes[i].legend(fontsize=8)
-        axes[i].set_xlabel('Lag', fontsize=8)
-        axes[i].set_ylabel('Autocorrelation', fontsize=8)
+        axes[i].set_xlabel('Lag', fontsize=4)
+        axes[i].set_ylabel('Autocorrelation', fontsize=4)
+    
+    plt.tight_layout()
+    
+    idx = np.arange(math.ceil(D/3) *3 )  
+    for i in idx[D:]:  
+        axes[i].set_visible(False)
     plt.tight_layout()
 
 
@@ -72,7 +78,7 @@ def plot_data_2d(train_data, test_data):
     plt.savefig('pics/'+data_name+'_tsne.pdf', dpi=300)
     
 
-data_name = 'PPGAS'
+data_name = 'DC'
 
 if __name__ == '__main__':
 
@@ -93,7 +99,7 @@ if __name__ == '__main__':
     # Time Series Visualization
     plot_time_series(data, columns)
     # # ACF Lag Plot
-    # plot_acf_lag(data, columns)
+    plot_acf_lag(data, columns)
 
     # # Spearmanr Plot
     # plot_spearmanr(data, columns, corr=data_df.corr(method='spearman'))
