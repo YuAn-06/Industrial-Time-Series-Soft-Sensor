@@ -465,6 +465,12 @@ losses_dict = {
     'STALSTM': MSE_Loss,
     'Koopa': MSE_Loss,
     'TimeKAN': MSE_Loss,
+    'MSGNet': MSE_Loss,
+    'DLSTM': MSE_Loss,
+    'GCT': MSE_Loss,
+    'SOFTS': MSE_Loss,
+    'FEDformer': MSE_Loss,
+    
 }
 
 

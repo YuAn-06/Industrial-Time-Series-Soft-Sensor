@@ -17,13 +17,8 @@ class Model(nn.Module):
         if self.task == 'soft_sensor':
             self.projection = nn.Linear(configs.hidden_dim, configs.C_out, bias=True)
 
-        else:
-            self.projection = nn.Sequential(
-                nn.Linear(configs.hidden_dim, configs.C_out, bias=True),
-                Permute(0, 2, 1),
-                nn.Linear(1, configs.pred_len, bias=True),
-                Permute(0, 2, 1)
-            )
+        elif self.task == 'short_term_forecasting':
+            self.projection = nn.Linear(configs.hidden_dim * configs.seq_len, configs.pred_len, bias=True)
 
     def soft_sensor(self, x_enc):
         enc_out, _ = self.lstm(x_enc)
@@ -32,8 +27,9 @@ class Model(nn.Module):
     
     def short_term_forecasting(self, x_enc):
         enc_out, _ = self.lstm(x_enc)
-        enc_out = self.projection(enc_out[:,-1:])
-        return enc_out
+        enc_out = enc_out.reshape(enc_out.shape[0], -1)
+        enc_out = self.projection(enc_out)
+        return enc_out.unsqueeze(-1)
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, batch_y, flag='train'):
          

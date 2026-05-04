@@ -1,17 +1,8 @@
-# Industrial Time-Series Soft Sensing Library (InduTS-SL)
-
-
-
 <div align="center">
   <img src="docs/Logo.jpg#gh-light-mode-only" height=200>
-      <h3><b> Industrial Time-Series Soft Sensing Library. </b></h3>
-    <p align="center"><i>A Unified Library of Industrial Soft Sensor Models based on Time Series Analysis</i></p>
+      <h3><b> A Unified and Fair Time-series Soft Sensor Library and Benchmark. </b></h3>
+    <p align="center"><i></i></p>
     </div>
-
-
-
-
-
 
 <p align="center">
     <a href="https://www.python.org/">
@@ -29,17 +20,17 @@
 
 
 
-**Industrial Time-Series Soft Sensing Library  (InduTS-SL)** is an **open-source** library specifically designed for researchers working on time series data analysis and soft sensor modeling of complex industrial processes.
+**Industrial Time-Series Soft Sensor  (InduTS-SS)** is an **open-source** library specifically designed for researchers working on time series data analysis and soft sensor modeling of complex industrial processes.
 
 
 
 
 
-## ☀️ The motivation of InduTS-SL
+## ☀️ The motivation of InduTS-SS
 
 While modern machine learning libraries offer powerful tools for time series modeling, they are not tailored to the specific needs of soft sensor development in industrial processes. Researchers often spend significant effort reimplementing preprocessing pipelines, feature extraction methods, and evaluation protocols from scratch—leading to fragmented codebases and difficulties in fair model comparison. Moreover, many published soft sensor approaches lack open implementations, making reproducibility and benchmarking challenging. 
 
-To bridge this gap, we introduce Time Series Library for Industrial Soft Sensing Modeling: an open-source library that provides a consistent, modular framework for building, training, and evaluating soft sensors on multivariate time series data. By standardizing common components—from input representation to forecasting horizons—InduTS-SL aims to accelerate research, improve comparability, and lower the barrier to entry for new contributors in the field.
+To bridge this gap, we introduce Time Series Library for Industrial Soft Sensing Modeling: an open-source library that provides a consistent, modular framework for building, training, and evaluating soft sensors on multivariate time series data. By standardizing common components—from input representation to forecasting horizons—InduTS-SS aims to accelerate research, improve comparability, and lower the barrier to entry for new contributors in the field.
 
 
 
@@ -117,40 +108,43 @@ We have assigned two abbreviated labels to the two definitions mentioned above, 
 
 
 
-| Models                                                       | Journal/Conference | Type (F) | Type (R) | Remark                                            | Status                                                       |
-| ------------------------------------------------------------ | ------------------ | -------- | -------- | ------------------------------------------------- | ------------------------------------------------------------ |
-| [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al) | IEEE TPAMI 2026    | ✅        |          | A MLP-based time-series foundation model          |                                                              |
-| [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al)    | ICLR 2025          | ✅        | ✅        | A KAN-based time-series foundation model          |                                                              |
-| [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al)    | ICML 2025          | ✅        | ✅        | A GNN-based time-series foundation model          |                                                              |
-| [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al) | ICLR 2024          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al) | AAAI 2024          | ✅        | ✅        | A GNN-based time-series foundation model          |                                                              |
-| [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al) | ICLR 2024          | ✅        | ✅        | A MLP-based time-series foundation model          |                                                              |
-| [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al)  | KDD 2024           | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al) | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al) | ICLR 2023          | ✅        | ✅        | A TCN-based time-series foundation model          |                                                              |
-| [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al)     | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al)     | AAAI 2023          | ✅        | ✅        | A MLP-based time-series foundation model          |                                                              |
-| [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al)        | NeurlPS 2023       | ✅        |          |                                                   |                                                              |
-| [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu, etal) | NeurlPS 2022       | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al)    | ICLR 2021          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [Nystroformer](https://arxiv.org/abs/2102.03902) (Xiong et al) | AAAI 2021          | ✅        |          | A Transformer-based time-series foundation model  |                                                              |
-| [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al) | IJCAI 2019         | ✅        |          | A Transformer-based time-series foundation model  |                                                              |
-| [TCN](https://arxiv.org/abs/1803.01271) (Bai et al)          | arXiv 2018         | ✅        | ✅        |                                                   |                                                              |
-| [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al) | NIPS 2017          | ✅        | ✅        | A Transformer-based time-series foundation model  |                                                              |
-| [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al)       | NIPS 2015          | ✅        | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [LSTM ](https://ieeexplore.ieee.org/abstract/document/6795963) (Sepp Hochreiter) | NC 1997            | ✅        | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al) | IEEE TC 2026       |          | ✅        | A CNN-based time-series soft sensor model         | The model debugging is not yet complete.                     |
-| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al) | IEEE TC 2026       | ✅        |          | A GNN-based time-series soft sensor model         |                                                              |
-| [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al) | IEEE Sensor J 2025 | ✅        |          | A MLP-based time-series soft sensor model         |                                                              |
-| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al) | IEEE TIM 2024      | ✅        |          | A Transformer-based time-series soft sensor model |                                                              |
-| [MSACNN ](https://ieeexplore.ieee.org/document/10465636) (Yuan et al) | IEEE TC 2024       |          | ✅        | A CNN-based time-series soft sensor model         | The model debugging is not yet complete.                     |
-| [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al) | IEEE TASE 2024     |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al) | IEEE TII 2023      | ✅        |          | A VAE-based time series soft sensor model         | SMC sampling for multi-step prediction is not yet available. |
-| [DMRIFormer](10.1109/TII.2022.3227731) (Liu et al)           | IEEE TII 2022      | ✅        |          | A Transformer-based time-series soft sensor model |                                                              |
-| [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al) | IEEE TII 2022      |          | ✅        | A DVAE-based time-series soft sensor model        |                                                              |
-| [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (yuan et al) | IEEE TII 2021      |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [DAGRU](https://www.bing.com/ck/a?!&&p=d38b94cc62cf6a6ce44ac9bfbe5faf9b931f122ce2afd1f02f626697340fe8faJmltdHM9MTc3NzA3NTIwMA&ptn=3&ver=2&hsh=4&fclid=30f06e45-5093-6f12-3215-786c519b6e75&u=a1aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkxNzQ3Njc) (Feng et al) | IEEE TNNLS 2020    |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
-| [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan, et al) | CJCE 2019          |          | ✅        | A RNN-based time-series soft sensor model         |                                                              |
+| Models                                                       | Journal/Conference | Type (F) | Type (R) | Remark                                                       | Status                                                       |
+| ------------------------------------------------------------ | ------------------ | -------- | -------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al) | IEEE TPAMI 2026    | ✅        |          | A MLP-based time-series foundation model                     |                                                              |
+| [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al)    | ICLR 2025          | ✅        | ✅        | A KAN-based time-series foundation model                     |                                                              |
+| [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al)    | ICML 2025          | ✅        | ✅        | A GNN-based time-series foundation model                     |                                                              |
+| [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al )        | NeurIPS 2024       | ✅        | ✅        | A Transformer-based foundation model                         |                                                              |
+| [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al) | ICLR 2024          | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al) | AAAI 2024          | ✅        | ✅        | A GNN-based time-series foundation model                     |                                                              |
+| [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al) | ICLR 2024          | ✅        | ✅        | A MLP-based time-series foundation model                     |                                                              |
+| [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al)  | KDD 2024           | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al) | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al) | ICLR 2023          | ✅        | ✅        | A TCN-based time-series foundation model                     |                                                              |
+| [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al)     | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al)     | AAAI 2023          | ✅        | ✅        | A MLP-based time-series foundation model                     |                                                              |
+| [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al)        | NeurlPS 2023       | ✅        |          |                                                              |                                                              |
+| [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu, et al) | NeurlPS 2022       | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [FEDformer](https://proceedings.mlr.press/v162/zhou22g.html) (Zhou, et al) | ICLR2022           | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al)    | ICLR 2021          | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [Nystroformer](https://arxiv.org/abs/2102.03902) (Xiong et al) | AAAI 2021          | ✅        |          | A Transformer-based time-series foundation model             |                                                              |
+| [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al) | IJCAI 2019         | ✅        |          | A Transformer-based time-series foundation model             |                                                              |
+| [TCN](https://arxiv.org/abs/1803.01271) (Bai et al)          | arXiv 2018         | ✅        | ✅        | A CNN-based time-series based time-series foundation model   |                                                              |
+| [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al) | NIPS 2017          | ✅        | ✅        | A Transformer-based time-series foundation model             |                                                              |
+| [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al)       | NIPS 2015          | ✅        | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
+| [LSTM ](https://ieeexplore.ieee.org/abstract/document/6795963) (Sepp Hochreiter) | NC 1997            | ✅        | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
+| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al) | IEEE TC 2026       |          | ✅        | A CNN-based time-series soft sensor model                    | The model debugging is not yet complete.                     |
+| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al) | IEEE TC 2026       | ✅        |          | A GNN-based time-series soft sensor model                    |                                                              |
+| [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al) | IEEE Sensor J 2025 | ✅        |          | A MLP-based time-series soft sensor model                    |                                                              |
+| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al) | IEEE TIM 2024      | ✅        |          | A Transformer-based time-series soft sensor model            |                                                              |
+| [MSACNN ](https://ieeexplore.ieee.org/document/10465636) (Yuan et al) | IEEE TC 2024       |          | ✅        | A CNN-based time-series soft sensor model                    | The model debugging is not yet complete.                     |
+| [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al) | IEEE TASE 2024     |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
+| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al) | IEEE TII 2023      | ✅        |          | A VAE-based time series soft sensor model                    | SMC sampling for multi-step prediction is not yet available. |
+| [DMRIFormer](10.1109/TII.2022.3227731) (Liu et al)           | IEEE TII 2022      | ✅        |          | A Transformer-based time-series soft sensor model            |                                                              |
+| [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al) | IEEE TII 2022      |          | ✅        | A DVAE-based time-series soft sensor model                   |                                                              |
+| [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al) | IEEE TII 2021      | ✅        | ✅        | A transformer&highway netowrk-based time series soft sensor model |                                                              |
+| [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (yuan et al) | IEEE TII 2021      |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
+| [DAGRU](https://www.bing.com/ck/a?!&&p=d38b94cc62cf6a6ce44ac9bfbe5faf9b931f122ce2afd1f02f626697340fe8faJmltdHM9MTc3NzA3NTIwMA&ptn=3&ver=2&hsh=4&fclid=30f06e45-5093-6f12-3215-786c519b6e75&u=a1aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkxNzQ3Njc) (Feng et al) | IEEE TNNLS 2020    |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
+| [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan, et al) | CJCE 2019          |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 
 
 
