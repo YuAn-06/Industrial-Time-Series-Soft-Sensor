@@ -1,6 +1,6 @@
 <div align="center">
   <img src="docs/Logo.jpg#gh-light-mode-only" height=200>
-      <h3><b> A Unified and Fair Time-series Soft Sensor Library and Benchmark. </b></h3>
+      <h3><b> A Unified and Fair Industrial Time-series Soft Sensor Library and Benchmark. </b></h3>
     <p align="center"><i></i></p>
     </div>
 
@@ -133,18 +133,23 @@ We have assigned two abbreviated labels to the two definitions mentioned above, 
 | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al)       | NIPS 2015          | ✅        | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 | [LSTM ](https://ieeexplore.ieee.org/abstract/document/6795963) (Sepp Hochreiter) | NC 1997            | ✅        | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al) | IEEE TC 2026       |          | ✅        | A CNN-based time-series soft sensor model                    | The model debugging is not yet complete.                     |
-| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al) | IEEE TC 2026       | ✅        |          | A GNN-based time-series soft sensor model                    |                                                              |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al) | IEEE Sensor J 2025 | ✅        |          | A MLP-based time-series soft sensor model                    |                                                              |
 | [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al) | IEEE TIM 2024      | ✅        |          | A Transformer-based time-series soft sensor model            |                                                              |
 | [MSACNN ](https://ieeexplore.ieee.org/document/10465636) (Yuan et al) | IEEE TC 2024       |          | ✅        | A CNN-based time-series soft sensor model                    | The model debugging is not yet complete.                     |
+| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al) | IEEE TC 2024       | ✅        |          | A GNN-based time-series soft sensor model                    |                                                              |
 | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al) | IEEE TASE 2024     |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 | [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al) | IEEE TII 2023      | ✅        |          | A VAE-based time series soft sensor model                    | SMC sampling for multi-step prediction is not yet available. |
 | [DMRIFormer](10.1109/TII.2022.3227731) (Liu et al)           | IEEE TII 2022      | ✅        |          | A Transformer-based time-series soft sensor model            |                                                              |
 | [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al) | IEEE TII 2022      |          | ✅        | A DVAE-based time-series soft sensor model                   |                                                              |
-| [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al) | IEEE TII 2021      | ✅        | ✅        | A transformer&highway netowrk-based time series soft sensor model |                                                              |
+| [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al) | IEEE TII 2021      | ✅        | ✅        | A transformer & highway netowrk-based time series soft sensor model |                                                              |
+| [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al) | IEEE TII 2021      | ✅        | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 | [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (yuan et al) | IEEE TII 2021      |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 | [DAGRU](https://www.bing.com/ck/a?!&&p=d38b94cc62cf6a6ce44ac9bfbe5faf9b931f122ce2afd1f02f626697340fe8faJmltdHM9MTc3NzA3NTIwMA&ptn=3&ver=2&hsh=4&fclid=30f06e45-5093-6f12-3215-786c519b6e75&u=a1aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkxNzQ3Njc) (Feng et al) | IEEE TNNLS 2020    |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
 | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan, et al) | CJCE 2019          |          | ✅        | A RNN-based time-series soft sensor model                    |                                                              |
+
+
+
+
 
 
 

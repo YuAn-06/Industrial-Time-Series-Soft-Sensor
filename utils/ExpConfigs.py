@@ -14,7 +14,6 @@ class ExpConfigs:
     if_missing: bool
     missing_rate: float
     use_condition_label: bool
-    # if_data_aug: bool
     
     # Model Config
     enc_in: int

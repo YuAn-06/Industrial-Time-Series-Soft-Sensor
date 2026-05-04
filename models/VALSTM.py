@@ -6,6 +6,12 @@ from torch import nn
 from layers.Output_Layer import Permute
 
 
+"""
+Deep learning for quality prediction of nonlinear dynamic processes with variable attention-based long short-term memory network
+
+Thanks to authors: Xiaofeng Yuan, Lin Li, Yalin Wang, Chunhua Yang, Weihua Gui
+"""
+
 class Model(nn.Module):
     def __init__(self, configs):
         super(Model, self).__init__()

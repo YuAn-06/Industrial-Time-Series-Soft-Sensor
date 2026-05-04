@@ -10,7 +10,7 @@ from layers.Autoformer_EncDec import Encoder, Decoder, EncoderLayer, DecoderLaye
 
 class Model(nn.Module):
     """
-    FEDformer performs the attention mechanism on frequency domain and achieved O(N) complexity
+    Fedformer: Frequency Enhanced Decomposed Transformer for Long-term Series Forecasting
     Paper link: https://proceedings.mlr.press/v162/zhou22g.html
     """
 

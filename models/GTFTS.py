@@ -2,6 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+"""
+A Graph-Based Time-Frequency Two-Stream Network for Multistep Prediction of Key Performance Indicators in Industrial Processes, IEEE TC 2024
+
+Thanks to authors: Feng Yan; Xinmin Zhang; Chunjie Yang
+"""
 
 class GATLayer(nn.Module):
     def __init__(self, in_dim, out_dim):

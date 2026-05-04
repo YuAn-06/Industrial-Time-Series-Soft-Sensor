@@ -319,3 +319,18 @@ def SRU_preprocess(df_raw, target):
     print('Enhance Sequence columns', data_df.columns)
 
     return data_df, cols
+
+def del_columns(data_name, target):
+    """
+    Delete unnecessary columns for specific datasets
+    """
+    
+    if data_name == 'PPGAS':
+        del_col = 'NOX' if target == 'CO' else 'CO'
+
+    elif data_name == 'SRU':
+        del_col = 'H2S' if target == 'SO2' else 'SO2'
+    else:
+        del_col = None
+   
+    return del_col

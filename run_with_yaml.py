@@ -6,6 +6,7 @@ Copyright (C) 2025
 @ Author: YuAn_L
 @ Eamil: yuan_l1106@163.com
 @ Software: PyCharm
+@ License: Apache-2.0
 """
 
 
@@ -22,13 +23,12 @@ from utils.tools import *
 from utils.print_configs import print_args
 from utils.logger import Logger
 
-# from utils.configs import args
 
 from utils.configs import Parse_arguments
 
 if __name__ == '__main__':
 
-    yaml_name = "SS_task/DC_scripts/FEDformer.yaml"
+    yaml_name = "SS_task/DC_scripts/STALSTM.yaml"
     #yaml_name = "SS_task/DC_scripts/HSAM_dGRUs.yaml"
     yaml_path = f"./scripts/{yaml_name}"
     

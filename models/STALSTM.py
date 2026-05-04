@@ -4,6 +4,11 @@ import numpy as np
 from torch import nn
 import math
 
+"""
+Deep Learning With Spatiotemporal Attention-Based LSTM for Industrial Soft Sensor Model Development, IEEE TII 2021
+
+Thanks to authors: Xiaofeng Yuan; Lin Li; Yuri A. W. Shardt; Yalin Wang; Chunhua Yang
+"""
 
 
 class TemporalLSTM(nn.Module):
@@ -149,6 +154,8 @@ class Model(nn.Module):
         if self.task == 'short_term_forecasting':
             pass
         elif self.task == 'soft_sensor':
-            return self.soft_sensor(x_enc, batch_y)
+            y_enc = x_enc[:, :self.seq_len, -self.configs.C_out:]
+            x_enc = x_enc[:, :self.seq_len, :-self.configs.C_out]
+            return self.soft_sensor(x_enc, y_enc)
         else:
             raise ValueError(f'Invalid task type: {self.task}. Supporting short_term_forecasting and soft_sensor')

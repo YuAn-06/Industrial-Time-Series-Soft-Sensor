@@ -1,15 +1,15 @@
-# Copyright (C) 2021 #
-# @Time    : 2025/1/25 15:58
-# @Author  : Xingyuan Li
-# @Email   : 2021200795@buct.edu.cn
-# @File    : DGMVAE.py
-# @Software: PyCharm
+
 
 import torch
 from torch import nn
 from layers.Embedding import *
 from collections import namedtuple
 from layers.Output_Layer import *
+
+"""
+Semi-Supervised Deep Dynamic Probabilistic Latent Variable Model for Multimode Process Soft Sensor Application, IEEE TII 2021
+Thanks to authors: Le Yao; Bingbing Shen; Linlin Cui; Junhua Zheng; Zhiqiang Ge, et al
+"""
 
 
 class Model(nn.Module):

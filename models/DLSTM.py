@@ -3,6 +3,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+"""
+A Novel Soft Sensor Modeling Approach Based on Difference-LSTM for Complex Industrial Process, IEEE TII 2021
+Thanks to authors: Jiayi Zhou; Xiaoli Wang; Chunhua Yang; Wei Xiong
+"""
+
+
 class DLSTMLayer(nn.Module):
     def __init__(self, enc_in, hidden_dim):
         super().__init__()
