@@ -41,6 +41,11 @@ from models import (
     STALSTM,
     Koopa,
     TimeKAN,
+    MSGNet,
+    DLSTM,
+    GCT,
+    SOFTS,
+    FEDformer,
 )
 
 class Exp_basic(object):
@@ -82,6 +87,11 @@ class Exp_basic(object):
             'STALSTM': STALSTM,
             'Koopa': Koopa,
             'TimeKAN': TimeKAN,
+            'MSGNet': MSGNet,
+            'DLSTM': DLSTM,
+            'GCT': GCT,
+            'SOFTS': SOFTS,
+            'FEDformer': FEDformer,
         }
     
 

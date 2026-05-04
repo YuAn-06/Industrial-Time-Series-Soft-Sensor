@@ -86,9 +86,9 @@ class SpatialLSTM(nn.Module):
         self.ba = nn.Parameter(torch.Tensor(self.C_in), requires_grad=True)
         self.Va = nn.Parameter(torch.Tensor(self.C_in, self.C_in), requires_grad=True)
         self.Softmax = nn.Softmax(dim=1)
-        self.init_weights()
+        self._init_weights()
 
-    def init_weights(self):
+    def _init_weights(self):
         stdv = 1.0 / math.sqrt(self.hidden_dim)
         for weight in self.parameters():
             weight.data.uniform_(-stdv, stdv)

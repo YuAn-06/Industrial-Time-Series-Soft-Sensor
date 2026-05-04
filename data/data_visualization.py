@@ -44,7 +44,7 @@ def plot_acf_lag(data, columns):
         axes[i].set_ylabel('Autocorrelation', fontsize=4)
     
     plt.tight_layout()
-    
+
     idx = np.arange(math.ceil(D/3) *3 )  
     for i in idx[D:]:  
         axes[i].set_visible(False)
@@ -97,16 +97,16 @@ if __name__ == '__main__':
     columns = data_df.columns
 
     # Time Series Visualization
-    plot_time_series(data, columns)
-    # # ACF Lag Plot
-    plot_acf_lag(data, columns)
+    # plot_time_series(data, columns)
+    # # # ACF Lag Plot
+    # plot_acf_lag(data, columns)
 
-    # # Spearmanr Plot
-    # plot_spearmanr(data, columns, corr=data_df.corr(method='spearman'))
+    # Spearmanr Plot
+    plot_spearmanr(data, columns, corr=data_df.corr(method='spearman'))
 
     # 2D Visualization
-    data_train = data[:int(0.7*len(data))]
-    data_test = data[int(0.8*len(data)):]
-    plot_data_2d(data_train, data_test)
+    # data_train = data[:int(0.7*len(data))]
+    # data_test = data[int(0.8*len(data)):]
+    # plot_data_2d(data_train, data_test)
     plt.legend()
     plt.show()

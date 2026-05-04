@@ -106,7 +106,7 @@ def Init_parser():
     # EnvFormer & TCN
     parser.add_argument('--kernel_size', type=int, default=4,help='Kernel size for EnvFormer & TCN')
 
-    # TimesMixer
+    # TimesMixer & SOFTS
     parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesMixer and TimeKAN ')
     parser.add_argument('--channel_independence', type=bool, default=False,help='if channel independence for TimesNet')
     parser.add_argument('--top_k', type=int, default=5,help='Top k for TimesNet')
@@ -140,6 +140,21 @@ def Init_parser():
     # TimeKAN
     parser.add_argument('--begin_order', type=bool, default=False,help='If use future temporal feature for TimeKAN')
 
+    
+    # GCN
+    parser.add_argument('--conv_channel', type=int, default=32,help='Convolution channel for GCN')
+    parser.add_argument('--skip_channel', type=int, default=32,help='Skip channel for GCN')
+    parser.add_argument('--gcn_depth', type=int, default=2,help='GCN depth')
+    parser.add_argument('--node_dim', type=int, default=10,help='Node dimension for GCN')
+    parser.add_argument('--propalpha', type=float, default=0.1,help='Propagation alpha for GCN')
+
+    # SOFTS
+    parser.add_argument('--d_core', type=int, default=10, help='Core dimension for SOFTS')
+
+    # FEDformer
+    parser.add_argument('--version', type=str, default='fourier', help='Version of FEDformer: [Fourier, Wavelets]')
+    parser.add_argument('--mode_select', type=str, default='random', help='Mode selection method for FEDformer: [random, low]')
+    parser.add_argument('--modes', type=int, default=32, help='Number of modes to be selected for FEDformer')
 
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')

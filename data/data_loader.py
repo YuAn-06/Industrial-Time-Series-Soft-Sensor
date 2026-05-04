@@ -50,7 +50,7 @@ class Dataset_Custom(Dataset):
         if self.args.if_missing:
             self.scaler = ZeroMaskStandardScaler()
         else:
-            if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS']:
+            if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS', 'GCT']:
                 self.scaler = MinMaxScaler()
             else:
                 self.scaler = StandardScaler()  # 
@@ -198,7 +198,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
             self.scaler_x = ZeroMaskStandardScaler()
             self.scaler_y = ZeroMaskStandardScaler()
         else:
-            if self.args.model == 'HSAM_dGRUs':
+            if self.args.model in ['HSAM_dGRUs','GCT','ARDNN', 'GTFTS']:
                 self.scaler_x = MinMaxScaler()
                 self.scaler_y = MinMaxScaler()
             else:
@@ -234,11 +234,10 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
 
 
             
-        if self.args.model not in ['DAGRU','HSAM_dGRUs']:
-            data_x = self.df_raw[columns_with_x].values
-            
-        else:
+        if self.args.model in ['DAGRU','HSAM_dGRUs','GCT']:
             data_x = self.df_raw[columns_with_x + [self.target]].values # DAGRU and HSAM_dGRUs needs last point of sequence as input
+        else:
+             data_x = self.df_raw[columns_with_x].values
 
             
         data_y = self.df_raw[self.target].values.reshape(-1,1)

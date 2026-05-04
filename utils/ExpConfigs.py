@@ -132,6 +132,21 @@ class ExpConfigs:
     # TimeKAN
     begin_order: bool
 
+    # GCN
+    conv_channel: int
+    skip_channel: int
+    gcn_depth: int
+    node_dim: int
+    propalpha: float
+
+    # SOFTS
+    d_core: int
+
+    # FEDformer
+    version: str
+    mode_select: str
+    modes: int
+
     # Setting
     setting: str
 
