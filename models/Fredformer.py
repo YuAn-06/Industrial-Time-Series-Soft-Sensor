@@ -9,8 +9,11 @@ from layers.Output_Layer import *
 from layers.Transformer_EncDec import *
 from layers.SelfAttention_Family import FullAttention, AttentionLayer
 from layers.Output_Layer import Flatten_head
+
+"""
 # Fredformer: Frequency Debiased Transformer for Time Series Forecasting
 # https://ieeexplore.ieee.org/document/10699388
+"""
 
 class Model(nn.Module):
     def __init__(self, configs):

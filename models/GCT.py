@@ -3,6 +3,13 @@ import torch.nn as nn
 import math
 from layers.Embedding import PositionalEmbedding
 
+"""
+Novel Transformer Based on Gated Convolutional Neural Network for Dynamic Soft Sensor Modeling of Industrial Processes, IEEE TII 2021
+
+Thanks to authors: Zhiqiang Geng; Zhiwei Chen; Qingchao Meng; Yongming Han
+"""
+
+
 class ISRU(nn.Module):
     """
     逆平方根激活单元 (Inverse Square Root Unit)

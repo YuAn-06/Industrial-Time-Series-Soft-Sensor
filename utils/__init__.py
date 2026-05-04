@@ -1,5 +1,5 @@
 from .metrics import metric
-from .tools import roll_data, setup_seed, DC_preprocess, SRU_preprocess, select_tensorboard_hparams,EarlyStopping,adjust_learning_rate
+from .tools import roll_data, setup_seed, DC_preprocess, SRU_preprocess, select_tensorboard_hparams,EarlyStopping,adjust_learning_rate,del_columns
 from .logger import Logger
 from .configs import Parse_arguments
 from .scaler import MinMaxScaler, StandardScaler, ZeroMaskStandardScaler
@@ -20,5 +20,6 @@ __all__=[
     'StandardScaler',
     'ZeroMaskStandardScaler',
     'time_features',
-    'print_args'
+    'print_args',
+    'del_columns'
 ]

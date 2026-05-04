@@ -9,8 +9,13 @@ from collections import namedtuple
 from layers.Output_Layer import *
 from layers.EnvFormer_EncDec import *
 from layers.SelfAttention_Family import FullAttention, AttentionLayer
-# EnvFormer: A Decomposition-Based Transformer for Multistep Burn-Through Point Prediction in the Sintering Process
-# https://ieeexplore.ieee.org/document/10699388
+
+"""
+EnvFormer: A Decomposition-Based Transformer for Multistep Burn-Through Point Prediction in the Sintering Process, IEEE TIM 2023
+Thanks to authors: Yuhan Xie; Bocun He; Xinmin Zhang; Zhihuan Song; Manabu Kano
+"""
+
+
 
 class Model(nn.Module):
     def __init__(self, configs):

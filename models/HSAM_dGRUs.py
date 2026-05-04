@@ -4,12 +4,13 @@ import torch.nn.functional as F
 
 
 """
-HSAM_dGRUs model, Migrating from Keras to PyTorch version, author: Yuan_L, 2026
+Novel Distributed GRUs Based on Hybrid Self-Attention Mechanism for Dynamic Soft Sensing, IEEE TASE 2023
+
+Thanks to authors: Yan-Lin He; Xing-Yuan Li; Yuan Xu; Qun-Xiong Zhu; Shan Lu
 """
 
 from layers.Embedding import DataEmbedding
 import numpy as np
-
 from layers.HybridAttention import *
 
 

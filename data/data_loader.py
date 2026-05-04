@@ -26,6 +26,27 @@ preprocess_data_dict = {
 
 
 class Dataset_Custom(Dataset):
+    """
+    A specialized PyTorch Dataset class designed for Custom Time-Series Soft Sensor Forecasting tasks. 
+    It handles CSV data loading, automated dataset splitting (Train/Valid/Test), 
+    feature scaling, and time-feature encoding specifically formatted for 
+    Encoder-Decoder architectures.
+    Parameters:
+    :param args: Configuration object containing:
+        - data_path: Path to the CSV file.
+        - data_name: Name of the dataset for specific preprocessing logic.
+        - target: The name of the column to be predicted.
+        - if_missing: Boolean flag for handling missing values.
+        - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
+        - seq_len: Input sequence length (look-back window).
+        - label_len: Start token length for the decoder.
+        - pred_len: Prediction horizon (forecast length).
+        - data_aug: Boolean flag to enable data augmentation.
+        - C_out: Number of output channels.
+        - freq: Frequency for time feature encoding (e.g., 'h', 't', 's').
+    :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
+    :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
+    """
     def __init__(self, args, flag, timeenc):
         self.args = args
         self.timeenc = timeenc
@@ -67,10 +88,8 @@ class Dataset_Custom(Dataset):
 
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
-        if 'PPGAS' in self.data_name:
-            del_col = 'NOX' if self.target == 'CO' else 'CO'
-        else:
-            del_col = None
+
+        del_col = del_columns(self.data_name, self.target)
         
         if columns_with_x == []:
             columns_with_x = [col for col in self.df_raw.columns if col != del_col and col != "date" and col!="mode"]
@@ -83,7 +102,6 @@ class Dataset_Custom(Dataset):
         data_x = self.df_raw[columns_with_x + [self.target]].values
         data_y = self.df_raw[columns_with_x + [self.target]].values
     
-        # Sequence to sequence 训练方式 D TO D
         
         train_data = data_x[border1s[0]:border2s[0]]
         self.scaler.fit(train_data)
@@ -124,6 +142,19 @@ class Dataset_Custom(Dataset):
         
 
     def __getitem__(self, index):
+
+        """
+        Retrieves a single data sample (a sliding window) for the model.
+        
+        Logic Overview:
+        1. Defines the sliding window boundaries for both Encoder and Decoder 
+        2. x_enc: Historical data window used as input for the Model. # Size: [B, T, C_in]
+        3. x_dec: Input for the Transformer based-Decoder, consisting of a 'start token' (label_len) followed 
+           by zeros representing the period to be predicted (pred_len). # Size: [B, T + P - L, C_in]
+        4. x_mark: Temporal features (e.g., hour, day) corresponding to the data windows. # Size: [B, T, C]
+        5. batch_y: The target values for the prediction values. # Size: [B, P, C_out]
+        """
+
         s_begin = index
         s_end = s_begin + self.args.seq_len
         r_begin = s_end - self.args.label_len
@@ -167,7 +198,28 @@ class Dataset_Custom(Dataset):
         return self.scaler_y.inverse_transform(data)
 
 class Dataset_Custom_4_Soft_Sensor(Dataset):
-    ## Soft Sensor Forecasting Task: For single step forecasting, we only use the last point of the sequence as the target value.
+    """
+    A specialized PyTorch Dataset class designed for Custom Time-Series Soft Sensor Regression and Sequential Estimation tasks. 
+    It handles CSV data loading, automated dataset splitting (Train/Valid/Test), 
+    feature scaling, and time-feature encoding specifically formatted for 
+    Encoder-Decoder architectures.
+
+    Parameters:
+    :param args: Configuration object containing:
+        - data_path: Path to the CSV file.
+        - data_name: Name of the dataset for specific preprocessing logic.
+        - target: The name of the column to be predicted.
+        - if_missing: Boolean flag for handling missing values.
+        - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
+        - seq_len: Input sequence length (look-back window).
+        - label_len: Start token length for the decoder.
+        - pred_len: Prediction horizon (forecast length).
+        - data_aug: Boolean flag to enable data augmentation.
+        - C_out: Number of output channels.
+        - freq: Frequency for time feature encoding (e.g., 'h', 't', 's').
+    :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
+    :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
+    """
     
     def __init__(self, args, flag, timeenc):
         self.args = args
@@ -215,10 +267,8 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
-        if 'PPGAS' in self.data_name:
-            del_col = 'NOX' if self.target == 'CO' else 'CO'
-        else:
-            del_col = None
+
+        del_col = del_columns(self.data_name, self.target)
 
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
@@ -232,10 +282,11 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
-
-            
-        if self.args.model in ['DAGRU','HSAM_dGRUs','GCT']:
-            data_x = self.df_raw[columns_with_x + [self.target]].values # DAGRU and HSAM_dGRUs needs last point of sequence as input
+        """
+        For certain models, we need the target variable as input. Otherwise, we only use the input variables.
+        """       
+        if self.args.model in ['DAGRU','HSAM_dGRUs','GCT','STALSTM']:
+            data_x = self.df_raw[columns_with_x + [self.target]].values 
         else:
              data_x = self.df_raw[columns_with_x].values
 
@@ -283,9 +334,16 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         
 
     def __getitem__(self, index):
-        """ 
-        input: process variable x [T: T + seq_len, C_in]
-        output: quality variable y [T + seq_len - 1 : T + seq_len, C_out]
+        """
+        Retrieves a single data sample (a sliding window) for the model.
+        
+        Logic Overview:
+        1. Defines the sliding window boundaries for both Encoder and Decoder. 
+        2. x_enc: Historical data window used as input for the Model. Size: [B, T, C_in]
+        3. x_dec: Input for the Transformer based-Decoder, consisting of a 'start token' (label_len) 
+           followed by zeros representing the period to be predicted (pred_len). Size: [B, T + P - L, C_in].
+        4. x_mark: Temporal features (e.g., hour, day) corresponding to the data windows. Size: [B, T, C]
+        5. batch_y: The target values for the prediction values at last time step T. Size: [B, 1, C_out]
         """
         s_begin = index
         s_end = s_begin + self.args.seq_len
@@ -333,7 +391,27 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
 
 
 class Dataset_MultiMode(Dataset):
-    """ Multi-Mode Dataset for Multi-Step Forecasting Task
+    """
+    A specialized PyTorch Dataset class designed for Custom Time-Series Multi-mode Soft Sensor forecasting tasks . 
+    It handles CSV data loading, automated dataset splitting (Train/Valid/Test), 
+    feature scaling, and time-feature encoding specifically formatted for 
+    Encoder-Decoder architectures.
+
+    Parameters:
+    :param args: Configuration object containing:
+        - data_path: Path to the CSV file.
+        - data_name: Name of the dataset for specific preprocessing logic.
+        - target: The name of the column to be predicted.
+        - if_missing: Boolean flag for handling missing values.
+        - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
+        - seq_len: Input sequence length (look-back window).
+        - label_len: Start token length for the decoder.
+        - pred_len: Prediction horizon (forecast length).
+        - data_aug: Boolean flag to enable data augmentation.
+        - C_out: Number of output channels.
+        - freq: Frequency for time feature encoding (e.g., 'h', 't', 's').
+    :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
+    :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
     """
     def __init__(self, args, flag, timeenc):
         self.args = args
@@ -374,11 +452,7 @@ class Dataset_MultiMode(Dataset):
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
-        if 'PPGAS' in self.data_name:
-            del_col = 'NOX' if self.target == 'CO' else 'CO'
-        else:
-            del_col = None
-
+        del_col = del_columns(self.data_name, self.target)
         
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
@@ -455,6 +529,19 @@ class Dataset_MultiMode(Dataset):
 
 
     def __getitem__(self, index):
+        """
+        Retrieves a single data sample (a sliding window) for the model.
+        
+        Logic Overview:
+        1. Defines the sliding window boundaries for both Encoder and Decoder 
+        2. x_enc: Historical data window used as input for the Model. # Size: [B, T, C_in]
+        3. x_dec: Input for the Transformer based-Decoder, consisting of a 'start token' (label_len) followed 
+           by zeros representing the period to be predicted (pred_len). # Size: [B, T + P - L, C_in]
+        4. x_mark: Temporal features (e.g., hour, day) corresponding to the data windows. # Size: [B, T, C]
+        5. c_enc: Mode label for the input sequence. # Size: [B, T, M]
+        6. batch_y: The target values for the prediction values. # Size: [B, P, C_out]
+        """
+
         s_begin = index
         s_end = s_begin + self.args.seq_len
         r_begin = s_end - self.args.label_len
@@ -504,6 +591,28 @@ class Dataset_MultiMode(Dataset):
     
 
 class Dataset_MultiMode_4_Soft_Sensor(Dataset):
+    """
+    A specialized PyTorch Dataset class designed for Custom Time-Series Multi-mode Soft Sensor Regression and Sequential Estimation tasks. 
+    It handles CSV data loading, automated dataset splitting (Train/Valid/Test), 
+    feature scaling, and time-feature encoding specifically formatted for 
+    Encoder-Decoder architectures.
+
+    Parameters:
+    :param args: Configuration object containing:
+        - data_path: Path to the CSV file.
+        - data_name: Name of the dataset for specific preprocessing logic.
+        - target: The name of the column to be predicted.
+        - if_missing: Boolean flag for handling missing values.
+        - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
+        - seq_len: Input sequence length (look-back window).
+        - label_len: Start token length for the decoder.
+        - pred_len: Prediction horizon (forecast length).
+        - data_aug: Boolean flag to enable data augmentation.
+        - C_out: Number of output channels.
+        - freq: Frequency for time feature encoding (e.g., 'h', 't', 's').
+    :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
+    :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
+    """
     def __init__(self, args, flag, timeenc):
         self.args = args
         self.timeenc = timeenc
@@ -543,10 +652,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
 
         columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
 
-        if 'PPGAS' in self.data_name:
-            del_col = 'NOX' if self.target == 'CO' else 'CO'
-        else:
-            del_col = None
+        del_col = del_columns(self.data_name, self.target)
 
         if columns_with_x == []:
             columns_with_x = [
@@ -556,6 +662,9 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
         if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
 
+        """
+        Load mode labels for multi-mode tasks. If 'mode' column is not present, load from file.
+        """
         if 'mode' in self.df_raw.columns:
             self.label_mode = self.df_raw["mode"].values
         else:
@@ -620,10 +729,20 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
         
 
     def __getitem__(self, index):
-        """ 
-        input: process variable x [T: T + seq_len, C_in]
-        output: quality variable y [T + seq_len - 1 : T + seq_len, C_out]
+        
         """
+        Retrieves a single data sample (a sliding window) for the model.
+        
+        Logic Overview:
+        1. Defines the sliding window boundaries for both Encoder and Decoder 
+        2. x_enc: Historical data window used as input for the Model. # Size: [B, T, C_in]
+        3. x_dec: Input for the Transformer based-Decoder, consisting of a 'start token' (label_len) followed 
+           by zeros representing the period to be predicted (pred_len). # Size: [B, T + P - L, C_in]
+        4. x_mark: Temporal features (e.g., hour, day) corresponding to the data windows. # Size: [B, T, C]
+        5. c_enc: Mode label for the input sequence. # Size: [B, T, M]
+        6. batch_y: The target values for the prediction values. # Size: [B, 1, C_out]
+        """
+        
         s_begin = index
         s_end = s_begin + self.args.seq_len
         r_begin = s_begin + self.args.seq_len - 1

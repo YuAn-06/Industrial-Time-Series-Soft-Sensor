@@ -7,8 +7,10 @@ from layers.SelfAttention_Family import DMRIAttention, DMRIAttentionLayer
 from layers.Embedding import DataEmbedding
 
 
-"""Data Mode Related Interpretable Transformer Network for Predictive Modeling and Key Sample Analysis in Industrial Processes, IEEE Transactions on Industrial Informatics, 2022
-Thanks to authors: Diju Liu, Yalin Wang, et al"""
+"""
+Data Mode Related Interpretable Transformer Network for Predictive Modeling and Key Sample Analysis in Industrial Processes, IEEE Transactions on Industrial Informatics, 2022
+Thanks to authors: Diju Liu, Yalin Wang, et al
+"""
 
 
 class Model(nn.Module):
