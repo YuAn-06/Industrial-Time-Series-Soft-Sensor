@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
 from sklearn.manifold import TSNE
-
+from statsmodels.tsa.stattools import adfuller
 
 import seaborn as sns
 import pandas as pd
@@ -38,7 +38,7 @@ def plot_acf_lag(data, columns):
     axes = axes.flatten()  # 将二维数组展平成一维，便于索引
     for i in range(D):
         # 绘制ACF，lags=60表示显示前60个滞后
-        plot_acf(data[:,i], ax=axes[i], lags=60, alpha=0.05, label=columns[i])
+        plot_acf(data[:,i], ax=axes[i], lags=100, alpha=0.05, label=columns[i])
         axes[i].legend(fontsize=8)
         axes[i].set_xlabel('Lag', fontsize=4)
         axes[i].set_ylabel('Autocorrelation', fontsize=4)
@@ -76,9 +76,33 @@ def plot_data_2d(train_data, test_data):
     plt.ylabel(' ')
     plt.grid(True)
     plt.savefig('pics/'+data_name+'_tsne.pdf', dpi=300)
-    
 
-data_name = 'DC'
+def ADF_test(data, columns):
+    for i in range(data.shape[1]):
+        result = adfuller(data[:, i])
+        print(f'{columns[i]}: ADF Statistic: {result[0]}, p-value: {result[1]}, the series is stationary' if result[1] < 0.05 
+        else f'{columns[i]}: ADF Statistic: {result[0]}, p-value: {result[1]}, the series is non-stationary')
+     
+
+def detect_outliers(data, columns):
+    n_samples = data.shape[0]
+
+    for i in range(data.shape[1]):
+        Q1 = np.percentile(data[:, i], 25)
+        Q3 = np.percentile(data[:, i], 75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+
+        iqr_outliers = (data[:, i] < lower_bound) | (data[:, i] > upper_bound)
+        iqr_percentage = (iqr_outliers.sum() / n_samples) * 100
+        print(f'{columns[i]}: IQR Outliers Percentage: {iqr_percentage:.5f}%')
+
+        # outliers = (data[:, i] < lower_bound) | (data[:, i] > upper_bound)
+        # percentage = (outliers.sum() / n_samples) * 100
+        # print(f'{columns[i]}: Outliers Percentage: {percentage:.2f}%')
+
+data_name = 'Ironmaking'
 
 if __name__ == '__main__':
 
@@ -96,13 +120,19 @@ if __name__ == '__main__':
     data = data_df.values
     columns = data_df.columns
 
+    # ADF Test
+    ADF_test(data, columns)
+
     # Time Series Visualization
-    # plot_time_series(data, columns)
-    # # # ACF Lag Plot
-    # plot_acf_lag(data, columns)
+    plot_time_series(data, columns)
+    # # ACF Lag Plot
+    plot_acf_lag(data, columns)
+
+    # Outliers Detection
+    detect_outliers(data, columns)
 
     # Spearmanr Plot
-    plot_spearmanr(data, columns, corr=data_df.corr(method='spearman'))
+    # plot_spearmanr(data, columns, corr=data_df.corr(method='spearman'))
 
     # 2D Visualization
     # data_train = data[:int(0.7*len(data))]

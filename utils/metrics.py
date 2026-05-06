@@ -57,6 +57,14 @@ def MSPE(pred, true):
 
     return np.mean(mspe)
 
+def WAPE(pred, true):
+    
+
+
+    wape = np.sum(np.abs(pred - true), axis=1) / (np.sum(np.abs(true), axis=1) + 5e-5)
+
+    return np.mean(wape)
+
 def R2(pred, true):
     
     mean = np.mean(true, axis=0)
@@ -74,9 +82,11 @@ def metric(pred, true, task):
     mape = MAPE(pred, true)
     mspe = MSPE(pred, true)
     corr = CORR(pred, true, task)
+    wape = WAPE(pred, true)
+    
     if task == 'soft_sensor':
         r2 = R2(pred, true)
         return mae,mse,rmse,mape,mspe,r2,corr
     elif task == 'short_term_forecasting':
-        return mae,mse,rmse,mape,mspe,corr
+        return mae,mse,rmse,mape,mspe,wape,corr
     
