@@ -20,17 +20,17 @@ params:
   dec_in: 8  
   C_in: 8  
   C_out: 1
-  seq_len: 30 
-  label_len: 30
-  pred_len: 5
-  patch_len: 30
+  seq_len: 48 
+  label_len: 24
+  pred_len: 24
+  patch_len: 4
   stride: 8
-  d_model: 16
-  h_head: 2
-  e_layers: 2
-  d_ff: 16
+  d_model: 128
+  n_head: 8
+  e_layers: 1
+  d_ff: 512
   factor: 5
-  dropout: 0.0
+  dropout: 0.05
   activation: relu
 
 
@@ -39,7 +39,7 @@ params:
   learning_rate: 0.0005 # 0.0005
   epoch: 100
   if_valid: True
-  patience: 15 # 25
+  patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
 
 

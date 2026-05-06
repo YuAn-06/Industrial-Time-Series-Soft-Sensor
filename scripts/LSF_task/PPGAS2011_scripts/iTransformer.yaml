@@ -19,12 +19,12 @@ params:
   dec_in: 10  # Dimension of decoder Input
   C_in: 10  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
-  seq_len: 16 #
+  seq_len: 64 #
+  label_len: 64
   embed: 'TimeF'
   freq: 's'
   factor: 1
-  label_len: 16
-  pred_len: 6 # Prediction Length,
+  pred_len: 32 # Prediction Length,
   n_components: 5
   d_model: 64
   n_heads: 8

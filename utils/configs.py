@@ -13,14 +13,13 @@ def Init_parser():
     parser.add_argument('--data_path', type=str, default="",help="Dataset path")         
     parser.add_argument('--data_name', type=str, default="DC",help="Dataset name: [ 'DEB', 'SRU']")
     parser.add_argument('--target', type=str, default="",help="Target variable name")                
-    parser.add_argument('--data_aug',  default=False,   type=bool,help='If use data augmentation for Deb and SRU dataset')                    
-    parser.add_argument('--use_amp',  default=False,   type=bool,help='If use automatic mixed precision training')                   
+    parser.add_argument('--data_aug',  action='store_true',help='If use data augmentation for Deb and SRU dataset')                    
+    parser.add_argument('--use_amp',  action='store_true',help='If use automatic mixed precision training')                   
     parser.add_argument('--num_workers', type=int, default=1,help='DataLoader the number of workers')                   
-    parser.add_argument('--if_missing',  default=False,   type=bool,help='If exists Missing Data')                  
+    parser.add_argument('--if_missing',  action='store_true',help='If exists Missing Data')                  
     parser.add_argument('--missing_rate', type=float, default=0.0,help='Missing data rate [0:0.5]')                
-    parser.add_argument('--use_condition_label',  default=False,   type=bool,help='If use mode variable for multi_mode dataset')
-    # parser.add_argument('--if_data_aug',  default=False,help='If use data augmentation for Deb and SRU dataset')                    
-
+    parser.add_argument('--use_condition_label',  action='store_true',help='If use mode variable for multi_mode dataset')
+    
     # Model Config
     parser.add_argument('--enc_in', type=int, default=16,help='Dimension of encoder Input')               
     parser.add_argument('--dec_in', type=int, default=16,help='Dimension of decoder Input')               
@@ -49,22 +48,20 @@ def Init_parser():
     parser.add_argument('--batch_size', type=int, default=64,  help='Batch size for training')           
     parser.add_argument('--learning_rate', type=float, default=0.001,  help='Learning rate for optimizer')              
     parser.add_argument('--epoch', type=int, default=200, help='Number of training epochs')                
-    parser.add_argument('--if_valid', type=bool, default=False,help='If use validation during training')
     parser.add_argument('--patience', type=int, default=10,help='Patience for early stopping')                  
     parser.add_argument('--lradj', type=str, default='cosine',help="Learning rate adjustment strategy: ['type1', 'type2', 'cosine']")
     parser.add_argument('--weight_decay', type=float, default=0.0,help='L2 regularization weight')         
 
     # Test Config
-    parser.add_argument('--inverse', type=bool, default=False,
-                        help='If the data is scaled, inverse the data to the original scale')
+    parser.add_argument('--inverse', action='store_true', help='If the data is scaled, inverse the data to the original scale')
 
     # GPU config
-    parser.add_argument('--use_cuda', default=False, help='Use CUDA for training')                
+    parser.add_argument('--use_cuda', action='store_true', help='Use CUDA for training')                
     parser.add_argument('--device', type=str, default="cuda",help='Device to use')                  
     parser.add_argument('--gpu', type=int, default=0,help='GPU ID to use')               
     parser.add_argument('--seed', type=int, default=2021,help='Random seed')                
     parser.add_argument('--device_ids', nargs='+', type=int, default=[0],help='List of GPU device IDs')                 
-    parser.add_argument('--use_multi_gpu', default=False, help='Use multiple GPUs')
+    parser.add_argument('--use_multi_gpu', action='store_true', help='Use multiple GPUs')
 
     # Nystromformer config
     parser.add_argument('--num_landmarks', type=int, default=10,help='Number of landmarks')
@@ -79,10 +76,10 @@ def Init_parser():
     parser.add_argument('--moving_avg', type=int, default=25,help='moving average for Autoformer')
 
     # DLinear
-    parser.add_argument('--individual', type=bool, default=False,help='If use individual linear layer for each forecast')
+    parser.add_argument('--individual', action='store_true',help='If use individual linear layer for each forecast')
 
     # Informer
-    parser.add_argument('--distil', type=bool, default=False,help='whether to use distilling in encoder, using this argument means not using distilling')
+    parser.add_argument('--distil', action='store_true',help='whether to use distilling in encoder, using this argument means not using distilling')
     
     # MSACNN
     parser.add_argument('--reduction_ratio', type=float, default=16,help='Reduction ratio for MSACNN')
@@ -108,12 +105,12 @@ def Init_parser():
 
     # TimesMixer & SOFTS
     parser.add_argument('--down_sampling_window', type=int, default=4,help='Down sampling window for TimesMixer and TimeKAN ')
-    parser.add_argument('--channel_independence', type=bool, default=False,help='if channel independence for TimesNet')
+    parser.add_argument('--channel_independence', action='store_true',help='if channel independence for TimesNet')
     parser.add_argument('--top_k', type=int, default=5,help='Top k for TimesNet')
     parser.add_argument('--num_kernels', type=int, default=5,help='Number of kernels for TimesMixer')
     parser.add_argument('--decomp_method', type=str, default='none',help='[moving_avg, dft_decomp]')
     parser.add_argument('--down_sampling_layers', type=int, default=2,help='Number of down sampling layers for TimesMixer')
-    parser.add_argument('--use_norm', type=bool, default=False,help='If use normalization for TimesMixer')
+    parser.add_argument('--use_norm', action='store_true',help='If use normalization for TimesMixer')
     parser.add_argument('--down_sampling_method', type=str, default='max_pooling',help='[max, avg, conv')
 
     # GTFTS
@@ -138,7 +135,7 @@ def Init_parser():
 
 
     # TimeKAN
-    parser.add_argument('--begin_order', type=bool, default=False,help='If use future temporal feature for TimeKAN')
+    parser.add_argument('--begin_order', action='store_true',help='If use future temporal feature for TimeKAN')
 
     
     # GCN
