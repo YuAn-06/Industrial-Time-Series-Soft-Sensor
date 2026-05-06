@@ -42,7 +42,6 @@ class ExpConfigs:
     batch_size: int 
     learning_rate: float 
     epoch: int
-    if_valid: bool 
     patience: int 
     lradj: str 
     weight_decay: float

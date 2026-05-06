@@ -56,12 +56,12 @@ def Init_parser():
     parser.add_argument('--inverse', action='store_true', help='If the data is scaled, inverse the data to the original scale')
 
     # GPU config
-    parser.add_argument('--use_cuda', default=False, help='Use CUDA for training')                
+    parser.add_argument('--use_cuda', action='store_true', help='Use CUDA for training')                
     parser.add_argument('--device', type=str, default="cuda",help='Device to use')                  
     parser.add_argument('--gpu', type=int, default=0,help='GPU ID to use')               
     parser.add_argument('--seed', type=int, default=2021,help='Random seed')                
     parser.add_argument('--device_ids', nargs='+', type=int, default=[0],help='List of GPU device IDs')                 
-    parser.add_argument('--use_multi_gpu', default=False, help='Use multiple GPUs')
+    parser.add_argument('--use_multi_gpu', action='store_true', help='Use multiple GPUs')
 
     # Nystromformer config
     parser.add_argument('--num_landmarks', type=int, default=10,help='Number of landmarks')
