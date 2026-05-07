@@ -20,14 +20,15 @@ params:
   dec_in: 8  
   C_in: 8  
   C_out: 1
-  seq_len: 30 
-  label_len: 30
-  pred_len: 5
+  seq_len: 16 
+  label_len: 8
+  pred_len: 6
   moving_avg: 5
-  e_layers: 3
-  d_layers: 2
-  n_heads: 2
-  d_ff: 64
+  e_layers: 1
+  d_layers: 1
+  n_heads: 4
+  d_model: 64
+  d_ff: 256
   factor: 5
   activation: 'relu'
   embed: 'fixed'
@@ -39,7 +40,6 @@ params:
   batch_size: 128 #128
   learning_rate: 0.0005 # 0.0005
   epoch: 100
-  
   patience: 15 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
 
