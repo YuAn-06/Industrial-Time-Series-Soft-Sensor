@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     exp = get_exp_by_model_and_task(configs)
     
-    print(configs.freq)
+    print("if_missing:",configs.if_missing)
     
     logger.info("Start training...")
     exp.train(logger)
