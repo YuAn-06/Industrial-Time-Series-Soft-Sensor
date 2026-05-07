@@ -62,6 +62,7 @@ def Init_parser():
     parser.add_argument('--seed', type=int, default=2021,help='Random seed')                
     parser.add_argument('--device_ids', nargs='+', type=int, default=[0],help='List of GPU device IDs')                 
     parser.add_argument('--use_multi_gpu', action='store_true', help='Use multiple GPUs')
+    parser.add_argument('--use_tensorboard',action= 'store_true', help='use tensorboard to record')
 
     # Nystromformer config
     parser.add_argument('--num_landmarks', type=int, default=10,help='Number of landmarks')
@@ -153,6 +154,10 @@ def Init_parser():
     parser.add_argument('--mode_select', type=str, default='random', help='Mode selection method for FEDformer: [random, low]')
     parser.add_argument('--modes', type=int, default=32, help='Number of modes to be selected for FEDformer')
 
+    # VRNN
+    parser.add_argument('--x_embed_dim',type=int,default=16,help='dimension of embedding x dim')
+    parser.add_argument('--z_embed_dim',type=int,default=16,required=False,help='dimension of embedding z dim')
+    
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')
 
@@ -181,8 +186,11 @@ def Parse_arguments(yaml_path=None):
         for key, value in config["params"].items():
             setattr(args, key, value)
 
-    
-
+        try:
+            args = ExpConfigs(**vars(args))
+        except TypeError as e:
+            raise ValueError(f"Invalid config field detected:\n{e}")
+    print(args)
     if args.model == 'HSAM_dGRUs':
         setting = "{}_{}_{}_sl{}_hd{}_bt{}_lr{}_pat{}".format(
         args.data_name,
@@ -196,17 +204,73 @@ def Parse_arguments(yaml_path=None):
     )
 
     else:
-        setting = "{}_{}_{}_sl{}_dm{}_bt{}_lr{}_pat{}".format(
-        args.data_name,
-        args.model,
-        args.task,
+#         setting = "{}_{}_{}_sl{}_dm{}_dff{}_nh{}_el{}_dl{}_bt{}_lr{}".format(
+#         args.data_name, 
+#         args.model, 
+#         args.task, 
+#         args.seq_len, 
+#         args.d_model,
+#         args.d_ff,
+#         args.n_heads,
+#         args.e_layers,
+#         args.d_layers,
+#         args.batch_size, 
+#         args.learning_rate, 
+# )         
+        # setting = "{}_{}_{}_sl{}_dm{}_dff{}_nh{}_cc{}_sc{}_el{}_dl{}_bt{}_lr{}".format(
+        #         args.data_name, 
+        #         args.model, 
+        #         args.task, 
+        #         args.seq_len, 
+        #         args.d_model,
+        #         args.d_ff,
+        #         args.n_heads,
+        #         args.conv_channel,
+        #         args.skip_channel,
+        #         args.e_layers,
+        #         args.d_layers,
+        #         args.batch_size, 
+        #         args.learning_rate, 
+        # )
+        # setting = "{}_{}_{}_sl{}_ma{}_in{}_bt{}_lr{}".format(
+        #         args.data_name, 
+        #         args.model, 
+        #         args.task, 
+        #         args.seq_len, 
+        #         args.moving_avg,
+        #         args.individual,
+        #         args.batch_size, 
+        #         args.learning_rate, 
+        # )
+#         setting = "{}_{}_{}_sl{}_prl{}_dm{}_dff{}_nh{}_el{}_dl{}_bt{}_lr{}".format(
+#         args.data_name, 
+#         args.model, 
+#         args.task, 
+#         args.seq_len,
+#         args.period_len,
+#         args.d_model,
+#         args.d_ff,
+#         args.n_heads,
+#         args.e_layers,
+#         args.d_layers,
+#         args.batch_size, 
+#         args.learning_rate, 
+# )  
+        setting = "{}_{}_{}_sl{}_prl{}_dm{}_xed{}_zed{}_zd{}_bt{}_lr{}".format(
+        args.data_name, 
+        args.model, 
+        args.task, 
         args.seq_len,
+        args.period_len,
         args.d_model,
-        args.batch_size,
-        args.learning_rate,
-        args.patience
-    )
-
+        args.d_ff,
+        args.x_embed_dim,
+        args.z_embed_dim,
+        args.z_dim,
+        args.batch_size, 
+        args.learning_rate, 
+)    
+        
     print(setting)
     folder_path = f"./results/{args.model}/" + setting +"/"
     if not os.path.exists(folder_path):

@@ -268,5 +268,5 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         plt.savefig(self.args.save_dir + 'test.png')  # Save the plot as a PDF file
         logger.info(f"Saved plot as 'test.png' in {self.args.save_dir}")
 
-        plt.show()
+        # plt.show()
         return

@@ -1,7 +1,7 @@
-for e_layers in 1 2 3; do
-    for d_layers in 1 2 3; do
+for kernel_size in 2 4 6 8 10 12 14 16; do
+
         {
-            python -u run.py --model 'EnvFormer' \
+            python -u run.py --model 'TCN' \
                          --task 'short_term_forecasting' \
                          --data_name "DC" \
                          --data_path './data/DC/debutanizer_column.csv' \
@@ -15,15 +15,13 @@ for e_layers in 1 2 3; do
                          --seq_len 16 \
                          --label_len 8 \
                          --pred_len 6 \
-                         --kernel_size 2 \
+                         --moving_avg 3 \
                          --embed 'TimeF' \
                          --freq 's' \
                          --factor 1 \
-                         --d_model 128 \
-                         --d_ff 128 \
-                         --n_heads 4 \
-                         --e_layers ${e_layers} \
-                         --d_layers ${d_layers} \
+                         --kernel_size ${kernel_size} \
+                         --e_layers 1\
+                         --d_layers 1 \
                          --dropout 0.05 \
                          --activation 'gelu' \
                          --batch_size 64 \

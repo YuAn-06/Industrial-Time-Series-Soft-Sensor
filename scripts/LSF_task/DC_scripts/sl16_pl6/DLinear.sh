@@ -1,7 +1,8 @@
-for e_layers in 1 2 3; do
-    for d_layers in 1 2 3; do
-        {
-            python -u run.py --model 'EnvFormer' \
+
+for moving_avg in 3 5 7 9 11 13 15 17; do
+
+            python -u run.py \
+                         --model 'DLinear' \
                          --task 'short_term_forecasting' \
                          --data_name "DC" \
                          --data_path './data/DC/debutanizer_column.csv' \
@@ -13,17 +14,12 @@ for e_layers in 1 2 3; do
                          --C_in 8 \
                          --C_out 1 \
                          --seq_len 16 \
-                         --label_len 8 \
-                         --pred_len 6 \
-                         --kernel_size 2 \
                          --embed 'TimeF' \
                          --freq 's' \
                          --factor 1 \
-                         --d_model 128 \
-                         --d_ff 128 \
-                         --n_heads 4 \
-                         --e_layers ${e_layers} \
-                         --d_layers ${d_layers} \
+                         --label_len 16 \
+                         --pred_len 6 \
+                         --moving_avg ${moving_avg} \
                          --dropout 0.05 \
                          --activation 'gelu' \
                          --batch_size 64 \
@@ -38,7 +34,12 @@ for e_layers in 1 2 3; do
                          --seed 2021 \
 
         sleep 5
-        }
 done
-done
+
 wait
+
+
+
+
+
+
