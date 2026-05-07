@@ -207,7 +207,7 @@ class DMVAER_Loss(BaseLoss):
         x_true = true['x_true']
         y_true = true['y_true']
         c_true = true['c_true']
-        c_true = c_true[:,:-self.args.pred_len,:]
+        # c_true = c_true[:,:-self.args.pred_len,:]
         x_pred = preds['x_pred']
         y_pred = preds['y_pred']
         c_pred = preds['c_pred']

@@ -46,11 +46,13 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         batch_x = x_enc # [B, T, D]
         batch_c = c_enc
         if self.args.model in ['VRNN']: # VRNN
-            
-            return {
-                'y_true': batch_y[:,-self.args.pred_len:,-self.args.C_out:],
-                'x_true': batch_x  
-            }
+            if flag == 'train':
+                return {
+                    'y_true': batch_y[:,-self.args.pred_len:,-self.args.C_out:],
+                    'x_true': batch_x  
+                }
+            else:
+                return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
         elif self.args.model in ['DMVAER']: # DMVAER 
             if flag == 'train':
                 return {
