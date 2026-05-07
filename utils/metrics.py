@@ -8,11 +8,21 @@
 import numpy as np
 import torch
 
-def RSE(pred, true):
+def RSE(pred: np.array, true: np.array) -> float:
+    """
+    Root Squared Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
     return np.sqrt(np.sum((true-pred)**2)) / np.sqrt(np.sum((true-true.mean())**2))
 
-def CORR(pred, true, task):
-
+def CORR(pred: np.ndarray, true: np.ndarray, task: str) -> float:
+    """
+    Pearson Correlation Coefficient Metrics
+    pred (np.ndarray): predicted values
+    true (np.ndarray): true values
+    task (str): task type
+    """
     pred_mean = np.mean(pred, axis=0)
     true_mean = np.mean(true, axis=0)
 
@@ -24,17 +34,37 @@ def CORR(pred, true, task):
     return np.mean(numerator / (denominator + 1e-6))
         
 
-def MAE(pred, true):
+def MAE(pred: np.array, true: np.array) -> float:
+    """
+    Mean Absolute Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
     return np.mean(np.abs(pred-true))
 
-def MSE(pred, true):
-    # return mean_squared_error(pred,true)
+def MSE(pred: np.array, true: np.array) -> float:
+    """
+    Mean Squared Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
     return np.mean((pred-true)**2)
 
-def RMSE(pred, true):
+def RMSE(pred: np.array, true: np.array) -> float:
+    """
+    Root Mean Squared Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
     return np.sqrt(MSE(pred, true))
 
-def MAPE(pred : np.array, true : np.array, true_mask : np.array = None):
+def MAPE(pred : np.array, true : np.array, true_mask : np.array = None) -> float:
+    """
+    Mean Absolute Percentage Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    true_mask (np.array): true mask
+    """
 
     zero_mask = ~np.isclose(true, 0, atol=1e-5)
 
@@ -47,7 +77,12 @@ def MAPE(pred : np.array, true : np.array, true_mask : np.array = None):
 
     return np.mean(mape)
 
-def MSPE(pred, true):
+def MSPE(pred: np.array, true: np.array) -> float:
+    """
+    Mean Squared Percentage Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
 
     zero_mask = ~np.isclose(true, 0, atol=1e-5)
 
@@ -57,15 +92,23 @@ def MSPE(pred, true):
 
     return np.mean(mspe)
 
-def WAPE(pred, true):
-    
-
+def WAPE(pred: np.array, true: np.array) -> float:
+    """
+    Weighted Absolute Percentage Error
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
 
     wape = np.sum(np.abs(pred - true), axis=1) / (np.sum(np.abs(true), axis=1) + 5e-5)
 
     return np.mean(wape)
 
-def R2(pred, true):
+def R2(pred: np.array, true: np.array) -> float:
+    """
+    R-squared Metrics
+    pred (np.array): predicted values
+    true (np.array): true values
+    """
     
     mean = np.mean(true, axis=0)
     sse = np.sum(np.pow(pred - true, 2), axis=0)
@@ -75,7 +118,15 @@ def R2(pred, true):
 
     return np.mean(r2)
 
-def metric(pred, true, task):
+def metric(pred: np.array, true: np.array, task: str) -> tuple:
+    """
+    Calculate the metrics for the given predicted and true values. 
+    The metrics include MAE, MSE, RMSE, MAPE, MSPE, R2, and correlation coefficient. 
+    The function returns a tuple containing the calculated metrics.
+    pred (np.array): predicted values
+    true (np.array): true values
+    task (str): task type
+    """
     mae = MAE(pred, true)
     mse = MSE(pred, true)
     rmse = RMSE(pred, true)
@@ -86,7 +137,7 @@ def metric(pred, true, task):
     
     if task == 'soft_sensor':
         r2 = R2(pred, true)
-        return mae,mse,rmse,mape,mspe,r2,corr
+        return mae, mse, rmse, mape, mspe, r2, corr
     elif task == 'short_term_forecasting':
-        return mae,mse,rmse,mape,mspe,wape,corr
+        return mae, mse, rmse, mape, mspe, wape, corr
     

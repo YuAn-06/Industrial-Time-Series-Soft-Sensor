@@ -8,14 +8,14 @@ Copyright (C) 2024
 """
 
 
-def print_args(args, indent=4):
-    """优雅地打印所有参数，按类别分组显示
+def print_args(args, indent: int = 4):
+    """ print all arguments, grouped by category
     
     Args:
-        args: 包含参数的对象
-        indent: 缩进空格数，默认为4
+        args: object containing the arguments
+        indent: number of spaces for indentation, default is 4
     """
-    # 将参数按类别分组
+    # group parameters by category
     basic_config = {
         'Model': getattr(args, 'model', None),
         'Data Name': getattr(args, 'data_name', None),
@@ -77,10 +77,10 @@ def print_args(args, indent=4):
     _print_section("GPU Config", gpu_config, indent)
 
 
-def _print_section(title, config_dict, indent):
+def _print_section(title: str, config_dict: dict, indent: int):
     """打印配置的一个部分"""
     print(f"\033[1m{title}:\033[0m")
     for key, value in config_dict.items():
         if value is not None:
             print(f"{' ' * indent}{key:<20}: {value}")
-    print()  # 空行分隔
+    print()  # 空行分隔 

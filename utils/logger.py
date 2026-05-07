@@ -8,7 +8,12 @@ COLOR_DICT = {
     'blue': '\033[94m',
 }
 
-def wrap_message(message, color=None):
+def wrap_message(message: str, color: str = None) -> str:
+    """
+    Wrap a message with color code.
+    message (str): The message to wrap.
+    color (str): The color to wrap the message with. Default is None.
+    """
     if color is None or color not in COLOR_DICT:
         return message
     else:
@@ -18,7 +23,13 @@ def wrap_message(message, color=None):
 
 
 class Logger:
-    def __init__(self, log_dir, name=None, remove_old=True):
+    """
+    Logger class for logging messages with different colors and levels.
+    log_dir (str): Directory to save the log file.
+    name (str): Name of the logger. Default is None.
+    remove_old (bool): Whether to remove the old log file. Default is True.
+    """
+    def __init__(self, log_dir: str, name: str = None, remove_old=True):
         if name is None:
             name = __name__
 
@@ -49,13 +60,13 @@ class Logger:
         handler02.setFormatter(formatter)
         self.logger.addHandler(handler02)
 
-    def log(self, level, message, color=None):
+    def log(self, level: int, message: str, color=None):
         self.logger.log(level, wrap_message(message, color))
 
-    def info(self, message, color=None):
+    def info(self, message: str, color=None):
         self.logger.info(wrap_message(message, color))
 
-    def debug(self, message, color=None):
+    def debug(self, message: str, color=None):
         self.logger.debug(wrap_message(message, color))
 
     def remove_handles(self):

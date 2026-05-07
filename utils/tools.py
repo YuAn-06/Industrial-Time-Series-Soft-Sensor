@@ -17,7 +17,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-
+from typing import List, Tuple
 
 def mean_interpolate_zeros(arr):
     """
@@ -126,7 +126,8 @@ def visual_feautures(features,model_name,data_name,decomposition='PCA'):
 
 
 class EarlyStopping:
-    def __init__(self,patience = 8, verbose = False, delta = 0):
+    """Early stops the training if validation loss doesn't improve after a given number of epochs"""
+    def __init__(self,patience: int = 8, verbose: bool = False, delta: float = 0):
         self.patience = patience
         self.verbose = verbose
         self.counter = 0
@@ -134,7 +135,7 @@ class EarlyStopping:
         self.early_stop = False
         self.val_loss_min = np.inf
         self.delta = delta
-    def __call__(self, val_loss, model, path):
+    def __call__(self, val_loss: float, model: torch.nn.Module, path: str):
         score = -val_loss
         if self.best_score is None:
             self.best_score = score
@@ -149,7 +150,8 @@ class EarlyStopping:
             self.best_score = score
             self.save_checkpoint(val_loss, model, path)
             self.counter = 0
-    def save_checkpoint(self, val_loss, model, path):
+    
+    def save_checkpoint(self, val_loss: float, model: torch.nn.Module, path: str):
         if self.verbose:
             print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).')
            
@@ -157,7 +159,7 @@ class EarlyStopping:
         self.val_loss_min = val_loss
 
 
-def adjust_learning_rate(optimizer, epoch, args):
+def adjust_learning_rate(optimizer: torch.optim.Optimizer, epoch: int, args):
     # lr = args.learning_rate * (0.2 ** (epoch // 2))
     if args.lradj == 'type1':
         lr_adjust = {epoch: args.learning_rate * (0.5 ** ((epoch - 1) // 1))}
@@ -254,7 +256,7 @@ def select_tensorboard_hparams(args):
     return hparams
 
 
-def DC_preprocess(df_raw, target):
+def DC_preprocess(df_raw: pd.DataFrame, target: str) -> Tuple[pd.DataFrame, List[str]]:
     
     """
     Debutainer columns (DC), Enhance the sequence data with rolling window data
@@ -287,14 +289,16 @@ def DC_preprocess(df_raw, target):
     
     return data_df, cols
     
-def SRU_preprocess(df_raw, target):  
+def SRU_preprocess(df_raw: pd.DataFrame, target: str) -> Tuple[pd.DataFrame, List[str]]:
     """
     For SRU, Enhance the sequence data with rolling window data
+    df_raw (pd.DataFrame): raw data
+    target (str): target column name
     """
     data_df = df_raw.copy()
     target_df = df_raw[target]
 
-    
+    # Drop unnecessary columns
 
     data_df = data_df.drop(columns=['SO2','H2S'])
 
@@ -320,7 +324,7 @@ def SRU_preprocess(df_raw, target):
 
     return data_df, cols
 
-def del_columns(data_name, target):
+def del_columns(data_name: str, target: str) -> str:
     """
     Delete unnecessary columns for specific datasets
     """

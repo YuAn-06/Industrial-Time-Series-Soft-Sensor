@@ -47,7 +47,7 @@ class Dataset_Custom(Dataset):
     :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
     :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
     """
-    def __init__(self, args, flag, timeenc):
+    def __init__(self, args, flag: str, timeenc: int):
         self.args = args
         self.timeenc = timeenc
         self.data_path = args.data_path
@@ -194,7 +194,7 @@ class Dataset_Custom(Dataset):
     def __len__(self):
         return len(self.data_x) - self.args.seq_len - self.args.pred_len + 1
     
-    def inverse_transform(self, data):
+    def inverse_transform(self, data: np.ndarray) -> np.ndarray:
         return self.scaler_y.inverse_transform(data)
 
 class Dataset_Custom_4_Soft_Sensor(Dataset):
@@ -221,7 +221,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
     :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
     """
     
-    def __init__(self, args, flag, timeenc):
+    def __init__(self, args, flag: str, timeenc: int):
         self.args = args
         self.timeenc = timeenc
         self.data_path = args.data_path
@@ -385,7 +385,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
     def __len__(self):
         return len(self.data_x) - self.args.seq_len  + 1
 
-    def inverse_transform(self, data):
+    def inverse_transform(self, data: np.ndarray) -> np.ndarray:
         # only y need inverse transform
         return self.scaler_y.inverse_transform(data)
 
@@ -413,7 +413,7 @@ class Dataset_MultiMode(Dataset):
     :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
     :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
     """
-    def __init__(self, args, flag, timeenc):
+    def __init__(self, args, flag: str, timeenc: int):
         self.args = args
         self.timeenc = timeenc
         self.data_path = args.data_path
@@ -586,7 +586,7 @@ class Dataset_MultiMode(Dataset):
     def __len__(self):
         return len(self.data_x) - self.args.seq_len - self.args.pred_len + 1
     
-    def inverse_transform(self, data):
+    def inverse_transform(self, data: np.ndarray) -> np.ndarray:
         return self.scaler_only_y.inverse_transform(data)
     
 
@@ -613,7 +613,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
     :param flag: Dataset split identifier, must be in ['train', 'test', 'valid'].
     :param timeenc: Integer (0 or 1) indicating the type of time feature encoding to use.
     """
-    def __init__(self, args, flag, timeenc):
+    def __init__(self, args, flag: str, timeenc: int):
         self.args = args
         self.timeenc = timeenc
         self.data_path = args.data_path
@@ -728,7 +728,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
         #     self.mask_label = self.mask_label[border1:border2]
         
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         
         """
         Retrieves a single data sample (a sliding window) for the model.
@@ -786,7 +786,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
     def __len__(self):
         return len(self.data_x) - self.args.seq_len  + 1
 
-    def inverse_transform(self, data):
+    def inverse_transform(self, data: np.ndarray) -> np.ndarray:
         # only y need inverse transform
         return self.scaler_y.inverse_transform(data)
     

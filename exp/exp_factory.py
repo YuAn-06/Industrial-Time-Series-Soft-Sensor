@@ -8,11 +8,11 @@
 
 
 from exp import Exp_Short_Term_Forecasting, Exp_Soft_Sensor
+from exp import Exp_basic
 
 
 
-
-def get_exp_by_model_and_task(args):
+def get_exp_by_model_and_task(args) -> Exp_basic:
     """
     Choose the appropriate Exp class based on the model name and task type
     """

@@ -9,9 +9,10 @@ from torch import optim, nn
 from matplotlib import pyplot as plt
 
 from exp import Exp_basic, Losses, TensorboardObserver
-from utils import metric, adjust_learning_rate, EarlyStopping
+from utils import metric, adjust_learning_rate, EarlyStopping, Logger
 from data import data_provider
-
+from data import data_provider, DataLoader, Dataset
+from typing import Any, Optional, Union, Dict
 
 
 warnings.filterwarnings('ignore')
@@ -33,16 +34,25 @@ class Exp_Soft_Sensor(Exp_basic):
         print(model)
         return model.to(self.device)    
     
-    def _get_data(self, flag):
+    def _get_data(self, flag: str) -> Union[Dataset, DataLoader]:
         data_set, data_loader = data_provider(self.args, flag)
         return data_set, data_loader
     
-    def _select_optimizer(self):
+    def _select_optimizer(self) -> optim.Optimizer:
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         return model_optim
     
-    def _select_gt(self, x_enc, x_dec, x_mark_enc, x_mark_dec, batch_y, c_enc=None, flag = 'Train'):
+    def _select_gt(self, 
+                x_enc: torch.Tensor, 
+                x_dec: torch.Tensor, 
+                x_mark_enc: torch.Tensor, 
+                x_mark_dec: torch.Tensor, 
+                batch_y: torch.Tensor, 
+                c_enc=None, 
+                flag = 'Train') -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
+        
         batch_x = x_enc
+        
         if self.args.model in ['VRNN']:
             if flag == 'Train':
                 return {
@@ -62,7 +72,7 @@ class Exp_Soft_Sensor(Exp_basic):
                 return batch_y.squeeze(1)
         else:
             return batch_y.squeeze(1)
-    def _select_pred(self, outputs):
+    def _select_pred(self, outputs: Union[torch.Tensor, Dict[str, torch.Tensor]], flag = 'train') -> torch.Tensor:
         if self.args.model in ['VRNN']:
             return outputs['y_pred']
         elif self.args.model in ['DMVAER']:
@@ -71,7 +81,7 @@ class Exp_Soft_Sensor(Exp_basic):
             return outputs
     
 
-    def train(self, logger):
+    def train(self, logger: Logger) -> None:
         
         folder_path = self.args.save_dir
         if not os.path.exists(folder_path):
@@ -139,7 +149,7 @@ class Exp_Soft_Sensor(Exp_basic):
         return self.model
     
     
-    def vali(self, val_data, val_loader):
+    def vali(self, val_data: Dataset, val_loader: DataLoader) -> float:
         total_loss = []
         self.model.eval()
         with torch.no_grad():
@@ -160,7 +170,7 @@ class Exp_Soft_Sensor(Exp_basic):
         return total_loss
     
     
-    def test(self,logger):
+    def test(self, logger: Logger) -> None:
         test_data, test_loader = self._get_data(flag='test')
  
         

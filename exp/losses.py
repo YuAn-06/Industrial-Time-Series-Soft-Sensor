@@ -5,7 +5,8 @@ from torch import nn
 import datetime
 import os
 from torch.utils.tensorboard import SummaryWriter
-
+from utils import Logger
+from typing import Any, Optional, Union, Dict
 
 class TensorboardObserver():
     """
@@ -40,14 +41,14 @@ class BaseLoss(nn.Module):
         self.args = args
         self._loss_lists = {}  # 存储所有损失列表
     
-    def _register_loss_list(self, name, initial_list=None):
+    def _register_loss_list(self, name: str, initial_list: list = None):
         """注册一个新的损失列表"""
         if initial_list is None:
             initial_list = []
         self._loss_lists[name] = initial_list
         # setattr(self, f'{name}_list', initial_list)
     
-    def _append_loss(self, list_name, value):
+    def _append_loss(self, list_name: str, value: float):
         """向指定的损失列表添加值"""
         self._loss_lists[list_name].append(value)
     
@@ -67,7 +68,7 @@ class BaseLoss(nn.Module):
         pass
 
 class Losses:  
-    def __init__(self, args, folder_path = None):
+    def __init__(self, args, folder_path: str = None):
         self.calculate_loss = losses_dict[args.model](args)
         self.args = args
     
@@ -75,7 +76,7 @@ class Losses:
     def __call__(self, *args, **kwargs):
         return self.calculate_loss(*args, **kwargs)
 
-    def print_loss(self, epoch, train_steps, valid_loss, logger):
+    def print_loss(self, epoch: int, train_steps: int, valid_loss: float, logger: Logger) -> None:
         # 打印通用损失信息
         message = f'Epoch [{epoch + 1}/{self.args.epoch}], Steps: {train_steps} Train Loss: {self.calculate_loss.mean_total_loss:.4f}, Valid Loss: {valid_loss:.4f}'
         print(message)
@@ -98,7 +99,7 @@ class MSE_Loss(BaseLoss):
         self.MSEloss = nn.MSELoss(reduction='mean')
         self._register_loss_list('loss')
     
-    def forward(self, y_pred, y_true, flag='train'):
+    def forward(self, y_pred: torch.Tensor, y_true: torch.Tensor, flag: str = 'train'):
         loss = self.MSEloss(y_pred, y_true)     
         
         if flag == 'train':
@@ -125,7 +126,7 @@ class CVAESMC_Loss(BaseLoss):
         """计算重建损失的平均值"""
         return np.mean(self._loss_lists['recon_loss'])
 
-    def forward(self, preds,true, flag='train'):
+    def forward(self, preds: Dict[str, torch.Tensor], true: torch.Tensor, flag: str = 'train'):
 
         z_mu_p = preds['mu_posterior']
         z_logvar_p = preds['logvar_posterior']
@@ -203,7 +204,7 @@ class DMVAER_Loss(BaseLoss):
         """打印DMVAER模型的详细损失信息"""
         # print(f'z_s KL Loss: {self.mean_zs_kl_loss:.4f}, z_t KL Loss: {self.mean_zt_kl_loss:.4f}, c KL Loss: {self.mean_c_kl_loss:.4f}, x Recon Loss: {self.mean_x_recon_loss:.4f}, y Recon Loss: {self.mean_y_recon_loss:.4f}')
         print(f'x Recon Loss: {self.mean_x_recon_loss:.4f}, y Recon Loss: {self.mean_y_recon_loss:.4f}, zt KL Loss: {self.mean_zt_kl_loss:.4f}, zs KL Loss: {self.mean_zs_kl_loss:.4f}, c KL Loss: {self.mean_c_kl_loss:.4f}')
-    def forward(self, preds, true, flag = 'train'):
+    def forward(self, preds: Dict[str, torch.Tensor], true: Dict[str, torch.Tensor], flag: str = 'train'):
         x_true = true['x_true']
         y_true = true['y_true']
         c_true = true['c_true']
@@ -288,7 +289,7 @@ class TCVAE_Loss(BaseLoss):
         print(f'Pred Loss: {self.mean_pred_loss:.4f}, KL Loss: {self.mean_KL_loss:.4f}')
         
     
-    def forward(self, preds, true, flag = 'train'):
+    def forward(self, preds: Dict[str, torch.Tensor], true: torch.Tensor, flag = 'train'):
         
         pred_y = preds['dec_out_train'][:, -self.args.pred_len:, :]
         pred_loss = self.MSEloss(pred_y, true)
@@ -342,7 +343,7 @@ class VRNN_Loss(BaseLoss):
         """打印VRNN模型的详细损失信息"""
         print(f'Recon Loss X: {self.mean_recon_x_loss:.4f}, Recon Loss Y: {self.mean_recon_y_loss:.4f}, KL Loss: {self.mean_KL_loss:.4f}')
     
-    def forward(self, preds, trues, trues_rec=None, flag = 'train'):
+    def forward(self, preds: Dict[str, torch.Tensor], trues: Dict[str, torch.Tensor], trues_rec=None, flag: str = 'train') -> torch.Tensor:
         y_pred = preds['y_pred']
         x_pred = preds['x_pred']
         x_true = trues['x_true']
@@ -398,7 +399,7 @@ class GTFTS_Loss(BaseLoss):
         """打印VRNN模型的详细损失信息"""
         print(f'Pred Loss: {self.pred_loss:.4f}, MRMC Loss 1: {self.MRMC1_loss:.4f}, MRMC Loss 2: {self.MRMC2_loss:.4f}')
     
-    def forward(self, preds, trues, trues_rec=None, flag = 'train'):
+    def forward(self, preds: Dict[str, torch.Tensor], trues: Dict[str, torch.Tensor], trues_rec=None, flag: str = 'train') -> torch.Tensor:
         y_pred = preds['y_pred']
 
         y_true = trues
@@ -426,7 +427,7 @@ class HuberLoss(BaseLoss):
         super().__init__(args)
         self.huber_loss = nn.HuberLoss(reduction='mean',delta=0.8)
         self._register_loss_list('loss')
-    def forward(self, preds, true, flag = 'train'):
+    def forward(self, preds: torch.Tensor, true: torch.Tensor, flag: str = 'train') -> torch.Tensor:
         loss = self.huber_loss(preds, true)
         if flag == 'train':
             self._append_loss('loss', loss.item())

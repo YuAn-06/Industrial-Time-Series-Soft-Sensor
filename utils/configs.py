@@ -174,7 +174,10 @@ def Init_parser():
     return args
 
 
-def Parse_arguments(yaml_path=None):
+
+
+
+def Parse_arguments(yaml_path: str = None):
     args = Init_parser()
     print('yaml_path', yaml_path)
 

@@ -3,40 +3,50 @@ import torch
 import numpy as np
 import datetime
 import time
+from typing import Any, Optional, Union, Dict
 
 from exp import Exp_basic, Losses, TensorboardObserver
-from data import data_provider
-from utils import metric, adjust_learning_rate, EarlyStopping, select_tensorboard_hparams
+
+from data import data_provider, DataLoader, Dataset
+from utils import metric, adjust_learning_rate, EarlyStopping, select_tensorboard_hparams,Logger
 
 from torch import optim, nn
 from matplotlib import pyplot as plt
 
 
-
-class Exp_Short_Term_Forecasting(Exp_basic):
+class Exp_Short_Term_Forecasting(Exp_basic): 
     
-    def __init__(self, args):
+    def __init__(self, args: Any) -> None:
         super(Exp_Short_Term_Forecasting, self).__init__(args)
 
         
         self.loss = Losses(args)
     
-    def _build_model(self):
+    def _build_model(self) -> Any:
         model = self.model_dict[self.args.model].Model(self.args).float()
         if self.args.use_multi_gpu and self.args.use_cuda:
             model = torch.nn.DataParallel(model, device_ids=self.args.device_ids)
             
         return model.to(self.device)
     
-    def _get_data(self, flag):
+    def _get_data(self, flag: str) -> Union[Dataset, DataLoader]:
         data_set, data_loader = data_provider(self.args, flag)
         return data_set, data_loader
     
-    def _select_optimizer(self):
+    def _select_optimizer(self) -> optim.Optimizer:
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         return model_optim
     
-    def _select_gt(self, x_enc,  x_dec, x_mark_enc, x_mark_dec, batch_y, flag ='train',c_enc=None):
+    def _select_gt(
+        self,
+        x_enc: torch.Tensor,
+        x_dec: torch.Tensor,
+        x_mark_enc: torch.Tensor,
+        x_mark_dec: torch.Tensor,
+        batch_y: torch.Tensor,
+        flag: str = 'train',
+        c_enc: Optional[torch.Tensor] = None
+        ) -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
 
         """
         x_enc: [B, T, D] input sequence
@@ -53,12 +63,13 @@ class Exp_Short_Term_Forecasting(Exp_basic):
                 }
             else:
                 return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
+
         elif self.args.model in ['DMVAER']: # DMVAER 
             if flag == 'train':
                 return {
                     'y_true': batch_y[:,-self.args.pred_len:,-self.args.C_out:],
                     'x_true': batch_x,
-                    'c_true': batch_c
+                    'c_true': batch_c[:, :-self.args.pred_len]
             }
             else:
                 return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
@@ -69,7 +80,6 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             else:
                 return batch_y[:, -self.args.pred_len:, :]
           
-           
         else: # 其他模型
             if flag == 'train':
                 return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
@@ -78,7 +88,10 @@ class Exp_Short_Term_Forecasting(Exp_basic):
            
         
         
-    def _select_pred(self, outputs,flag ='train'):
+    def _select_pred(self, 
+                     outputs: Union[torch.Tensor, Dict[str, torch.Tensor]], 
+                     flag: str = 'train'
+                     ) -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
         if self.args.model in ['VRNN','DMVAER']:
             if flag == 'train':  
                 return outputs
@@ -91,11 +104,13 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             else:
                 outputs = outputs['dec_out_infer']
                 return outputs[:, -self.args.pred_len:, :]
+
         elif self.args.model in ['CVAESMC']:
             if flag == 'train':
                 return outputs
             else:
                 return outputs
+
         elif self.args.model in ['GTFTS']:
             if flag == 'train':
                 return outputs
@@ -108,7 +123,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
                 return outputs[:, -self.args.pred_len:, -self.args.C_out:]
     
 
-    def train(self, logger):
+    def train(self, logger: Logger) -> None:
         
             
         # 检查是否启用tensorboard，优先使用args中的设置，否则默认为False
@@ -179,7 +194,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         return self.model
     
     
-    def vali(self, val_data, val_loader):
+    def vali(self, val_data: Dataset, val_loader: DataLoader) -> float:
         total_loss = []
         self.model.eval()
         with torch.no_grad():
@@ -201,7 +216,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         return total_loss
     
     
-    def test(self, logger):
+    def test(self, logger: Logger) -> None:
         test_data, test_loader = self._get_data(flag='test')
         
         

@@ -7,7 +7,8 @@ Copyright (C) 2024
 @ Software: PyCharm
 """
 from data import Dataset_Custom, Dataset_Custom_4_Soft_Sensor, Dataset_MultiMode, Dataset_MultiMode_4_Soft_Sensor
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
+from typing import Union
 
 data_dict = {
     # DC
@@ -29,7 +30,7 @@ data_dict = {
 }   
 
 
-def data_provider(args, flag):
+def data_provider(args, flag: str)-> Union[Dataset, DataLoader]:
     data_name = args.data_name
     if 'PPGAS' in data_name:
         data_name = 'PPGAS'
