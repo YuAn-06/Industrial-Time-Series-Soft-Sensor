@@ -30,7 +30,7 @@ params:
   batch_size: 64 #128
   learning_rate: 0.001 # 0.0005
   epoch: 600
-  if_valid: True
+  
   patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
 

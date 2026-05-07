@@ -20,6 +20,8 @@ def Init_parser():
     parser.add_argument('--if_missing',  action='store_true',  help='If exists Missing Data')                  
     parser.add_argument('--missing_rate', type=float, default=0.0,help='Missing data rate [0:0.5]')                
     parser.add_argument('--use_condition_label',  action='store_true', help='If use mode variable for multi_mode dataset')
+    parser.add_argument('--use_tensorboard',  action='store_true', help='If use tensorboard for visualization')
+    
                  
 
     # Model Config
@@ -156,6 +158,11 @@ def Init_parser():
     parser.add_argument('--mode_select', type=str, default='random', help='Mode selection method for FEDformer: [random, low]')
     parser.add_argument('--modes', type=int, default=32, help='Number of modes to be selected for FEDformer')
 
+
+    # VRNN
+    parser.add_argument('--x_embed_dim', type=int, default=16, help='Number of layers for VRNN')
+    parser.add_argument('--z_embed_dim', type=int, default=16, help='Number of layers for VRNN')
+
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')
 
@@ -184,6 +191,11 @@ def Parse_arguments(yaml_path=None):
         # Modify the global args object directly
         for key, value in config["params"].items():
             setattr(args, key, value)
+    
+    try:
+        args = ExpConfigs(**vars(args))
+    except TypeError as e:
+        raise ValueError(f"Invalid config field detected:\n{e}")
 
     
 

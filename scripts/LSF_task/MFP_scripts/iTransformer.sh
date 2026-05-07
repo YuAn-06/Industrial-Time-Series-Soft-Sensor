@@ -11,7 +11,6 @@ python -u run.py --model 'iTransformer' \
                  --num_workers 1 \
                  --if_missing False \
                  --missing_rate 0 \
-                 --use_axliary_var False \
                  --enc_in 17 \
                  --dec_in 17 \
                  --C_in 17 \

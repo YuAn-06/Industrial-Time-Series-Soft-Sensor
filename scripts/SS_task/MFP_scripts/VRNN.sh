@@ -11,7 +11,7 @@ python -u run.py --model 'VRNN' \
                  --num_workers 1 \
                  --if_missing False \
                  --missing_rate 0 \
-                 --use_axliary_var False \
+                 --
                  --enc_in 16 \
                  --dec_in 16 \
                  --C_in 16 \
