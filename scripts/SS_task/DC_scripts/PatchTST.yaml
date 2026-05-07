@@ -10,7 +10,7 @@ params:
   num_workers: 1
   if_missing: False
   missing_rate: 0
-  use_axliary_var: False
+  
 
   # Model Config
   enc_in: 13
@@ -40,7 +40,7 @@ params:
   learning_rate: 0.001
   weight_decay: 0.0
   epoch: 300
-  if_valid: True
+  
   patience: 10
   lradj: 'cosine'
   use_tensorboard: False

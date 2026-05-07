@@ -1,4 +1,5 @@
 import argparse
+from re import A
 from utils.ExpConfigs import ExpConfigs
 import yaml
 from dataclasses import asdict
@@ -13,13 +14,16 @@ def Init_parser():
     parser.add_argument('--data_path', type=str, default="",help="Dataset path")         
     parser.add_argument('--data_name', type=str, default="DC",help="Dataset name: [ 'DEB', 'SRU']")
     parser.add_argument('--target', type=str, default="",help="Target variable name")                
-    parser.add_argument('--data_aug',  action='store_true',help='If use data augmentation for Deb and SRU dataset')                    
-    parser.add_argument('--use_amp',  action='store_true',help='If use automatic mixed precision training')                   
+    parser.add_argument('--data_aug',  action='store_true',   help='If use data augmentation for Deb and SRU dataset')                    
+    parser.add_argument('--use_amp',  action='store_true',   help='If use automatic mixed precision training')                   
     parser.add_argument('--num_workers', type=int, default=1,help='DataLoader the number of workers')                   
-    parser.add_argument('--if_missing',  action='store_true',help='If exists Missing Data')                  
+    parser.add_argument('--if_missing',  action='store_true',  help='If exists Missing Data')                  
     parser.add_argument('--missing_rate', type=float, default=0.0,help='Missing data rate [0:0.5]')                
-    parser.add_argument('--use_condition_label',  action='store_true',help='If use mode variable for multi_mode dataset')
+    parser.add_argument('--use_condition_label',  action='store_true', help='If use mode variable for multi_mode dataset')
+    parser.add_argument('--use_tensorboard',  action='store_true', help='If use tensorboard for visualization')
     
+                 
+
     # Model Config
     parser.add_argument('--enc_in', type=int, default=16,help='Dimension of encoder Input')               
     parser.add_argument('--dec_in', type=int, default=16,help='Dimension of decoder Input')               
@@ -53,7 +57,8 @@ def Init_parser():
     parser.add_argument('--weight_decay', type=float, default=0.0,help='L2 regularization weight')         
 
     # Test Config
-    parser.add_argument('--inverse', action='store_true', help='If the data is scaled, inverse the data to the original scale')
+    parser.add_argument('--inverse', action='store_true',
+                        help='If the data is scaled, inverse the data to the original scale')
 
     # GPU config
     parser.add_argument('--use_cuda', action='store_true', help='Use CUDA for training')                
@@ -135,7 +140,7 @@ def Init_parser():
 
 
     # TimeKAN
-    parser.add_argument('--begin_order', action='store_true',help='If use future temporal feature for TimeKAN')
+    parser.add_argument('--begin_order', action='store_true', help='If use future temporal feature for TimeKAN')
 
     
     # GCN
@@ -153,6 +158,11 @@ def Init_parser():
     parser.add_argument('--mode_select', type=str, default='random', help='Mode selection method for FEDformer: [random, low]')
     parser.add_argument('--modes', type=int, default=32, help='Number of modes to be selected for FEDformer')
 
+
+    # VRNN
+    parser.add_argument('--x_embed_dim', type=int, default=16, help='Number of layers for VRNN')
+    parser.add_argument('--z_embed_dim', type=int, default=16, help='Number of layers for VRNN')
+
     # Setting
     parser.add_argument('--setting', type=str, default='',help='Setting to use')
 
@@ -166,11 +176,12 @@ def Init_parser():
 
 def Parse_arguments(yaml_path=None):
     args = Init_parser()
-
+    print('yaml_path', yaml_path)
 
     if yaml_path is not None:
         if os.path.exists(yaml_path):
             print('YAML exists')
+    
         else:
             raise FileNotFoundError(f"YAML file not found: {yaml_path}")
 
@@ -180,6 +191,11 @@ def Parse_arguments(yaml_path=None):
         # Modify the global args object directly
         for key, value in config["params"].items():
             setattr(args, key, value)
+    
+    try:
+        args = ExpConfigs(**vars(args))
+    except TypeError as e:
+        raise ValueError(f"Invalid config field detected:\n{e}")
 
     
 
@@ -196,18 +212,19 @@ def Parse_arguments(yaml_path=None):
     )
 
     else:
-        setting = "{}_{}_{}_sl{}_dm{}_bt{}_lr{}_pat{}".format(
+        setting = "{}_{}_{}_sl{}_dm{}_dff{}_bt{}_lr{}_pat{}".format(
         args.data_name,
         args.model,
         args.task,
         args.seq_len,
         args.d_model,
+        args.d_ff,
         args.batch_size,
         args.learning_rate,
         args.patience
     )
 
-    print(setting)
+    # print(setting)
     folder_path = f"./results/{args.model}/" + setting +"/"
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)

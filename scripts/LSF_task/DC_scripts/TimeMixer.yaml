@@ -12,7 +12,7 @@ params:
   num_workers: 1 # type: int, DataLoader the number of workers
   if_missing: False # type: bool, default: False, help: If exists Missing Data
   missing_rate: 0 # type: float, default: 0, help: Missing data rate [0:0.5]
-  use_axliary_var: False # type: bool, default: False, help: If use mode variable for multi_mode dataset
+   # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
 # Model Config
   enc_in: 8  # Dimension of encoder Input
@@ -46,7 +46,7 @@ params:
   batch_size: 64 #128
   learning_rate: 0.001 # 0.0005
   epoch: 300
-  if_valid: True
+  
   patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
   use_tensorboard: True

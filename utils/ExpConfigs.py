@@ -14,6 +14,7 @@ class ExpConfigs:
     if_missing: bool
     missing_rate: float
     use_condition_label: bool
+    use_tensorboard: bool
     
     # Model Config
     enc_in: int
@@ -144,6 +145,10 @@ class ExpConfigs:
     version: str
     mode_select: str
     modes: int
+
+    # VRNN
+    x_embed_dim: int
+    z_embed_dim: int
 
     # Setting
     setting: str
