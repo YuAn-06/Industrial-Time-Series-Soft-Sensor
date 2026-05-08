@@ -62,7 +62,7 @@ class Exp_Soft_Sensor(Exp_basic):
                 return batch_y.squeeze(1)
         else:
             return batch_y.squeeze(1)
-    def _select_pred(self, outputs):
+    def _select_pred(self, outputs,flag='train'):
         if self.args.model in ['VRNN']:
             return outputs['y_pred']
         elif self.args.model in ['DMVAER']:

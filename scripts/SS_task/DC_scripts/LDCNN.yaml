@@ -1,45 +1,49 @@
+# LDCNN.yaml
+
 params:
   # Data Config
-  model: 'Autoformer'
-  task: 'soft_sensor'
-  data_name: 'DC'
+  model: 'LDCNN'
+  task: 'soft_sensor'   # ['short_term_forecasting', 'soft_sensor']
+  data_name: "DC"
   data_path: './data/DC/debutanizer_column.csv'
   target: 'y_1'
+
   data_aug: True
   use_amp: False
   num_workers: 1
   if_missing: False
   missing_rate: 0
-  
 
   # Model Config
   enc_in: 13
   dec_in: 13
   C_in: 13
   C_out: 1
+
   seq_len: 16
-  label_len: 24
+  label_len: 16
   pred_len: 1
 
   embed: 'TimeF'
   freq: 's'
   factor: 1
-  moving_avg: 3
 
+  # LDCNN-specific / shared model parameters
   d_model: 64
-  n_heads: 8
-  e_layers: 2
-  d_layers: 2
-  d_ff: 128
+  e_layers: 4       # LDCNN 中对应空洞卷积块数量，建议 <= 4
   dropout: 0.05
+
+  # The following params are kept for framework compatibility
+  n_components: 5
+  n_heads: 8
+  d_layers: 1
+  d_ff: 128
   activation: 'gelu'
 
   # Train Config
   batch_size: 64
   learning_rate: 0.001
-  weight_decay: 0.0
   epoch: 300
-  
   patience: 10
   lradj: 'cosine'
   use_tensorboard: False
@@ -49,7 +53,7 @@ params:
 
   # GPU Config
   use_cuda: True
-  device: 'cuda'
+  device: "cuda"
   gpu: 0
   seed: 2021
   device_ids: [0]

@@ -1,53 +1,50 @@
 # configs.yaml
 
 params:
-# Data Config
-  model: 'PatchTST'
+  # Data Config
+  model: 'VALSTM'
   task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "SRU" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/SRU/SRU_data.csv' # type: str, default: None, help: Path to the dataset
   target: 'SO2' # type: str, default: None, help: Target variable name
-  data_aug: False # type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
+  data_aug: True # type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
   use_amp: False # type: bool, default: False, help: If use automatic mixed precision training
   num_workers: 1 # type: int, DataLoader the number of workers
   if_missing: False # type: bool, default: False, help: If exists Missing Data
   missing_rate: 0 # type: float, default: 0, help: Missing data rate [0:0.5]
    # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
-
-# Model Config
+  # Model Config
   enc_in: 20  # Dimension of encoder Input
   dec_in: 20  # Dimension of decoder Input
   C_in: 20  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
-  seq_len: 16 # type: int, default: 12, help: Sequence Length
-  patch_len: 4
-  d_model: 32
-  d_ff: 64
-  stride: 1
-  n_heads: 8 
-  e_layers: 1
-  d_layers: 1
-  activation: 'GELU'
-  dropout: 0
+  seq_len: 16 #
+  factor: 1
+  label_len: 16
+  hidden_dim: 64
+  dropout: 0.05
+  activation: 'gelu'
+  pred_len: 1
 
-# Train Configs
-  batch_size: 64 # 64
-  learning_rate: 0.001 # 0.0001
-  epoch: 150
-  
-  patience: 10 # 10
+
+  # Train Config
+  batch_size: 64 #128
+  learning_rate: 0.005 # 0.0005
+  epoch: 300
+
+  patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
+  use_tensorboard: False
 
-
-# Test Config
+  # Test Config
   inverse: True # If the data is scaled, inverse the data to the original scale
 
-# GPU config
+  # GPU config
   use_cuda: True
   device: "cuda"
   gpu: 0
-  seed: 1998
+  seed: 2021
   device_ids: [0]
   use_multi_gpu: False
 

@@ -2,7 +2,7 @@
 
 params:
 # Data Config
-  model: 'DAGRU'
+  model: 'DAGRU.yaml'
   task: 'short_term_forecasting' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "DC" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/DC/debutanizer_column.csv' # type: str, default: None, help: Path to the dataset

@@ -1,6 +1,6 @@
 params:
   # Data Config
-  model: 'DAGRU'   # 如果你在 model_dict 里注册的名字不是这个，就改成你的实际名字
+  model: 'DAGRU'
   task: 'soft_sensor'
   data_name: 'DC'
   data_path: './data/DC/debutanizer_column.csv'
@@ -25,11 +25,11 @@ params:
   freq: 's'
   factor: 1
   n_components: 5
-  d_model: 64
+  d_model: 128
   n_heads: 4
   e_layers: 1
   d_layers: 1
-  d_ff: 128
+  d_ff: 256
   dropout: 0.05
   activation: 'gelu'
 

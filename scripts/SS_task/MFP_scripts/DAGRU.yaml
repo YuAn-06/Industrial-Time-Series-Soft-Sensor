@@ -2,7 +2,7 @@
 
 params:
 # Data Config
-  model: 'DAGRU'
+  model: 'DAGRU.yaml'
   task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "MFP" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: 'C:\Study\Code\datasets\MFP\data\MFP_combined_data.csv' # type: str, default: None, help: Path to the dataset

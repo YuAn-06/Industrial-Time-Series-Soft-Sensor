@@ -1,6 +1,6 @@
 params:
   # Data Config
-  model: 'DAGRU'   # 如果你在 model_dict 里注册的名字不是这个，就改成你的实际名字
+  model: 'DAGRU.yaml'   # 如果你在 model_dict 里注册的名字不是这个，就改成你的实际名字
   task: 'soft_sensor'
   data_name: 'PPGAS'
   data_path: './data/PPGAS/gt_2011.csv'

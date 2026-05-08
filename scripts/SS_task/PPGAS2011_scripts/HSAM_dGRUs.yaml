@@ -17,7 +17,7 @@ params:
 # Model Config
   enc_in: 10  # type: int, default: 17
   dec_in: 10  # Dimension of decoder Input
-  C_in: 9  # Dimension of Channel Input
+  C_in: 10  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
   seq_len: 12  #
   embed: 'TimeF'

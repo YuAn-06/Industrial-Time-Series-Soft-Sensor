@@ -6,7 +6,7 @@ params:
   task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "SRU" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/SRU/SRU_data.csv' # type: str, default: None, help: Path to the dataset
-  target: 'H2S' # type: str, default: None, help: Target variable name
+  target: 'SO2' # type: str, default: None, help: Target variable name
   data_aug: False # [ False ]type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
   use_amp: False # type: bool, default: False, help: If use automatic mixed precision training
   num_workers: 1 # type: int, DataLoader the number of workers

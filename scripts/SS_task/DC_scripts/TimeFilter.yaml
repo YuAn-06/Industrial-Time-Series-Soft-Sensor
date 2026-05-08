@@ -25,7 +25,7 @@ params:
   pred_len: 6
   patch_len: 16
   d_model: 64
-  h_head: 2
+  n_heads: 2
   e_layers: 2
   d_ff: 128
   factor: 5

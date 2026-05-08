@@ -29,7 +29,8 @@ class ExpConfigs:
     embed: str 
     freq: str 
     factor: int 
-    d_model: int 
+    d_model: int
+    pd_model: int
     n_heads: int 
     e_layers: int 
     d_layers: int 
@@ -68,6 +69,7 @@ class ExpConfigs:
 
     # HSAM_dGRUs & VALSTM
     hidden_dim: int
+    num_layers: int
 
     # Autoformer & TimesNet
     moving_avg: int

@@ -3,7 +3,7 @@
 params:
 # Data Config
   model: 'TimeMixer'
-  task: 'short_term_forecasting' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
+  task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "DC" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/DC/debutanizer_column.csv' # type: str, default: None, help: Path to the dataset
   target: 'y_1' # type: str, default: None, help: Target variable name
@@ -21,7 +21,7 @@ params:
   C_out: 1  # Dimension of Channel Output
   seq_len: 16 #
   label_len: 16
-  pred_len: 6 # Prediction Length,
+  pred_len: 1 # Prediction Length,
   down_sampling_window: 4
   channel_independence: False
   moving_avg: 3
