@@ -137,7 +137,7 @@ def metric(pred: np.array, true: np.array, task: str) -> tuple:
     
     if task == 'soft_sensor':
         r2 = R2(pred, true)
-        return mae, mse, rmse, mape, mspe, r2, corr
+        return mae, mse, rmse, mape, mspe, wape, corr
     elif task == 'short_term_forecasting':
         return mae, mse, rmse, mape, mspe, wape, corr
     
