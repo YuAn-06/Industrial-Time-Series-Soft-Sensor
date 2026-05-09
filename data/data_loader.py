@@ -107,7 +107,7 @@ class Dataset_Custom(Dataset):
         self.scaler.fit(train_data)
 
         if self.flag == 'test':
-            self.scaler_y = StandardScaler()
+            self.scaler_y = MinMaxScaler() if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS', 'GCT'] else StandardScaler()
             train_data_y = data_y[border1s[0]:border2s[0],-self.args.C_out:]
             self.scaler_y.fit(train_data_y)
 

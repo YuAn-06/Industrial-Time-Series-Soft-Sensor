@@ -204,9 +204,9 @@ class Exp_Soft_Sensor(Exp_basic):
       
         print('test shape:', preds.shape, 'trues shape:', trues.shape)
         
-        mae,mse,rmse,mape,mspe,r2,corr = metric(preds, trues, self.args.task)
-        logger.info(f"mae:{mae:.4f}, mse:{mse:.4f}, rmse:{rmse:.4f}, mape:{mape:.4f}, mspe:{mspe:.4f}, r2:{r2:.4f}, corr:{corr:.4f}")
-        np.save(self.args.save_dir + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe, r2, corr]))
+        mae,mse,rmse,mape,mspe,wape,corr = metric(preds, trues, self.args.task)
+        logger.info(f"mae:{mae:.4f}, mse:{mse:.4f}, rmse:{rmse:.4f}, mape:{mape:.4f}, mspe:{mspe:.4f}, wape:{wape:.4f}, corr:{corr:.4f}")
+        np.save(self.args.save_dir + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe, wape, corr]))
         np.save(self.args.save_dir + 'pred.npy', preds)
         np.save(self.args.save_dir + 'true.npy', trues)
         
