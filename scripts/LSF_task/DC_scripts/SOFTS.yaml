@@ -25,7 +25,7 @@ params:
   pred_len: 5
   stride: 8
   d_model: 64
-  h_head: 2
+  n_heads: 2
   e_layers: 2
   d_ff: 128
   d_core: 4

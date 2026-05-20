@@ -1,5 +1,6 @@
 
-            python -u run.py --model 'Envformer' \
+
+            python -u run.py --model 'Informer' \
                          --task 'short_term_forecasting' \
                          --data_name "DC" \
                          --data_path './data/DC/debutanizer_column.csv' \
@@ -13,15 +14,15 @@
                          --seq_len 16 \
                          --label_len 16 \
                          --pred_len 6 \
-                         --kernel_size 2 \
                          --embed 'TimeF' \
                          --freq 's' \
                          --factor 1 \
-                         --d_model 128 \
+                         --distil \
+                         --d_model 64 \
                          --d_ff 128 \
                          --n_heads 4 \
-                         --e_layers 1 \
-                         --d_layers 1 \
+                         --e_layers 4\
+                         --d_layers 2 \
                          --dropout 0.05 \
                          --activation 'gelu' \
                          --batch_size 64 \

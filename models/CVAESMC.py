@@ -118,7 +118,10 @@ class Model(nn.Module):
         self.encoder = Encoder(configs.C_in, configs.C_out, configs.seq_len, configs.z_dim, configs.hidden_dim, configs.activation, configs.num_samples)
         self.decoder = Decoder(configs.C_in, configs.C_out, configs.seq_len, configs.z_dim, configs.hidden_dim, configs.num_samples, configs.activation)
         self.output_type = configs.output_type
-    
+
+        if configs.pred_len > 1:
+            raise ValueError('Only support pred_len = 1 for now')
+
     @torch.no_grad()
     def generate(self, dec_inp, num_samples):
 
@@ -138,7 +141,7 @@ class Model(nn.Module):
         elif self.output_type == 'median':
             return y_pred.median(dim=0).values
 
-
+        
 
     def short_term_forecasting(self, x_enc, dec_inp):
         

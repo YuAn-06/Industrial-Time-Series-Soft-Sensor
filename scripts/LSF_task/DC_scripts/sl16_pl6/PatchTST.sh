@@ -1,9 +1,6 @@
 
 
-GPU=0
-for d_model in 32 64 128 256; do
-    for d_ff in 64 128 256 512; do
-        {
+
             python -u run.py --model 'PatchTST' \
                          --task 'short_term_forecasting' \
                          --data_name "DC" \
@@ -21,8 +18,8 @@ for d_model in 32 64 128 256; do
                          --factor 1 \
                          --label_len 16 \
                          --pred_len 6 \
-                         --d_model ${d_model} \
-                         --d_ff ${d_ff} \
+                         --d_model 256 \
+                         --d_ff 64 \
                          --n_heads 4 \
                          --e_layers 1 \
                          --d_layers 1 \
@@ -39,11 +36,6 @@ for d_model in 32 64 128 256; do
                          --gpu 0 \
                          --seed 2021 \
 
-        sleep 5
-        }
-done
-done
-wait
 
 
 

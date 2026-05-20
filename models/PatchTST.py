@@ -68,6 +68,7 @@ class Model(nn.Module):
             self.head_nf = FlattenHead(configs.enc_in, self.head_nf, configs.pred_len, head_dropout=configs.dropout)
         elif self.task == 'soft_sensor':
             self.head_nf = FlattenHead(configs.enc_in, self.head_nf, configs.C_out, head_dropout=configs.dropout)
+            self.projection = nn.Linear(configs.C_in, configs.C_out)
         else:
             raise ValueError("task type not supported")
 
@@ -131,11 +132,10 @@ class Model(nn.Module):
         dec_out = dec_out.permute(0, 2, 1) # [B, pred_len, C]
 
         dec_out = dec_out * \
-                  (stdev[:, 0, :].unsqueeze(1).repeat(1, self.C_out, 1))
+                  (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         dec_out = dec_out + \
-                  (means[:, 0, :].unsqueeze(1).repeat(1, self.C_out, 1))
-
-        dec_out = dec_out[:, :, -self.C_out:]
+                  (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+        dec_out = self.projection(dec_out)
         return dec_out.squeeze(-1)
 
 

@@ -87,7 +87,8 @@ def Init_parser():
     parser.add_argument('--distil', action='store_true',help='whether to use distilling in encoder, using this argument means not using distilling')
     
     # MSACNN
-    parser.add_argument('--reduction_ratio', type=float, default=16,help='Reduction ratio for MSACNN')
+    parser.add_argument('--reduction_ratio', type=int, default=16,help='Reduction ratio for MSACNN')
+    parser.add_argument('--out_per_channel', type=int, nargs='+', default=[5, 8, 10, 12],help='Output per channel for MSACNN')
 
     # Save config
     parser.add_argument('--save_dir', type=str, default='logs',help='Directory to save logs and models')
@@ -98,11 +99,11 @@ def Init_parser():
     parser.add_argument('--output_type', type=str, default='mean',help='Output type for CVAESMC', choices=['mean', 'median', 'sample'])
     parser.add_argument('--z_global_dim', type=int, default=16,help='Global latent dimension for DMVAER')
     parser.add_argument('--z_local_dim', type=int, default=16,help='Local latent dimension for DMVAER')
-    parser.add_argument('--DMVAER_loss_weight', type=list, default=[0.1, 1, 1, 1, 0.01],help='0: x reconstruction, 1: y reconstruction, 2: KL_zt, 3: KL_zs, 4: KL_C')
+    parser.add_argument('--DMVAER_loss_weight', type=float, nargs='+', default=[0.1, 1, 1, 1, 0.01],help='0: x reconstruction, 1: y reconstruction, 2: KL_zt, 3: KL_zs, 4: KL_C')
 
 
     # Nonstationary Transformer
-    parser.add_argument('--p_hidden_dims', type=list, default=[128, 128],help='Hidden dimensions for projection network')
+    parser.add_argument('--p_hidden_dims', type=int, nargs='+', default=[128, 128],help='Hidden dimensions for projection network')
     parser.add_argument('--p_hidden_layers', type=int, default=2,help='Number of hidden layers for projection network')
 
     # EnvFormer & TCN
@@ -126,13 +127,13 @@ def Init_parser():
     parser.add_argument('--period_len', type=int, default=10,help='Period length for SparseTSF')
     
     # TCN
-    parser.add_argument('--num_channels', type=list, default=[16, 32, 64],help='Number of channels for TCN')
+    parser.add_argument('--num_channels', type=list, nargs='+', default=[16, 32, 64],help='Number of channels for TCN')
 
 
     # TimeFilter
     parser.add_argument('--alpha', type=float, default=0.1, help='KNN for Graph Construction')
     parser.add_argument('--top_p', type=float, default=0.5, help='Dynamic Routing in MoE')
-    parser.add_argument('--pos', type=int, choices=[0, 1], default=1, help='Positional Embedding. Set pos to 0 or 1')
+    parser.add_argument('--pos', type=int, nargs='+', choices=[0, 1], default=[1], help='Positional Embedding. Set pos to 0 or 1')
 
     # STALSTM
     parser.add_argument('--SA_dim', type=int, default=10, help='Spatial Attention dimension for TimeFilter')
@@ -215,13 +216,14 @@ def Parse_arguments(yaml_path: str = None):
     )
 
     else:
-        setting = "{}_{}_{}_sl{}_dm{}_dff{}_bt{}_lr{}_pat{}".format(
+        setting = "{}_{}_{}_sl{}_dm{}_dff{}_ma{}_bt{}_lr{}_pat{}".format(
         args.data_name,
         args.model,
         args.task,
         args.seq_len,
         args.d_model,
         args.d_ff,
+        args.moving_avg,
         args.batch_size,
         args.learning_rate,
         args.patience

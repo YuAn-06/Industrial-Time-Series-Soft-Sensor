@@ -349,7 +349,7 @@ class VRNN_Loss(BaseLoss):
         x_true = trues['x_true']
         y_true = trues['y_true']
         
-        recon_x_loss = self.MSEloss(x_pred, x_true)
+        recon_x_loss = 0.1 * self.MSEloss(x_pred, x_true)
         
         recon_y_loss = self.MSEloss(y_pred, y_true)
         

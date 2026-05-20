@@ -41,8 +41,8 @@ params:
 
 # Train Config
   batch_size: 64 #128
-  learning_rate: 0.01 # 0.0005
-  epoch: 500
+  learning_rate: 0.001 # 0.0005
+  epoch: 300
   
   patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]

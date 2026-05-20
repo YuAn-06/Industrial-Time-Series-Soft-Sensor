@@ -230,7 +230,7 @@ class DistributedGRUs(nn.Module):
         self.configs = configs
         
         self.GRU_list = nn.ModuleList([
-            nn.GRU(d_keys, configs.hidden_dim, configs.num_layers, batch_first=True)
+            nn.GRU(d_keys, configs.hidden_dim, configs.e_layers, batch_first=True)
             for _ in range(configs.n_heads)
         ])
 

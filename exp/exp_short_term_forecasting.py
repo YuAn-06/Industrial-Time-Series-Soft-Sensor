@@ -23,7 +23,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         self.loss = Losses(args)
     
     def _build_model(self) -> Any:
-        model = self.model_dict[self.args.model].Model(self.args).float()
+        model = self._get_model_module(self.args.model).Model(self.args).float()
         if self.args.use_multi_gpu and self.args.use_cuda:
             model = torch.nn.DataParallel(model, device_ids=self.args.device_ids)
             
@@ -49,42 +49,42 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         ) -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
 
         """
+        Get ground truth target sequence for training or testing
         x_enc: [B, T, D] input sequence
         x_dec: [B, L + H, D] decoder input, sequence label sequence (L) + zero_padding sequence (H)
         batch_y: [B, L + H, D]  label sequence (L) + target sequence (H)
+
         """
+        flag = self._normalize_flag(flag)
         batch_x = x_enc # [B, T, D]
         batch_c = c_enc
         if self.args.model in ['VRNN']: # VRNN
             if flag == 'train':
                 return {
-                    'y_true': batch_y[:,-self.args.pred_len:,-self.args.C_out:],
+                    'y_true': self._select_forecast_target(batch_y),
                     'x_true': batch_x  
                 }
             else:
-                return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
+                return self._select_forecast_target(batch_y)
 
         elif self.args.model in ['DMVAER']: # DMVAER 
             if flag == 'train':
                 return {
-                    'y_true': batch_y[:,-self.args.pred_len:,-self.args.C_out:],
+                    'y_true': self._select_forecast_target(batch_y),
                     'x_true': batch_x,
                     'c_true': batch_c[:, :-self.args.pred_len]
             }
             else:
-                return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
+                return self._select_forecast_target(batch_y)
 
         elif self.args.model in ['CVAESMC']:
             if flag == 'train':
-                return batch_y[:, -self.args.pred_len:, -self.args.C_out: ] # 通过x(1:t)和y(1:t-1)预测y(t)
+                return self._select_forecast_target(batch_y) # 通过x(1:t)和y(1:t-1)预测y(t)
             else:
                 return batch_y[:, -self.args.pred_len:, :]
           
         else: # 其他模型
-            if flag == 'train':
-                return batch_y[:,-self.args.pred_len:,-self.args.C_out:]
-            else:
-                return batch_y[:,-self.args.pred_len:, -self.args.C_out:] # for inverse, not select target dimension
+            return self._select_forecast_target(batch_y) # for inverse, not select target dimension
            
         
         
@@ -92,17 +92,18 @@ class Exp_Short_Term_Forecasting(Exp_basic):
                      outputs: Union[torch.Tensor, Dict[str, torch.Tensor]], 
                      flag: str = 'train'
                      ) -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
+        flag = self._normalize_flag(flag)
         if self.args.model in ['VRNN','DMVAER']:
             if flag == 'train':  
                 return outputs
             else:
-                return outputs['y_pred']
+                return self._require_output_key(outputs, 'y_pred')
             
         elif self.args.model in ['TCVAE']:
             if flag == 'train':
                 return outputs
             else:
-                outputs = outputs['dec_out_infer']
+                outputs = self._require_output_key(outputs, 'dec_out_infer')
                 return outputs[:, -self.args.pred_len:, :]
 
         elif self.args.model in ['CVAESMC']:
@@ -115,12 +116,9 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             if flag == 'train':
                 return outputs
             else:
-                return outputs['y_pred']
+                return self._require_output_key(outputs, 'y_pred')
         else:
-            if flag == 'train':
-                return outputs[:, -self.args.pred_len:, -self.args.C_out:]
-            else:
-                return outputs[:, -self.args.pred_len:, -self.args.C_out:]
+            return self._select_forecast_target(outputs)
     
 
     def train(self, logger: Logger) -> None:
@@ -285,5 +283,5 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         plt.savefig(self.args.save_dir + 'test.png')  # Save the plot as a PDF file
         logger.info(f"Saved plot as 'test.png' in {self.args.save_dir}")
 
-        plt.show()
+        # plt.show()
         return

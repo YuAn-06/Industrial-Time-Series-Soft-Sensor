@@ -1,26 +1,26 @@
 
-            python -u run.py --model 'Envformer' \
+            python -u run.py --model 'Autoformer' \
                          --task 'short_term_forecasting' \
-                         --data_name "DC" \
-                         --data_path './data/DC/debutanizer_column.csv' \
-                         --target 'y_1' \
+                         --data_name "SRU" \
+                         --data_path './data/SRU/SRU_data.csv' \
+                         --target 'SO2' \
                          --num_workers 1 \
                          --missing_rate 0 \
-                         --enc_in 8 \
-                         --dec_in 8 \
-                         --C_in 8 \
+                         --enc_in 6 \
+                         --dec_in 6 \
+                         --C_in 6 \
                          --C_out 1 \
                          --seq_len 16 \
-                         --label_len 16 \
+                         --label_len 8 \
                          --pred_len 6 \
-                         --kernel_size 2 \
+                         --moving_avg 15 \
                          --embed 'TimeF' \
                          --freq 's' \
                          --factor 1 \
-                         --d_model 128 \
-                         --d_ff 128 \
+                         --d_model 256 \
+                         --d_ff 256 \
                          --n_heads 4 \
-                         --e_layers 1 \
+                         --e_layers 2\
                          --d_layers 1 \
                          --dropout 0.05 \
                          --activation 'gelu' \

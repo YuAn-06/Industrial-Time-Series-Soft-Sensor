@@ -2,14 +2,14 @@
                         python -u run.py \
                         --model 'iTransformer' \
                         --task 'short_term_forecasting' \
-                        --data_name "DC" \
-                        --data_path './data/DC/debutanizer_column.csv' \
-                        --target 'y_1' \
+                        --data_name "SRU" \
+                        --data_path './data/SRU/SRU_data.csv' \
+                        --target 'SO2' \
                         --num_workers 1 \
                         --missing_rate 0 \
-                        --enc_in 8 \
-                        --dec_in 8 \
-                        --C_in 8 \
+                        --enc_in 6 \
+                        --dec_in 6 \
+                        --C_in 6 \
                         --C_out 1 \
                         --seq_len 16 \
                         --embed 'TimeF' \
@@ -17,7 +17,7 @@
                         --factor 1 \
                         --label_len 16 \
                         --pred_len 6 \
-                        --d_model 64 \
+                        --d_model 128 \
                         --d_ff 64 \
                         --n_heads 8 \
                         --e_layers 1 \

@@ -2,7 +2,7 @@
 
 params:
 # Data Config
-  model: 'PatchTST'
+  model: 'VRNN'
   task: 'soft_sensor' # type: str, default: short_term_forecasting, help: ['short_term_forecasting', 'soft_sensor']
   data_name: "SRU" # type: str, default: None, help: ['MFP', 'DEB', 'SRU','PPGAS','PTA']
   data_path: './data/SRU/SRU_data.csv' # type: str, default: None, help: Path to the dataset
@@ -14,41 +14,47 @@ params:
   missing_rate: 0 # type: float, default: 0, help: Missing data rate [0:0.5]
    # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
-
 # Model Config
-  enc_in: 20  # Dimension of encoder Input
+  enc_in: 20  # type: int, default: 17
   dec_in: 20  # Dimension of decoder Input
   C_in: 20  # Dimension of Channel Input
   C_out: 1  # Dimension of Channel Output
-  seq_len: 16 # type: int, default: 12, help: Sequence Length
-  patch_len: 8
-  pred_len: 1
-  d_model: 32
-  d_ff: 64
-  stride: 1
-  n_heads: 4 
+  seq_len: 16 #
+  embed: 'TimeF'
+  freq: 's'
+  factor: 1
+  label_len: 16
+  pred_len: 1     # type: int, default: 6, help: Prediction Length,re
+  d_model: 8
+  d_ff: 32        # type: int, fast-forward network dimension
+  x_embed_dim: 8 # type: int, Embedding dimension of X
+  z_embed_dim: 8 # type: int, Embedding dimension of Z 
+  z_dim: 8       # type: int, Embedding dimension of X
+  n_heads: 8 
   e_layers: 1
   d_layers: 1
+  dropout: 0.05
   activation: 'GELU'
-  dropout: 0
+  num_landmarks: 4
 
-# Train Configs
-  batch_size: 64 # 64
-  learning_rate: 0.001 # 0.0001
-  epoch: 150
+
+# Train Config
+  batch_size: 64 #128
+  learning_rate: 0.001 # 0.0005
+  epoch: 300
   
-  patience: 10 # 10
+  patience: 10 # 25
   lradj: 'cosine' # learning rate adjustment strategy: [type1, type2, cosine]
-
+  use_tensorboard: False
 
 # Test Config
-  inverse: True # If the data is scaled, inverse the data to the original scale
+  inverse: False # If the data is scaled, inverse the data to the original scale
 
 # GPU config
   use_cuda: True
   device: "cuda"
   gpu: 0
-  seed: 1998
+  seed: 2021
   device_ids: [0]
   use_multi_gpu: False
 

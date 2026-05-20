@@ -102,7 +102,7 @@ def detect_outliers(data, columns):
         # percentage = (outliers.sum() / n_samples) * 100
         # print(f'{columns[i]}: Outliers Percentage: {percentage:.2f}%')
 
-data_name = 'Ironmaking'
+data_name = 'PPGAS'
 
 if __name__ == '__main__':
 

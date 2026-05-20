@@ -79,7 +79,8 @@ class ExpConfigs:
     individual: bool
 
     # MSACNN
-    reduction_ratio: float
+    reduction_ratio: int
+    out_per_channel: List[int]
 
     # CVAESMC and DMVAER
     num_samples: int
@@ -87,7 +88,7 @@ class ExpConfigs:
     output_type: str
     z_global_dim: int
     z_local_dim: int
-    DMVAER_loss_weight: list
+    DMVAER_loss_weight: list[float]
 
     # Nonstationary Transformer
     p_hidden_dims: list
