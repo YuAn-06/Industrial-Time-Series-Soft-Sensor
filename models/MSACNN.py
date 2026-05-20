@@ -102,6 +102,8 @@ class ChannelAttentionModule(nn.Module):
     """Channel-wise Attention Module as shown in Figure 3."""
     def __init__(self, num_channels, reduction_ratio=16):
         super(ChannelAttentionModule, self).__init__()
+        num_channels = int(num_channels)
+        reduction_ratio = int(reduction_ratio)
         self.num_channels = num_channels
         self.reduction_ratio = reduction_ratio
         
@@ -147,7 +149,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.configs = configs
         self.task = configs.task
-        self.out_ch_per_channel = [5, 8, 10, 12]
+        self.out_ch_per_channel = [int(ch) for ch in configs.out_per_channel]
         self.kernel_sizes = [3, 5, 7]
         self.multiscale_conv_list = nn.ModuleList()
         self.input_height = configs.seq_len

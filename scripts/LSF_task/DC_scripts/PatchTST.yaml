@@ -26,7 +26,7 @@ params:
   patch_len: 4
   stride: 8
   d_model: 128
-  n_head: 8
+  n_heads: 8
   e_layers: 1
   d_ff: 512
   factor: 5

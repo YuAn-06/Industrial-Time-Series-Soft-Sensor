@@ -27,8 +27,8 @@ class Exp_Soft_Sensor(Exp_basic):
         self.loss = Losses(args)
 
     
-    def _build_model(self):
-        model = self.model_dict[self.args.model].Model(self.args).float()
+    def _build_model(self) -> torch.nn.Module:
+        model = self._get_model_module(self.args.model).Model(self.args).float()
         if self.args.use_multi_gpu and self.args.use_cuda:
             model = torch.nn.DataParallel(model, device_ids=self.args.device_ids)
         print(model)
@@ -41,6 +41,7 @@ class Exp_Soft_Sensor(Exp_basic):
     def _select_optimizer(self) -> optim.Optimizer:
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         return model_optim
+
     
     def _select_gt(self, 
                 x_enc: torch.Tensor, 
@@ -48,35 +49,40 @@ class Exp_Soft_Sensor(Exp_basic):
                 x_mark_enc: torch.Tensor, 
                 x_mark_dec: torch.Tensor, 
                 batch_y: torch.Tensor, 
-                c_enc=None, 
-                flag = 'Train') -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
+                c_enc: Optional[torch.Tensor] = None, 
+                flag: str = 'train') -> Union[torch.Tensor, Dict[str, torch.Tensor]]:
+        
+        flag = self._normalize_flag(flag)
         
         batch_x = x_enc
         
         if self.args.model in ['VRNN']:
-            if flag == 'Train':
+            if flag == 'train':
                 return {
                     'y_true': batch_y,
                     'x_true': batch_x  
             }
             else:
-                return batch_y[:, -1, :]
+                return self._select_last_time_target(batch_y)
         elif self.args.model in ['DMVAER']:
-            if flag == 'Train':
+            if flag == 'train':
                 return {
                     'y_true': batch_y,
                     'x_true': batch_x,  
                     'c_true': c_enc
                 }
             else:
-                return batch_y.squeeze(1)
+                return self._squeeze_dim(batch_y)
         else:
-            return batch_y.squeeze(1)
-    def _select_pred(self, outputs: Union[torch.Tensor, Dict[str, torch.Tensor]], flag = 'train') -> torch.Tensor:
-        if self.args.model in ['VRNN']:
-            return outputs['y_pred']
-        elif self.args.model in ['DMVAER']:
-            return outputs['y_pred']
+            return self._squeeze_dim(batch_y)
+
+    def _select_pred(
+            self,
+            outputs: Union[torch.Tensor, Dict[str, torch.Tensor]],
+            flag: str = 'train'
+            ) -> torch.Tensor:
+        if self.args.model in ['VRNN', 'DMVAER']:
+            return self._require_output_key(outputs, 'y_pred')
         else:
             return outputs
     

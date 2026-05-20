@@ -185,10 +185,10 @@ class Model(nn.Module):
 
         hd = dec_out['hd']
         B = hd.shape[0]
-
-        y_pred = self.dense_output_y(hd.reshape(B, -1))
-        y_pred = y_pred.view(B, self.configs.pred_len, self.configs.C_out)
-        y_pred = y_pred[:, -1, :]
+        y_pred = self.projection(hd[:, -1, :])
+        # y_pred = self.dense_output_y(hd.reshape(B, -1))
+        # y_pred = y_pred.view(B, self.configs.pred_len, self.configs.C_out)
+        # y_pred = y_pred[:, -1, :]
 
         dec_out['y_pred'] = y_pred
         return dec_out

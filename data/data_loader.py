@@ -17,12 +17,65 @@ from utils import  *
 from torch.utils.data import Dataset
 from torch import nn
 
-import matplotlib.pyplot as plt
-
 preprocess_data_dict = {
     'DC': DC_preprocess,
     'SRU': SRU_preprocess
 }
+
+MINMAX_MODELS = ['HSAM_dGRUs', 'ARDNN', 'GTFTS', 'GCT']
+
+
+def _get_borders(data_len: int, seq_len: int, set_type: int):
+    train_size = int(data_len * 0.7)
+    test_size = int(data_len * 0.2)
+    valid_size = data_len - train_size - test_size
+
+    border1s = [0, train_size - seq_len, data_len - test_size - seq_len]
+    border2s = [train_size, train_size + valid_size, data_len]
+
+    border1 = border1s[set_type]
+    border2 = border2s[set_type]
+    if border1 < 0 or border2 <= border1:
+        raise ValueError(
+            f"Invalid data split borders: border1={border1}, border2={border2}. "
+            f"Please check data length ({data_len}) and seq_len ({seq_len})."
+        )
+
+    return border1s, border2s, border1, border2
+
+
+def _get_feature_columns(df_raw: pd.DataFrame, data_name: str, target: str, include_target_when_no_x: bool):
+    columns_with_x = [col for col in df_raw.columns if col.startswith("x_")]
+    del_col = del_columns(data_name, target)
+
+    if columns_with_x == []:
+        excluded = {del_col, "date", "mode"}
+        if not include_target_when_no_x:
+            excluded.add(target)
+        columns_with_x = [col for col in df_raw.columns if col not in excluded]
+
+    return columns_with_x
+
+
+def _build_time_features(df_raw: pd.DataFrame, border1: int, border2: int, timeenc: int, freq: str):
+    if "date" not in df_raw.columns:
+        return torch.empty((0, 0), dtype=torch.float32), False
+
+    df_stamp = pd.DataFrame(df_raw["date"])[border1:border2].copy()
+    dates = pd.to_datetime(df_stamp["date"])
+    if timeenc == 0:
+        df_stamp["month"] = dates.dt.month
+        df_stamp["day"] = dates.dt.day
+        df_stamp["weekday"] = dates.dt.weekday
+        df_stamp["hour"] = dates.dt.hour
+        data_stamp = df_stamp.drop(labels=["date"], axis=1).values
+    elif timeenc == 1:
+        data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=freq)
+        data_stamp = data_stamp.transpose(1, 0)
+    else:
+        raise ValueError(f"Unsupported timeenc: {timeenc}")
+
+    return data_stamp, True
 
 
 class Dataset_Custom(Dataset):
@@ -71,28 +124,18 @@ class Dataset_Custom(Dataset):
         if self.args.if_missing:
             self.scaler = ZeroMaskStandardScaler()
         else:
-            if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS', 'GCT']:
+            if self.args.model in MINMAX_MODELS:
                 self.scaler = MinMaxScaler()
             else:
                 self.scaler = StandardScaler()  # 
         
-        TRAIN_SIZE = int(self.data.shape[0] * 0.7)
-        TEST_SIZE = int(self.data.shape[0] * 0.2)
-        VALID_SIZE = self.data.shape[0] - TRAIN_SIZE - TEST_SIZE
+        border1s, border2s, border1, border2 = _get_borders(
+            self.data.shape[0], self.args.seq_len, self.set_type
+        )
 
-        border1s = [0, TRAIN_SIZE - self.args.seq_len, self.data.shape[0] - TEST_SIZE - self.args.seq_len]
-        border2s = [TRAIN_SIZE, TRAIN_SIZE + VALID_SIZE, self.data.shape[0]]
-
-        border1 = border1s[self.set_type]
-        border2 = border2s[self.set_type]
-
-        columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
-
-
-        del_col = del_columns(self.data_name, self.target)
-        
-        if columns_with_x == []:
-            columns_with_x = [col for col in self.df_raw.columns if col != del_col and col != "date" and col!="mode"]
+        columns_with_x = _get_feature_columns(
+            self.df_raw, self.data_name, self.target, include_target_when_no_x=True
+        )
 
         if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
@@ -107,35 +150,16 @@ class Dataset_Custom(Dataset):
         self.scaler.fit(train_data)
 
         if self.flag == 'test':
-            self.scaler_y = MinMaxScaler() if self.args.model in ['HSAM_dGRUs','ARDNN', 'GTFTS', 'GCT'] else StandardScaler()
+            self.scaler_y = MinMaxScaler() if self.args.model in MINMAX_MODELS else StandardScaler()
             train_data_y = data_y[border1s[0]:border2s[0],-self.args.C_out:]
             self.scaler_y.fit(train_data_y)
 
         data_x = self.scaler.transform(data_x)
         data_y = self.scaler.transform(data_y)
 
-        if "date" in self.df_raw.columns:
-            df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
-            df_stamp["date"] = pd.to_datetime(df_stamp.date)
-            if self.timeenc == 0:
-                df_stamp["month"] = df_stamp.date.apply(lambda row: row.month, 1)
-                df_stamp["day"] = df_stamp.date.apply(lambda row: row.day, 1)
-                df_stamp["weekday"] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-                df_stamp["hour"] = df_stamp.date.apply(lambda row: row.hour, 1)
-                data_stamp = df_stamp.drop(labels=["date"], axis=1).values
-
-            elif self.args.timeenc == 1:
-                data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.args.freq)
-                data_stamp = data_stamp.transpose(1, 0)
-
-            self.data_stamp = data_stamp
-            self.use_stamp = True
-
-
-        
-        else:
-            self.data_stamp = torch.empty((0, 0), dtype=torch.int)
-            self.use_stamp = False
+        self.data_stamp, self.use_stamp = _build_time_features(
+            self.df_raw, border1, border2, self.timeenc, self.args.freq
+        )
         
         self.data_x = data_x[border1:border2]
         self.data_y = data_y[border1:border2]
@@ -180,7 +204,7 @@ class Dataset_Custom(Dataset):
                 'batch_y': torch.Tensor(seq_y).float(),
             }
         else:
-            seq_x_mark = torch.empty((0, 0), dtype=torch.int)
+            seq_x_mark = torch.empty((0, 0), dtype=torch.float32)
                 
             return {
                 'x_enc': torch.Tensor(seq_x).float(),
@@ -195,6 +219,8 @@ class Dataset_Custom(Dataset):
         return len(self.data_x) - self.args.seq_len - self.args.pred_len + 1
     
     def inverse_transform(self, data: np.ndarray) -> np.ndarray:
+        if not hasattr(self, "scaler_y"):
+            raise RuntimeError("inverse_transform is only available after initializing the test split.")
         return self.scaler_y.inverse_transform(data)
 
 class Dataset_Custom_4_Soft_Sensor(Dataset):
@@ -250,32 +276,20 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
             self.scaler_x = ZeroMaskStandardScaler()
             self.scaler_y = ZeroMaskStandardScaler()
         else:
-            if self.args.model in ['HSAM_dGRUs','GCT','ARDNN', 'GTFTS']:
+            if self.args.model in MINMAX_MODELS:
                 self.scaler_x = MinMaxScaler()
                 self.scaler_y = MinMaxScaler()
             else:
                 self.scaler_x = StandardScaler() 
                 self.scaler_y = StandardScaler()
 
-        TRAIN_SIZE = int(self.data.shape[0] * 0.7)
-        TEST_SIZE = int(self.data.shape[0] * 0.2)
-        VALID_SIZE = self.data.shape[0] - TRAIN_SIZE - TEST_SIZE
+        border1s, border2s, border1, border2 = _get_borders(
+            self.data.shape[0], self.args.seq_len, self.set_type
+        )
 
-        border1s = [0, TRAIN_SIZE - self.args.seq_len, self.data.shape[0] - TEST_SIZE - self.args.seq_len]
-        border2s = [TRAIN_SIZE, TRAIN_SIZE + VALID_SIZE, self.data.shape[0]]
-
-        border1 = border1s[self.set_type]
-        border2 = border2s[self.set_type]
-
-
-        del_col = del_columns(self.data_name, self.target)
-
-        columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
-
-        if columns_with_x == []:
-            columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
-            ]
+        columns_with_x = _get_feature_columns(
+            self.df_raw, self.data_name, self.target, include_target_when_no_x=False
+        )
 
         
         
@@ -304,26 +318,9 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
 
         
         
-        if "date" in self.df_raw.columns:
-            df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
-            df_stamp["date"] = pd.to_datetime(df_stamp.date)
-            if self.timeenc == 0:
-                df_stamp["month"] = df_stamp.date.apply(lambda row: row.month, 1)
-                df_stamp["day"] = df_stamp.date.apply(lambda row: row.day, 1)
-                df_stamp["weekday"] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-                df_stamp["hour"] = df_stamp.date.apply(lambda row: row.hour, 1)
-                data_stamp = df_stamp.drop(labels=["date"], axis=1).values
-
-            elif self.args.timeenc == 1:
-                data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.args.freq)
-                data_stamp = data_stamp.transpose(1, 0)
-
-            self.data_stamp = data_stamp
-            self.use_stamp = True
-        
-        else:
-            self.data_stamp = torch.empty((0, 0), dtype=torch.int)
-            self.use_stamp = False
+        self.data_stamp, self.use_stamp = _build_time_features(
+            self.df_raw, border1, border2, self.timeenc, self.args.freq
+        )
         self.data_x = data_x[border1:border2]
         self.data_y = data_y[border1:border2]
         
@@ -372,7 +369,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
                 'batch_y': torch.Tensor(seq_y).float(),
             }
         else:
-            seq_x_mark = torch.empty((0, 0), dtype=torch.int)
+            seq_x_mark = torch.empty((0, 0), dtype=torch.float32)
                 
             return {
                 'x_enc': torch.Tensor(seq_x).float(),
@@ -442,24 +439,13 @@ class Dataset_MultiMode(Dataset):
                 self.scaler_x = StandardScaler() 
                 self.scaler_y = StandardScaler() 
 
-        TRAIN_SIZE = int(self.data.shape[0] * 0.7)
-        TEST_SIZE = int(self.data.shape[0] * 0.2)
-        VALID_SIZE = self.data.shape[0] - TRAIN_SIZE - TEST_SIZE
+        border1s, border2s, border1, border2 = _get_borders(
+            self.data.shape[0], self.args.seq_len, self.set_type
+        )
 
-        border1s = [0, TRAIN_SIZE - self.args.seq_len, self.data.shape[0] - TEST_SIZE - self.args.seq_len]
-        border2s = [TRAIN_SIZE, TRAIN_SIZE + VALID_SIZE, self.data.shape[0]]
-
-        border1 = border1s[self.set_type]
-        border2 = border2s[self.set_type]
-
-        del_col = del_columns(self.data_name, self.target)
-        
-        columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
-
-        if columns_with_x == []:
-            columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
-            ]
+        columns_with_x = _get_feature_columns(
+            self.df_raw, self.data_name, self.target, include_target_when_no_x=False
+        )
         
         if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
@@ -489,8 +475,10 @@ class Dataset_MultiMode(Dataset):
         train_data_y = data_y[border1s[0]:border2s[0]]
 
         if self.flag == 'test':
-            self.scaler_only_y = StandardScaler()
-
+            if self.args.model in MINMAX_MODELS:
+                self.scaler_only_y = MinMaxScaler()
+            else:
+                self.scaler_only_y = StandardScaler()
             self.scaler_only_y.fit(train_data_y[:,-self.args.C_out:])
         
         self.scaler_x.fit(train_data_x)
@@ -500,26 +488,9 @@ class Dataset_MultiMode(Dataset):
         data_y = self.scaler_y.transform(data_y)
 
 
-        if "date" in self.df_raw.columns:
-            df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
-            df_stamp["date"] = pd.to_datetime(df_stamp.date)
-            if self.timeenc == 0:
-                df_stamp["month"] = df_stamp.date.apply(lambda row: row.month, 1)
-                df_stamp["day"] = df_stamp.date.apply(lambda row: row.day, 1)
-                df_stamp["weekday"] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-                df_stamp["hour"] = df_stamp.date.apply(lambda row: row.hour, 1)
-                data_stamp = df_stamp.drop(labels=["date"], axis=1).values
-
-            elif self.args.timeenc == 1:
-                data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.args.freq)
-                data_stamp = data_stamp.transpose(1, 0)
-
-            self.data_stamp = data_stamp
-            self.use_stamp = True
-        
-        else:
-            self.data_stamp = torch.empty((0, 0), dtype=torch.int)
-            self.use_stamp = False
+        self.data_stamp, self.use_stamp = _build_time_features(
+            self.df_raw, border1, border2, self.timeenc, self.args.freq
+        )
 
         
         self.data_x = data_x[border1:border2]
@@ -573,7 +544,7 @@ class Dataset_MultiMode(Dataset):
                 'batch_y': torch.Tensor(seq_y).float(),
             }
         else:
-            seq_x_mark = torch.empty((0, 0), dtype=torch.int)
+            seq_x_mark = torch.empty((0, 0), dtype=torch.float32)
             return {
                 'x_enc': torch.Tensor(seq_x).float(),
                 'x_dec': torch.Tensor(dec_inp).float(),
@@ -587,6 +558,8 @@ class Dataset_MultiMode(Dataset):
         return len(self.data_x) - self.args.seq_len - self.args.pred_len + 1
     
     def inverse_transform(self, data: np.ndarray) -> np.ndarray:
+        if not hasattr(self, "scaler_only_y"):
+            raise RuntimeError("inverse_transform is only available after initializing the test split.")
         return self.scaler_only_y.inverse_transform(data)
     
 
@@ -625,6 +598,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
         self.df_raw = pd.read_csv(self.data_path)
         self.data = self.df_raw.values
         
+        self.flag = flag
 
         assert flag in ['train', 'test', 'valid']
         type_map = {'train': 0, 'valid': 1, 'test': 2}
@@ -640,24 +614,13 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
             self.scaler_x = StandardScaler()
             self.scaler_y = StandardScaler()
         
-        TRAIN_SIZE = int(self.data.shape[0] * 0.7)
-        TEST_SIZE = int(self.data.shape[0] * 0.2)
-        VALID_SIZE = self.data.shape[0] - TRAIN_SIZE - TEST_SIZE
+        border1s, border2s, border1, border2 = _get_borders(
+            self.data.shape[0], self.args.seq_len, self.set_type
+        )
 
-        border1s = [0, TRAIN_SIZE - self.args.seq_len, self.data.shape[0] - TEST_SIZE - self.args.seq_len]
-        border2s = [TRAIN_SIZE, TRAIN_SIZE + VALID_SIZE, self.data.shape[0]]
-
-        border1 = border1s[self.set_type]
-        border2 = border2s[self.set_type]
-
-        columns_with_x = [col for col in self.df_raw.columns if col.startswith("x_")]
-
-        del_col = del_columns(self.data_name, self.target)
-
-        if columns_with_x == []:
-            columns_with_x = [
-                col for col in self.df_raw.columns if col != self.target and col != "date" and col!="mode" and col!=del_col
-            ]
+        columns_with_x = _get_feature_columns(
+            self.df_raw, self.data_name, self.target, include_target_when_no_x=False
+        )
         
         if self.data_name in ['DC', 'SRU'] and self.args.data_aug:
             self.df_raw, columns_with_x = preprocess_data_dict[self.data_name](self.df_raw, self.target)
@@ -695,37 +658,17 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
 
         
 
-        if "date" in self.df_raw.columns:
-            df_stamp = pd.DataFrame(self.df_raw["date"])[border1:border2]
-            df_stamp["date"] = pd.to_datetime(df_stamp.date)
-            if self.timeenc == 0:
-                df_stamp["month"] = df_stamp.date.apply(lambda row: row.month, 1)
-                df_stamp["day"] = df_stamp.date.apply(lambda row: row.day, 1)
-                df_stamp["weekday"] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-                df_stamp["hour"] = df_stamp.date.apply(lambda row: row.hour, 1)
-                data_stamp = df_stamp.drop(labels=["date"], axis=1).values
-
-            elif self.args.timeenc == 1:
-                data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.args.freq)
-                data_stamp = data_stamp.transpose(1, 0)
-
-            self.data_stamp = data_stamp
-            self.use_stamp = True
-        
-        else:
-            self.data_stamp = torch.empty((0, 0), dtype=torch.int)
-            self.use_stamp = False
+        self.data_stamp, self.use_stamp = _build_time_features(
+            self.df_raw, border1, border2, self.timeenc, self.args.freq
+        )
 
 
 
         
         self.data_x = data_x[border1:border2]
         self.data_y = data_y[border1:border2]
-        # self.data_stamp = data_stamp
         self.label_mode = self.label_mode[border1:border2]
-        # if self.args.if_missing:
-        #     self.mask_label = pd.read_csv(self.args.missing_path).values
-        #     self.mask_label = self.mask_label[border1:border2]
+
         
 
     def __getitem__(self, index: int):
@@ -750,8 +693,6 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
 
         seq_x = self.data_x[s_begin:s_end]
         seq_y = self.data_y[r_begin:r_end]
-        seq_x_mark = self.data_stamp[s_begin:s_end]
-        seq_y_mark = self.data_stamp[r_begin:r_end]
         seq_c = self.label_mode[s_begin: s_end]
 
         c_enc = torch.Tensor(seq_c).long()
@@ -773,7 +714,7 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
                 'batch_y': torch.Tensor(seq_y).float(),
             }
         else:
-            seq_x_mark = torch.empty((0, 0), dtype=torch.int)
+            seq_x_mark = torch.empty((0, 0), dtype=torch.float32)
             return {
                 'x_enc': torch.Tensor(seq_x).float(),
                 'x_dec': torch.Tensor(dec_inp).float(),

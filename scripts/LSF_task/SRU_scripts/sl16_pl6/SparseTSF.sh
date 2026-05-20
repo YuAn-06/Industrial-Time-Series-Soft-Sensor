@@ -1,32 +1,25 @@
 
                         python -u run.py \
-                        --model 'iTransformer' \
+                        --model 'SparseTSF' \
                         --task 'short_term_forecasting' \
-                        --data_name "DC" \
-                        --data_path './data/DC/debutanizer_column.csv' \
-                        --target 'y_1' \
+                        --data_name "SRU" \
+                        --data_path './data/SRU/SRU_data.csv' \
+                        --target 'SO2' \
                         --num_workers 1 \
                         --missing_rate 0 \
-                        --enc_in 8 \
-                        --dec_in 8 \
-                        --C_in 8 \
+                        --enc_in 6 \
+                        --C_in 6 \
                         --C_out 1 \
                         --seq_len 16 \
-                        --embed 'TimeF' \
-                        --freq 's' \
-                        --factor 1 \
                         --label_len 16 \
                         --pred_len 6 \
+                        --period_len 2 \
                         --d_model 64 \
-                        --d_ff 64 \
-                        --n_heads 8 \
-                        --e_layers 1 \
-                        --d_layers 1 \
-                        --dropout 0.05 \
-                        --activation 'gelu' \
+                        --model_type 'mlp' \
                         --batch_size 64 \
                         --learning_rate 0.001 \
                         --epoch 300 \
+                        --if_valid False \
                         --patience 10 \
                         --lradj 'cosine' \
                         --inverse \
@@ -34,11 +27,3 @@
                         --device "cuda" \
                         --gpu 0 \
                         --seed 2021 \
-
-
-
-
-
-
-
-

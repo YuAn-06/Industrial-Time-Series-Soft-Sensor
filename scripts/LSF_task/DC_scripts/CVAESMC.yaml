@@ -22,7 +22,7 @@ params:
   C_out: 1
   seq_len: 5 
   label_len: 5
-  pred_len: 5
+  pred_len: 1
   e_layers: 3
   activation: 'LeakyReLU'
   num_samples: 100
