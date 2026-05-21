@@ -1,4 +1,4 @@
-for moving_avg in 2 4 6 8 10 12; do
+
                         python -u run.py \
                         --model 'TimeKAN' \
                         --task 'short_term_forecasting' \
@@ -15,7 +15,7 @@ for moving_avg in 2 4 6 8 10 12; do
                         --freq 's' \
                         --label_len 16 \
                         --pred_len 6 \
-                        --moving_avg ${moving_avg} \
+                        --moving_avg 3 \
                         --down_sampling_window 8 \
                         --down_sampling_layers 1 \
                         --d_model 16 \
