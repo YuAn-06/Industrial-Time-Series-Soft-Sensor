@@ -79,7 +79,7 @@ def metric(pred, true, task):
     mae = MAE(pred, true)
     mse = MSE(pred, true)
     rmse = RMSE(pred, true)
-    wape = WAPE(pred, true)
+    wape = WAPE(pred, true, task)
     mape = MAPE(pred, true,task)
     mspe = MSPE(pred, true)
     corr = CORR(pred, true, task)

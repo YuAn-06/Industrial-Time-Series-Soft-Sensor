@@ -26,6 +26,12 @@
 
 
 
+## **🚀 What's New**
+
+**Update - 2026/5/21: ** **We have released the first version of InduTS-SS. Papers based on this benchmark framework are currently under submission. We welcome everyone to use and make corrections.**
+
+
+
 ## ☀️ The motivation of InduTS-SS
 
 While modern machine learning libraries offer powerful tools for time series modeling, they are not tailored to the specific needs of soft sensor development in industrial processes. Researchers often spend significant effort reimplementing preprocessing pipelines, feature extraction methods, and evaluation protocols from scratch—leading to fragmented codebases and difficulties in fair model comparison. Moreover, many published soft sensor approaches lack open implementations, making reproducibility and benchmarking challenging. 
@@ -67,7 +73,7 @@ Specifically, based on currently published articles on soft sensor modeling, we 
 
 
 
-The first formulation aligns closely with the classical definition of soft sensing: it aims to estimate the current value of one or more quality variables $Y$ using only the contemporaneous (or historical) measurements of easily accessible process variables $\bm{U}$. This setting is typical in real-time monitoring scenarios where physical analyzers are unavailable or too slow, and an instantaneous prediction is required for process control or decision-making.
+The first formulation aligns closely with the classical definition of soft sensing: it aims to estimate the current value of one or more quality variables $Y$ using only the contemporaneous (or historical) measurements of easily accessible process variables $\textbf{U}$. This setting is typical in real-time monitoring scenarios where physical analyzers are unavailable or too slow, and an instantaneous prediction is required for process control or decision-making.
 
 The second formulation extends this idea to multi-step-ahead forecasting. It assumes that both process variables and quality variables have been jointly observed over a historical window $[1, T]$, and leverages this combined sequence to predict a future trajectory of quality variables $Y = [Y_{T+1}, Y_{T+2}, \ldots, Y_{T+H}]$ over a horizon of H steps. This setup is particularly relevant when the underlying industrial process operates near steady state, where quality measurements—though not continuously available in practice—are assumed to evolve smoothly and can be sampled at regular intervals in the training data. Such a formulation supports applications like predictive quality control, early fault warning, and planning under uncertainty.
 
@@ -87,14 +93,6 @@ The second formulation extends this idea to multi-step-ahead forecasting. It ass
 - Quality prediction in manufacturing
 - Fault detection and diagnosis
 - Digital twins and advanced process control (APC)
-
-
-
-
-
-
-
-
 
 
 
@@ -157,7 +155,7 @@ We have assigned two abbreviated labels to the two definitions mentioned above, 
 
 ## 📊 Available Datasets
 
-We have provided two classic benchmarks, including **debutanizer column  (DC)** and **sulfur recovery units (SRU)**.  We are very grateful to the providers of these datasets, which are all open-source and included with this book, along with relevant descriptions. If you use these datasets, please cite the relevant articles.
+We have provided two classic benchmarks, including **debutanizer column  (DC)**, **sulfur recovery units (SRU), irong making (IM), and power plant gas turbine (PPGAS)**.  We are very grateful to the providers of these datasets, which are all open-source and included with this book, along with relevant descriptions. If you use these datasets, please cite the relevant articles.
 
 
 
@@ -199,6 +197,35 @@ Operational efficiency is primarily controlled by regulating the air-to-feed rat
 | SO2       | the concentrate of SO2     | Output |
 
 
+
+### 🏭 Iron making (IM)
+
+This high-alumina ironmaking dataset is derived from the article *“A Survey of Data-Driven Soft Sensing in Ironmaking System: Research Status and Opportunities”*. The dataset contains **21 easily measured process variables** collected from the ironmaking production process, while the **silicon content (Si)** is selected as the quality variable for soft sensor modeling.
+
+In practical ironmaking systems, key quality variables such as **silicon content** are difficult to measure online in real time because they usually require offline laboratory analysis, which is time-consuming and may introduce significant measurement delays. Therefore, soft sensor modeling provides an effective data-driven solution by estimating hard-to-measure quality variables from readily available process measurements. This is particularly important for process monitoring, quality prediction, and operational optimization in high-alumina ironmaking processes.
+
+**If you use this dataset or the related code in your research, please cite the following papers.**
+
+**[1] Yan F, Yang C, Zhang X, et al. BTPNet: A Probabilistic Spatial-Temporal Aware Network for Burn-Through Point Multistep Prediction in Sintering Process[J]. IEEE Transactions on Neural Networks and Learning Systems, 2024.**
+
+**[2] Yan F, Yang C, Zhang X. DSTED: A denoising spatial–temporal encoder–decoder framework for multistep prediction of burn-through point in sintering process[J]. IEEE Transactions on Industrial Electronics, 2022, 69(10): 10735-10744.**
+
+
+
+### 🏭 Power Plant Gas Turbine (PPGAS)
+
+The combustion process occurring in combined cycle power plants represents a prominent contributor to the release of harmful pollutants, namely, nitrogen oxides (NOx) and carbon monoxide (CO), into the atmosphere. In accordance with the Energy Conservation Directive set forth by the European Union, stringent emission regulations have been imposed, mandating a limit of 25 parts per million by dry volume for NOx and CO emissions. Consequently, the accurate detection and effective control of NOx emissions during the combustion process are of paramount importance for power plants. To address this issue, soft sensor approach has been considered due to its advantages of lower development costs and feasibility. The soft sensor technology enables the estimation and prediction of key process variables, such as NOx emissions, using indirect measurements and mathematical models. By employing this approach, power plant operators can obtain real-time estimations of NOx emissions, facilitating timely decision-making and the implementation of appropriate strategies to mitigate emissions and ensure compliance with regulatory standards.
+
+
+
+ **The dataset from the gas turbine is collected from hourly averaged sensor measurements of a power plant gas turbine in northwestern Turkey in 2011, with samples collected under three rapid operating changes from part load (75%) to full load (100%). It includes 10 easily measurable process variables and 2 quality variables (NOx and CO).**
+
+
+
+**If you use this dataset or the related code in your research, please cite the following papers.**
+
+**[1] H. Kaya, P. Tufekci, and E. Uzun, “Predicting CO and NOx emissions from gas turbines: Novel data and a benchmark PEMS,” Turkish J. Elect.**
+**Eng. Comput. Sci., vol. 27, no. 6, pp. 4783–4796, 2019.**
 
 ### **Notice:** 
 

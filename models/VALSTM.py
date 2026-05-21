@@ -35,6 +35,12 @@ class Model(nn.Module):
                 nn.Linear(configs.hidden_dim, configs.d_model, bias=True),
                 Permute(0, 2, 1),
                 nn.Linear(1, configs.pred_len, bias=True))
+        self.init_weights()
+    
+    def init_weights(self):
+        stdv = 1.0 / math.sqrt(self.hidden_dim)
+        for weight in self.parameters():
+            weight.data.uniform_(-stdv, stdv)
         
 
     def encoder(self, x_enc):
