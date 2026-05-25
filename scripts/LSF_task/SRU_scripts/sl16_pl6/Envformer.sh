@@ -1,5 +1,13 @@
 
-            python -u run.py --model 'Envformer' \
+            echo "========================================"
+            echo "Run model: EnvFormer"
+            echo "Experiment: short_term_forecasting on SRU"
+            echo "Input data: ./data/SRU/SRU_data.csv"
+            echo "Output target: SO2"
+            echo "Window: seq_len=16, pred_len=6"
+            echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "========================================"
+            python -u run.py --model 'EnvFormer' \
                          --task 'short_term_forecasting' \
                          --data_name "SRU" \
                          --data_path './data/SRU/SRU_data.csv' \
@@ -11,7 +19,7 @@
                          --C_in 6 \
                          --C_out 1 \
                          --seq_len 16 \
-                         --label_len 16 \
+                         --label_len 8 \
                          --pred_len 6 \
                          --kernel_size 14 \
                          --embed 'TimeF' \

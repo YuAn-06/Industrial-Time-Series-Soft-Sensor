@@ -128,7 +128,10 @@ class Model(nn.Module):
         y_enc_query = y_label.squeeze(-1)  # [B, T]
 
         if self.configs.task == 'soft_sensor':
-            y_query_single = y_enc_query[:, -1:].repeat(1, x_features.shape[1])
+            if flag == 'train':
+                y_query_single = y_enc_query[:, -1:].repeat(1, x_features.shape[1])
+            else:
+                y_query_single = y_enc_query[:, -2:-1].repeat(1, x_features.shape[1])
             return self.soft_sensor(x_features, x_mark_enc, y_query_single)
 
         elif self.configs.task == 'short_term_forecasting':

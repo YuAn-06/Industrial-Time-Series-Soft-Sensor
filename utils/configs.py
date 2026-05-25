@@ -5,6 +5,46 @@ import yaml
 from dataclasses import asdict
 import os
 
+def build_setting(args):
+    common_keys = [
+        ("sl", "seq_len"),
+        ("ll", "label_len"),
+        ("pl", "pred_len"),
+        ("bt", "batch_size"),
+        ("lr", "learning_rate"),
+        ("ep", "epoch"),
+        ("pat", "patience"),
+    ]
+    default_model_keys = [
+        ("dm", "d_model"),
+        ("dff", "d_ff"),
+        ("nh", "n_heads"),
+        ("el", "e_layers"),
+        ("dl", "d_layers"),
+    ]
+    model_keys = {
+        "ARDNN": [("dm", "d_model"), ("el", "e_layers")],
+        "Autoformer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("ma", "moving_avg")],
+        "DAGRU": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers")],
+        "DLinear": [("ma", "moving_avg"), ("ind", "individual")],
+        "EnvFormer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("ks", "kernel_size")],
+        "HSAM_dGRUs": [("hd", "hidden_dim"),("dm", "d_model"),("nh", "n_heads")],
+        "Informer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("distil", "distil")],
+        "MSGNet": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("nd", "node_dim"), ("cc", "conv_channel"), ("sc", "skip_channel"), ("pa", "propalpha"), ("gcn", "gcn_depth")],
+        "SparseTSF": [("dm", "d_model"), ("prl", "period_len"), ("mt", "model_type")],
+        "TCN": [("ks", "kernel_size"), ("el", "e_layers"), ("dl", "d_layers")],
+        "TimeKAN": [("dm", "d_model"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("dsl", "down_sampling_layers"), ("dsw", "down_sampling_window")],
+        "VRNN": [("dm", "d_model"), ("xed", "x_embed_dim"), ("zed", "z_embed_dim"), ("zd", "z_dim")],
+        "GCT": [ ("dm", "d_model"), ("dff", "d_ff"), ("ks", "kernel_size"), ("ll", "label_len")],
+        "VALSTM": [("hd", "hidden_dim")],
+        
+    }
+
+    setting_parts = [args.data_name, args.model, args.task]
+    for prefix, key in common_keys + model_keys.get(args.model, default_model_keys):
+        setting_parts.append(f"{prefix}{getattr(args, key)}")
+    return "_".join(str(part) for part in setting_parts)
+
 def Init_parser():
 
     parser = argparse.ArgumentParser(description='Configuration for All Models')
@@ -200,35 +240,10 @@ def Parse_arguments(yaml_path: str = None):
         args = ExpConfigs(**vars(args))
     except TypeError as e:
         raise ValueError(f"Invalid config field detected:\n{e}")
-
+    setting = build_setting(args)
     
 
-    if args.model == 'HSAM_dGRUs':
-        setting = "{}_{}_{}_sl{}_hd{}_bt{}_lr{}_pat{}".format(
-        args.data_name,
-        args.model,
-        args.task,
-        args.seq_len,
-        args.hidden_dim,
-        args.batch_size,
-        args.learning_rate,
-        args.patience
-    )
-
-    else:
-        setting = "{}_{}_{}_sl{}_dm{}_dff{}_ma{}_bt{}_lr{}_pat{}".format(
-        args.data_name,
-        args.model,
-        args.task,
-        args.seq_len,
-        args.d_model,
-        args.d_ff,
-        args.moving_avg,
-        args.batch_size,
-        args.learning_rate,
-        args.patience
-    )
-
+   
     # print(setting)
     folder_path = f"./results/{args.model}/" + setting +"/"
     if not os.path.exists(folder_path):
@@ -239,10 +254,19 @@ def Parse_arguments(yaml_path: str = None):
     config_dict = asdict(args)
     # Log setting
     
-    selected_keys = ["data_name", "model", "task", "seq_len", "label_len", "pred_len", "dropout", "activation", "batch_size", "learning_rate", "epoch","d_model","d_ff","hidden_dim", "patience"]
+    selected_keys = [
+        "data_name", "model", "task", "seq_len", "label_len", "pred_len",
+        "dropout", "activation", "batch_size", "learning_rate", "epoch",
+        "patience", "d_model", "d_ff", "n_heads", "e_layers", "d_layers",
+        "hidden_dim", "moving_avg", "individual", "kernel_size", "distil",
+        "num_layers", "period_len", "model_type", "down_sampling_layers",
+        "down_sampling_window", "x_embed_dim", "z_embed_dim", "z_dim",
+        "node_dim", "conv_channel", "skip_channel", "propalpha", "gcn_depth",
+    ]
     
     args.setting = ", ".join(f"{k}: {v}" for k, v in config_dict.items() if k in selected_keys)
     
+
 
 
     return args

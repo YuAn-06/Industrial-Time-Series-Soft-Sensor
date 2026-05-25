@@ -18,7 +18,7 @@
                          --factor 1 \
                          --label_len 4 \
                          --pred_len 6 \
-                         --hidden_dim 256 \
+                         --hidden_dim 512 \
                          --dropout 0.05 \
                          --activation 'gelu' \
                          --batch_size 64 \
@@ -33,7 +33,7 @@
                          --seed 2021 \
 
         sleep 5
-
+done
 wait
 
 

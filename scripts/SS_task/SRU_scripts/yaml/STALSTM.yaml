@@ -1,6 +1,6 @@
-﻿params:
+params:
   # Data Config
-  model: 'DAGRU'
+  model: 'STALSTM'
   task: 'soft_sensor'
   data_name: 'SRU'
   data_path: './data/SRU/SRU_data.csv'
@@ -9,7 +9,7 @@
   use_amp: False
   num_workers: 1
   if_missing: False
-  missing_rate: 0
+  missing_rate: 0.0
 
   # Model Config
   enc_in: 20
@@ -18,19 +18,18 @@
   C_out: 1
   seq_len: 4
   label_len: 4
-  pred_len: 1
+  pred_len: 6
   embed: 'TimeF'
   freq: 's'
   factor: 1
-  d_model: 32
-  d_ff: 32
+  SA_dim: 80
+  TA_dim: 60
   dropout: 0.05
   activation: 'gelu'
 
   # Train Config
   batch_size: 64
   learning_rate: 0.001
-  weight_decay: 0
   epoch: 300
   patience: 10
   lradj: 'cosine'
@@ -46,4 +45,3 @@
   seed: 2021
   device_ids: [0]
   use_multi_gpu: False
-
