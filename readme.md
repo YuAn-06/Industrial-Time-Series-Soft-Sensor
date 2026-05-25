@@ -155,7 +155,7 @@ We have assigned two abbreviated labels to the two definitions mentioned above, 
 
 ## 📊 Available Datasets
 
-We have provided two classic benchmarks, including **debutanizer column  (DC)**, **sulfur recovery units (SRU), irong making (IM), and power plant gas turbine (PPGAS)**.  We are very grateful to the providers of these datasets, which are all open-source and included with this book, along with relevant descriptions. If you use these datasets, please cite the relevant articles.
+We have provided two classic benchmarks and two public datasets, including **debutanizer column  (DC)**, **sulfur recovery units (SRU), irong making (IM), and power plant gas turbine (PPGAS)**.  We are very grateful to the providers of these datasets, which are all open-source and included with this book, along with relevant descriptions. If you use these datasets, please cite the relevant articles.
 
 
 

@@ -1,4 +1,12 @@
 
+                        echo "========================================"
+                        echo "Run model: TimeKAN"
+                        echo "Experiment: short_term_forecasting on SRU"
+                        echo "Input data: ./data/SRU/SRU_data.csv"
+                        echo "Output target: SO2"
+                        echo "Window: seq_len=16, pred_len=6"
+                        echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+                        echo "========================================"
                         python -u run.py \
                         --model 'TimeKAN' \
                         --task 'short_term_forecasting' \
@@ -34,4 +42,4 @@
 
                 sleep 5
 done
-wait 
+wait

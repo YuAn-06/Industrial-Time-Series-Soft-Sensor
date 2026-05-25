@@ -1,4 +1,12 @@
 
+            echo "========================================"
+            echo "Run model: Envformer"
+            echo "Experiment: short_term_forecasting on DC"
+            echo "Input data: ./data/DC/debutanizer_column.csv"
+            echo "Output target: y_1"
+            echo "Window: seq_len=16, pred_len=6"
+            echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "========================================"
             python -u run.py --model 'Envformer' \
                          --task 'short_term_forecasting' \
                          --data_name "DC" \
@@ -11,7 +19,7 @@
                          --C_in 8 \
                          --C_out 1 \
                          --seq_len 16 \
-                         --label_len 16 \
+                         --label_len 8 \
                          --pred_len 6 \
                          --kernel_size 2 \
                          --embed 'TimeF' \

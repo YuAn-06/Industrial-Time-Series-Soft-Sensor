@@ -1,5 +1,6 @@
 
-            python -u run.py --model 'TCN' \
+            python -u run.py 
+                         --model 'TCN' \
                          --task 'soft_sensor' \
                          --data_name "SRU" \
                          --data_path './data/SRU/SRU_data.csv' \

@@ -1,4 +1,12 @@
 
+                        echo "========================================"
+                        echo "Run model: iTransformer"
+                        echo "Experiment: short_term_forecasting on SRU"
+                        echo "Input data: ./data/SRU/SRU_data.csv"
+                        echo "Output target: SO2"
+                        echo "Window: seq_len=16, pred_len=6"
+                        echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+                        echo "========================================"
                         python -u run.py \
                         --model 'iTransformer' \
                         --task 'short_term_forecasting' \
@@ -34,11 +42,3 @@
                         --device "cuda" \
                         --gpu 0 \
                         --seed 2021 \
-
-
-
-
-
-
-
-

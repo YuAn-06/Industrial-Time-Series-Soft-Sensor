@@ -18,9 +18,9 @@
                          --factor 1 \
                          --label_len 4 \
                          --pred_len 1 \
-                         --d_model 64 \
-                         --n_heads 3 \
-                         --hidden_dim 2 \
+                         --d_model 128 \
+                         --n_heads 3\
+                         --hidden_dim 1 \
                          --num_layers 1 \
                          --dropout 0.05 \
                          --activation 'GELU' \
@@ -36,7 +36,9 @@
                          --seed 2021 \
 
         sleep 5
-
+# done
+# done
+# done
 wait
 
 
