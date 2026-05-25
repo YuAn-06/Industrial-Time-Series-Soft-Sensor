@@ -21,15 +21,36 @@
 
 InduTS-SS provides a unified framework for industrial soft sensing, including dataset loading, preprocessing, model training, evaluation, and benchmarking. It is intended to make model comparison more fair, reproducible, and convenient.
 
+## Table of Contents
+
+- [What's New](#whats-new)
+- [Motivation](#motivation)
+- [Getting Started](#getting-started)
+- [What Is a Soft Sensor?](#what-is-a-soft-sensor)
+- [Data-Driven Soft Sensor Modeling](#data-driven-soft-sensor-modeling)
+- [Available Models for Soft Sensors](#available-models-for-soft-sensors)
+- [Available Datasets](#available-datasets)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Citation](#citation)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
+
+<a id="whats-new"></a>
+
 ## 📢 What's New
 
 **Update - 2026/5/25:** We have released the first version of InduTS-SS. Papers based on this benchmark framework are currently under submission. We welcome users to try the library, report issues, and contribute improvements.
+
+<a id="motivation"></a>
 
 ## ✨ Motivation
 
 Modern machine learning libraries provide powerful tools for time-series modeling, but they are not always tailored to the specific needs of soft sensor development in industrial processes. Researchers often spend significant effort reimplementing preprocessing pipelines, feature extraction methods, and evaluation protocols from scratch, which leads to fragmented codebases and makes fair model comparison difficult. Moreover, many published soft sensor approaches do not provide open implementations, making reproducibility and benchmarking challenging.
 
 To bridge this gap, we introduce **InduTS-SS**, an open-source library that provides a consistent and modular framework for building, training, and evaluating soft sensors on multivariate industrial time-series data. By standardizing common components, from input representation to forecasting horizons, InduTS-SS aims to accelerate research, improve comparability, and lower the barrier to entry for new contributors in this field.
+
+<a id="getting-started"></a>
 
 ## 🚀 Getting Started
 
@@ -69,11 +90,15 @@ Before launching your first run, please check the hardware settings in the sourc
 - **Device selection:** Set the CUDA device index through `gpu_idx` or the corresponding script argument. The default value is usually `0`.
 - **Windows:** Shell scripts are mainly designed for Linux-style environments. On Windows, you can run YAML configurations directly with `python run_with_yaml.py`, or use Git Bash, WSL, or another compatible shell.
 
+<a id="what-is-a-soft-sensor"></a>
+
 ## 💻 What Is a Soft Sensor?
 
 ### Simple Definition
 
 A **soft sensor** uses easily measurable variables, such as temperature, pressure, and flow rate, together with historical data to estimate hard-to-measure target variables, such as product quality, chemical concentration, or viscosity, in real time. Soft sensors can be built using mathematical models, machine learning models, or deep learning models.
+
+<a id="data-driven-soft-sensor-modeling"></a>
 
 ### 📌 Data-Driven Soft Sensor Modeling
 
@@ -111,6 +136,8 @@ The second formulation extends this idea to multi-step-ahead forecasting. It ass
 - Quality prediction in manufacturing
 - Fault detection and diagnosis
 - Digital twins and advanced process control (APC)
+
+<a id="available-models-for-soft-sensors"></a>
 
 ## ✨ Available Models for Soft Sensors
 
@@ -162,6 +189,8 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | IEEE TNNLS 2020 |  | Yes | RNN-based time-series soft sensor model | Available |
 | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | CJCE 2019 |  | Yes | RNN-based time-series soft sensor model | Available |
 
+<a id="available-datasets"></a>
+
 ### 🏭 Available Datasets
 
 We provide two classic benchmarks and two public datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
@@ -201,7 +230,7 @@ Operational efficiency is primarily controlled by regulating the air-to-feed rat
 
 This high-alumina ironmaking dataset is derived from the article *A Survey of Data-Driven Soft Sensing in Ironmaking System: Research Status and Opportunities*. The dataset contains **21 easily measured process variables** collected from an ironmaking production process, while **silicon content (Si)** is selected as the quality variable for soft sensor modeling.
 
-In practical ironmaking systems, key quality variables such as silicon content are difficult to measure online in real time because they usually require offline laboratory analysis, which is time-consuming and may introduce significant measurement delays. Soft sensor modeling provides an effective data-driven solution by estimating hard-to-measure quality variables from readily available process measurements.
+In practical ironmaking systems, key quality variables such as silicon content are difficult to measure online in real time because they usually require offline laboratory analysis, which is time-consuming and may introduce significant measurement delays. Soft sensor modeling provides an effective data-driven solution by estimating hard-to-measure quality variables from readily available process measurements. The link of dataset is in https://github.com/ylkyc/ironmaking-zju.
 
 If you use this dataset or the related code in your research, please cite the following papers:
 
@@ -226,6 +255,8 @@ If you use this dataset or the related code in your research, please cite the fo
 If you use these datasets in your paper, please also cite:
 
 **L. Fortuna, S. Graziani, A. Rizzo, and M. G. Xibilia. Soft Sensors for Monitoring and Control of Industrial Processes. Advances in Industrial Control, 2007.**
+
+<a id="project-structure"></a>
 
 ## 📂 Project Structure
 
@@ -302,6 +333,8 @@ This directory stores experiment outputs, including trained models, logs, metric
 
 
 
+<a id="installation"></a>
+
 ## 🚩 Installation
 
 Clone the repository:
@@ -335,6 +368,8 @@ pip install -r requirements.txt
 ## Citation
 
 If you find this repository useful for your research, please consider citing the relevant dataset papers, model papers, and this benchmark framework. The BibTeX entry for InduTS-SS will be updated after the related paper is available.
+
+<a id="acknowledgements"></a>
 
 ## ❤️ Acknowledgements
 
