@@ -1,417 +1,345 @@
 <div align="center">
-  <img src="docs/Logo.jpg#gh-light-mode-only" height=200>
-      <h3><b> A Unified and Fair Industrial Time-series Soft Sensor Library and Benchmark. </b></h3>
-    <p align="center"><i></i></p>
-    </div>
+  <img src="docs/Logo.jpg#gh-light-mode-only" height="200">
+  <h3><b>A Unified and Fair Library and Benchmark for Industrial Time-Series Soft Sensors</b></h3>
+</div>
 
 <p align="center">
-    <a href="https://www.python.org/">
-       <img alt="Python version" src="https://img.shields.io/badge/Python-v3.10+-E97040?logo=python&logoColor=white">
-    </a>
-    <a href="https://pytorch.org/">
-        <img alt="powered by PyTorch" src="https://img.shields.io/badge/PyTorch-v2.7+-E97040?logo=pytorch&logoColor=white">
-    </a>
-    <a href="https://www.apache.org/licenses/">
-        <img alt="Apache License" src="https://img.shields.io/badge/License-Apache2.0-E9BB41%3Flogo%3Dopensourceinitiative%26logoColor%3Dwhite">
-    </a>
-
+  <a href="https://www.python.org/">
+    <img alt="Python version" src="https://img.shields.io/badge/Python-v3.10+-E97040?logo=python&logoColor=white">
+  </a>
+  <a href="https://pytorch.org/">
+    <img alt="powered by PyTorch" src="https://img.shields.io/badge/PyTorch-v2.7+-E97040?logo=pytorch&logoColor=white">
+  </a>
+  <a href="https://www.apache.org/licenses/">
+    <img alt="Apache License" src="https://img.shields.io/badge/License-Apache2.0-E9BB41?logo=opensourceinitiative&logoColor=white">
+  </a>
+</p>
 
 ---
 
+**Industrial Time-Series Soft Sensor (InduTS-SS)** is an open-source library designed for researchers working on time-series data analysis and soft sensor modeling for complex industrial processes.
 
+InduTS-SS provides a unified framework for industrial soft sensing, including dataset loading, preprocessing, model training, evaluation, and benchmarking. It is intended to make model comparison more fair, reproducible, and convenient.
 
-**Industrial Time-Series Soft Sensor  (InduTS-SS)** is an **open-source** library specifically designed for researchers working on time series data analysis and soft sensor modeling of complex industrial processes.
+## 📢 What's New
 
+**Update - 2026/5/25:** We have released the first version of InduTS-SS. Papers based on this benchmark framework are currently under submission. We welcome users to try the library, report issues, and contribute improvements.
 
+## ✨ Motivation
 
+Modern machine learning libraries provide powerful tools for time-series modeling, but they are not always tailored to the specific needs of soft sensor development in industrial processes. Researchers often spend significant effort reimplementing preprocessing pipelines, feature extraction methods, and evaluation protocols from scratch, which leads to fragmented codebases and makes fair model comparison difficult. Moreover, many published soft sensor approaches do not provide open implementations, making reproducibility and benchmarking challenging.
 
+To bridge this gap, we introduce **InduTS-SS**, an open-source library that provides a consistent and modular framework for building, training, and evaluating soft sensors on multivariate industrial time-series data. By standardizing common components, from input representation to forecasting horizons, InduTS-SS aims to accelerate research, improve comparability, and lower the barrier to entry for new contributors in this field.
 
-## **🚀 What's New**
+## 🚀 Getting Started
 
-**Update - 2026/5/21:** **We have released the first version of InduTS-SS. Papers based on this benchmark framework are currently under submission. We welcome everyone to use and make corrections.**
+InduTS-SS provides two primary entry points for running experiments.
 
+### 1. Configuration-Driven Execution (`run_with_yaml.py`)
 
+This mode is recommended for comprehensive experiments. Hyperparameters and environment settings are managed through `.yaml` files, which makes experiments easier to reproduce and track.
 
-## ☀️ The motivation of InduTS-SS
+Set `yaml_name` in `run_with_yaml.py` to the configuration file you want to use, for example:
 
-While modern machine learning libraries offer powerful tools for time series modeling, they are not tailored to the specific needs of soft sensor development in industrial processes. Researchers often spend significant effort reimplementing preprocessing pipelines, feature extraction methods, and evaluation protocols from scratch—leading to fragmented codebases and difficulties in fair model comparison. Moreover, many published soft sensor approaches lack open implementations, making reproducibility and benchmarking challenging. 
+```python
+yaml_name = "SS_task/SRU_scripts/yaml/VALSTM.yaml"
+```
 
-To bridge this gap, we introduce Time Series Library for Industrial Soft Sensing Modeling: an open-source library that provides a consistent, modular framework for building, training, and evaluating soft sensors on multivariate time series data. By standardizing common components—from input representation to forecasting horizons—InduTS-SS aims to accelerate research, improve comparability, and lower the barrier to entry for new contributors in the field.
+Then run:
 
+```bash
+python run_with_yaml.py
+```
 
+### 2. Command-Line Execution (`run.py`)
 
-## 🧠 What is Soft Sensor?
+This mode is useful for automated tasks and batch processing. Pre-configured shell scripts are provided for common settings.
 
-### **📌**Simple Definition
+Example:
 
-A **soft sensor** uses easily measurable variables (like temperature, pressure, flow rate) and historical data to **estimate a hard-to-measure target variable** (like product quality, chemical concentration, or viscosity) in real time—using mathematical, machine learning models, deep learning models.
+```bash
+bash scripts/LSF_task/DC_scripts/sl16_pl6/iTransformer.sh
+```
 
+### ⚠️ Important Notes
 
+Before launching your first run, please check the hardware settings in the source code, shell scripts, or YAML configuration files.
 
-## 💡Data-Driven Soft Sensor Modeling
+- **CUDA:** Set `use_gpu` or the equivalent option according to your environment.
+- **Device selection:** Set the CUDA device index through `gpu_idx` or the corresponding script argument. The default value is usually `0`.
+- **Windows:** Shell scripts are mainly designed for Linux-style environments. On Windows, you can run YAML configurations directly with `python run_with_yaml.py`, or use Git Bash, WSL, or another compatible shell.
 
-### **📌** Definition
+## 💻 What Is a Soft Sensor?
 
-Due to the increasingly large scale of modern process industries, it has become difficult to obtain mechanistic models of reaction processes or internal process dynamics.  Therefore, data-driven soft sensing models are being widely used by researchers.
+### Simple Definition
 
+A **soft sensor** uses easily measurable variables, such as temperature, pressure, and flow rate, together with historical data to estimate hard-to-measure target variables, such as product quality, chemical concentration, or viscosity, in real time. Soft sensors can be built using mathematical models, machine learning models, or deep learning models.
 
+### 📌 Data-Driven Soft Sensor Modeling
 
-Unlike mathematical and mechanistic models, data-driven models utilize process and quality data sampled from industrial processes to construct a black-box model for modeling industrial objects.
+### Definition
 
-First, we give some definitions of variables:
-- **Process Variables ($u_t$):** Denoted as $u_t \in \mathbb{R}^{N_x}$, where $N_x$ is the number of process variables. These represent high-frequency measurements from industrial sensors (e.g., temperature, pressure, flow rate).
-- **Quality Variables ($y_t$):** Denoted as $y_t \in \mathbb{R}^{N_y}$, where $N_y$ is the number of quality indicators. These represent key product properties (e.g., concentration, purity) that are often difficult, costly, or time-delayed to measure.
-- **Mode Labels ($m_t$):** Denoted as $m_t \in \{1, \dots, K\}$, where $K$ is the number of operating modes. These labels characterize different industrial regimes, such as steady-state, transitions, or fault conditions.
+Due to the increasing scale and complexity of modern process industries, it is often difficult to obtain accurate mechanistic models of reaction processes or internal process dynamics. Therefore, data-driven soft sensing models have been widely studied and applied.
 
+Unlike mathematical and mechanistic models, data-driven models use process and quality data sampled from industrial processes to construct black-box models for industrial objects.
 
+We first define the main variables:
 
-Specifically, based on currently published articles on soft sensor modeling, we define the task as follows:
+- **Process Variables ($u_t$):** Denoted as $u_t \in \mathbb{R}^{N_x}$, where $N_x$ is the number of process variables. These variables represent high-frequency measurements from industrial sensors, such as temperature, pressure, and flow rate.
+- **Quality Variables ($y_t$):** Denoted as $y_t \in \mathbb{R}^{N_y}$, where $N_y$ is the number of quality indicators. These variables represent key product properties, such as concentration and purity, that are often difficult, costly, or time-delayed to measure.
+- **Mode Labels ($m_t$):** Denoted as $m_t \in \{1, \dots, K\}$, where $K$ is the number of operating modes. These labels characterize different industrial regimes, such as steady states, transitions, and fault conditions.
 
-1. **Soft Sensor Regression:** Given a historical sequence of process variables of length $T$, denoted as $\mathbf{X}_R = \{\mathbf{u}_t\}_{t=1}^T \in \mathbb{R}^{T \times N_x}$, the objective is to learn a mapping to infer the **synchronous** quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$ at the current time step $T$.
+Based on existing soft sensor modeling studies, we define three tasks:
+
+1. **Soft Sensor Regression:** Given a historical sequence of process variables of length $T$, denoted as $\mathbf{X}_R = \{\mathbf{u}_t\}_{t=1}^T \in \mathbb{R}^{T \times N_x}$, the objective is to learn a mapping that infers the synchronous quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$ at the current time step $T$.
 2. **Soft Sensor Forecasting:** Given a historical sequence of length $T$ containing both process and quality variables, denoted as $\mathbf{X}_F = \{(\mathbf{u}_t, \mathbf{y}_t)\}_{t=1}^T \in \mathbb{R}^{T \times (N_x + N_y)}$, the objective is to learn a mapping $f$ that forecasts the future quality variables $\hat{\mathbf{Y}} = \{\hat{\mathbf{y}}_{t}\}_{t=T+1}^{T+H} \in \mathbb{R}^{H \times N_y}$ over a look-ahead horizon $H$.
-3. **Soft Sensor Sequential Estimation:** Given a historical sequence consisting of process variables up to time $T$ and past quality variables up to $T-1$, denoted as $\mathbf{X}_S = \{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\}$, the objective is to learn a mapping $f$ to estimate the **current** quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$.
+3. **Soft Sensor Sequential Estimation:** Given a historical sequence consisting of process variables up to time $T$ and past quality variables up to $T-1$, denoted as $\mathbf{X}_S = \{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\}$, the objective is to learn a mapping $f$ that estimates the current quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$.
 
+The first formulation aligns closely with the classical definition of soft sensing: estimating the current value of one or more quality variables $Y$ using only contemporaneous or historical measurements of easily accessible process variables $\mathbf{U}$. This setting is common in real-time monitoring scenarios where physical analyzers are unavailable or too slow.
 
+The second formulation extends this idea to multi-step-ahead forecasting. It assumes that both process variables and quality variables have been jointly observed over a historical window $[1, T]$, and uses this sequence to predict a future trajectory of quality variables $Y = [Y_{T+1}, Y_{T+2}, \ldots, Y_{T+H}]$ over a horizon of $H$ steps. This setup is particularly relevant when the underlying industrial process operates near steady state, where quality measurements, although not continuously available in practice, are assumed to evolve smoothly and can be sampled at regular intervals in the training data.
 
-The first formulation aligns closely with the classical definition of soft sensing: it aims to estimate the current value of one or more quality variables $Y$ using only the contemporaneous (or historical) measurements of easily accessible process variables $\textbf{U}$. This setting is typical in real-time monitoring scenarios where physical analyzers are unavailable or too slow, and an instantaneous prediction is required for process control or decision-making.
+### How Do Soft Sensors Work?
 
-The second formulation extends this idea to multi-step-ahead forecasting. It assumes that both process variables and quality variables have been jointly observed over a historical window $[1, T]$, and leverages this combined sequence to predict a future trajectory of quality variables $Y = [Y_{T+1}, Y_{T+2}, \ldots, Y_{T+H}]$ over a horizon of H steps. This setup is particularly relevant when the underlying industrial process operates near steady state, where quality measurements—though not continuously available in practice—are assumed to evolve smoothly and can be sampled at regular intervals in the training data. Such a formulation supports applications like predictive quality control, early fault warning, and planning under uncertainty.
+1. **Input:** Real-time measurements from easy-to-access sensors, such as temperature, pressure, and flow.
+2. **Model:** A trained model that learns the relationship between inputs and the target variable.
+3. **Output:** An estimated value of the hard-to-measure variable, updated continuously.
 
+### Applications
 
-
-### **🧠 How Do They Work?**
-
-1. **Input**:  Real-Time measurements from easy-to-access sensors (e.g., temperature, pressure, flow).
-2. **Model**: A trained model that learns the relationship between inputs and the target variable.
-3. **Output**: Estimated value of the hard-to-measure variable—updated continuously.
-
-
-
-### **🏭 Applications**
-
-- Process monitoring & control
+- Process monitoring and control
 - Quality prediction in manufacturing
 - Fault detection and diagnosis
 - Digital twins and advanced process control (APC)
 
-
-
 ## ✨ Available Models for Soft Sensors
 
-**We would like to thank the original authors for their pioneering research. Please note that several models in this library are independent reimplementations. Due to differences in deep learning frameworks and environments (e.g., migrating from Matlab or TensorFlow), performance may vary slightly from the originally reported results. We kindly ask users to cite the relevant articles. If you have any questions or suggestions, please feel free to contact us.**
+We thank the original authors for their pioneering research. Please note that several models in this library are independent reimplementations. Due to differences in deep learning frameworks and environments, such as migration from MATLAB or TensorFlow to PyTorch, performance may differ slightly from originally reported results. Users are kindly asked to cite the relevant papers.
 
+We use two abbreviations to indicate the supported task types:
 
+- **F:** Soft Sensor Forecasting
+- **R:** Soft Sensor Regression
 
-We have assigned two abbreviated labels to the two definitions mentioned above, to better indicate which definition each available model is specifically designed to serve, Definition (1) Soft Sensor Regression (R), Definition (2):  Soft Sensor Forecasting (F). Additionally, some models have been modified to perform two tasks simultaneously; please check the `Models`  for details.
+Some models have been adapted to support both tasks. Please refer to the files in `models/` and the corresponding scripts for details.
 
+| Model | Journal/Conference | F | R | Remark | Status |
+| ----- | ------------------ | - | - | ------ | ------ |
+| [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al.) | IEEE TPAMI 2026 | Yes |  | MLP-based time-series foundation model | Available |
+| [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al.) | ICLR 2025 | Yes | Yes | KAN-based time-series foundation model | Available |
+| [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al.) | ICML 2025 | Yes | Yes | GNN-based time-series foundation model | Available |
+| [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al.) | NeurIPS 2024 | Yes | Yes | Transformer-based foundation model | Available |
+| [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al.) | ICLR 2024 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al.) | AAAI 2024 | Yes | Yes | GNN-based time-series foundation model | Available |
+| [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al.) | ICLR 2024 | Yes | Yes | MLP-based time-series foundation model | Available |
+| [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al.) | KDD 2024 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al.) | ICLR 2023 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al.) | ICLR 2023 | Yes | Yes | TCN-based time-series foundation model | Available |
+| [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al.) | ICLR 2023 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al.) | AAAI 2023 | Yes | Yes | MLP-based time-series foundation model | Available |
+| [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al.) | NeurIPS 2023 | Yes |  | Koopman-based time-series model | Available |
+| [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu et al.) | NeurIPS 2022 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [FEDformer](https://proceedings.mlr.press/v162/zhou22g.html) (Zhou et al.) | ICML 2022 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al.) | NeurIPS 2021 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [Nystromformer](https://arxiv.org/abs/2102.03902) (Xiong et al.) | AAAI 2021 | Yes |  | Transformer-based time-series foundation model | Available |
+| [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al.) | IJCAI 2019 | Yes |  | VAE-based time-series model | Available |
+| [TCN](https://arxiv.org/abs/1803.01271) (Bai et al.) | arXiv 2018 | Yes | Yes | CNN-based time-series foundation model | Available |
+| [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al.) | NeurIPS 2017 | Yes | Yes | Transformer-based time-series foundation model | Available |
+| [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | NeurIPS 2015 | Yes | Yes | RNN-based time-series soft sensor model | Available |
+| [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter and Schmidhuber) | Neural Computation 1997 | Yes | Yes | RNN-based time-series soft sensor model | Available |
+| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | IEEE TC 2026 |  | Yes | CNN-based time-series soft sensor model | Debugging in progress |
+| [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | IEEE Sensors Journal 2025 | Yes |  | MLP-based time-series soft sensor model | Available |
+| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
+| [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Debugging in progress |
+| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | IEEE TC 2024 | Yes |  | GNN-based time-series soft sensor model | Available |
+| [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | IEEE TASE 2024 |  | Yes | RNN-based time-series soft sensor model | Available |
+| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al.) | IEEE TII 2023 | Yes |  | VAE-based time-series soft sensor model | SMC sampling for multi-step prediction is not yet available |
+| [DMRIFormer](https://doi.org/10.1109/TII.2022.3227731) (Liu et al.) | IEEE TII 2022 | Yes |  | Transformer-based time-series soft sensor model | Available |
+| [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al.) | IEEE TII 2022 |  | Yes | DVAE-based time-series soft sensor model | Available |
+| [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al.) | IEEE TII 2021 | Yes | Yes | Transformer and highway-network-based time-series soft sensor model | Available |
+| [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al.) | IEEE TII 2021 | Yes | Yes | RNN-based time-series soft sensor model | Available |
+| [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (Yuan et al.) | IEEE TII 2021 |  | Yes | RNN-based time-series soft sensor model | Available |
+| [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | IEEE TNNLS 2020 |  | Yes | RNN-based time-series soft sensor model | Available |
+| [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | CJCE 2019 |  | Yes | RNN-based time-series soft sensor model | Available |
 
+### 🏭 Available Datasets
 
-| Models                                                       | Journal/Conference | Type (F) | Type (R) | Remark                                                              | Status                                                       |
-| ------------------------------------------------------------ |--------------------| -------- | -------- |---------------------------------------------------------------------| ------------------------------------------------------------ |
-| [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al) | IEEE TPAMI 2026    | ✅        |          | A MLP-based time-series foundation model                            |                                                              |
-| [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al)    | ICLR 2025          | ✅        | ✅        | A KAN-based time-series foundation model                            |                                                              |
-| [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al)    | ICML 2025          | ✅        | ✅        | A GNN-based time-series foundation model                            |                                                              |
-| [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al )        | NeurIPS 2024       | ✅        | ✅        | A Transformer-based foundation model                                |                                                              |
-| [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al) | ICLR 2024          | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al) | AAAI 2024          | ✅        | ✅        | A GNN-based time-series foundation model                            |                                                              |
-| [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al) | ICLR 2024          | ✅        | ✅        | A MLP-based time-series foundation model                            |                                                              |
-| [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al)  | KDD 2024           | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al) | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al) | ICLR 2023          | ✅        | ✅        | A TCN-based time-series foundation model                            |                                                              |
-| [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al)     | ICLR 2023          | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al)     | AAAI 2023          | ✅        | ✅        | A MLP-based time-series foundation model                            |                                                              |
-| [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al)        | NeurIPS 2023       | ✅        |          |                                                                     |                                                              |
-| [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu, et al) | NeurlPS 2022       | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [FEDformer](https://proceedings.mlr.press/v162/zhou22g.html) (Zhou, et al) | ICLR2022           | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al)    | ICLR 2021          | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [Nystroformer](https://arxiv.org/abs/2102.03902) (Xiong et al) | AAAI 2021          | ✅        |          | A Transformer-based time-series foundation model                    |                                                              |
-| [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al) | IJCAI 2019         | ✅        |          | A Transformer-based time-series foundation model                    |                                                              |
-| [TCN](https://arxiv.org/abs/1803.01271) (Bai et al)          | arXiv 2018         | ✅        | ✅        | A CNN-based time-series based time-series foundation model          |                                                              |
-| [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al) | NIPS 2017          | ✅        | ✅        | A Transformer-based time-series foundation model                    |                                                              |
-| [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al)       | NIPS 2015          | ✅        | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
-| [LSTM ](https://ieeexplore.ieee.org/abstract/document/6795963) (Sepp Hochreiter) | NC 1997            | ✅        | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
-| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al) | IEEE TC 2026       |          | ✅        | A CNN-based time-series soft sensor model                           | The model debugging is not yet complete.                     |
-| [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al) | IEEE Sensor J 2025 | ✅        |          | A MLP-based time-series soft sensor model                           |                                                              |
-| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al) | IEEE TIM 2024      | ✅        |          | A Transformer-based time-series soft sensor model                   |                                                              |
-| [MSACNN ](https://ieeexplore.ieee.org/document/10465636) (Yuan et al) | IEEE TC 2024       |          | ✅        | A CNN-based time-series soft sensor model                           | The model debugging is not yet complete.                     |
-| [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al) | IEEE TC 2024       | ✅        |          | A GNN-based time-series soft sensor model                           |                                                              |
-| [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al) | IEEE TASE 2024     |          | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
-| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al) | IEEE TII 2023      | ✅        |          | A VAE-based time series soft sensor model                           | SMC sampling for multi-step prediction is not yet available. |
-| [DMRIFormer](10.1109/TII.2022.3227731) (Liu et al)           | IEEE TII 2022      | ✅        |          | A Transformer-based time-series soft sensor model                   |                                                              |
-| [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al) | IEEE TII 2022      |          | ✅        | A DVAE-based time-series soft sensor model                          |                                                              |
-| [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al) | IEEE TII 2021      | ✅        | ✅        | A transformer & highway network-based time series soft sensor model |                                                              |
-| [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al) | IEEE TII 2021      | ✅        | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
-| [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (yuan et al) | IEEE TII 2021      |          | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
-| [DAGRU](https://www.bing.com/ck/a?!&&p=d38b94cc62cf6a6ce44ac9bfbe5faf9b931f122ce2afd1f02f626697340fe8faJmltdHM9MTc3NzA3NTIwMA&ptn=3&ver=2&hsh=4&fclid=30f06e45-5093-6f12-3215-786c519b6e75&u=a1aHR0cHM6Ly9pZWVleHBsb3JlLmllZWUub3JnL2RvY3VtZW50LzkxNzQ3Njc) (Feng et al) | IEEE TNNLS 2020    |          | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
-| [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan, et al) | CJCE 2019          |          | ✅        | A RNN-based time-series soft sensor model                           |                                                              |
+We provide two classic benchmarks and two public datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
 
+### Debutanizer Column (DC)
 
+The **Debutanizer Column** is a critical unit in the desulfurization and naphtha splitter plant within petroleum refining processes. Its primary function is to remove propane and butane as overhead products from the naphtha stream. Since the butane content in the debutanizer bottom must be minimized, and direct measurement of this concentration is challenging, an accurate soft sensor for bottom butane concentration is valuable for improving process control performance.
 
+| Variable | Description | Type |
+| -------- | ----------- | ---- |
+| U1 | Top temperature | Input |
+| U2 | Top pressure | Input |
+| U3 | Reflux flow | Input |
+| U4 | Flow to next process | Input |
+| U5 | 6th tray temperature | Input |
+| U6 | Bottom temperature A | Input |
+| U7 | Bottom temperature B | Input |
+| Y | Butane content in C4 | Output |
 
-
-
-
-
-
-## 📊 Available Datasets
-
-We have provided two classic benchmarks and two public datasets, including **debutanizer column  (DC)**, **sulfur recovery units (SRU), irong making (IM), and power plant gas turbine (PPGAS)**.  We are very grateful to the providers of these datasets, which are all open-source and included with this book, along with relevant descriptions. If you use these datasets, please cite the relevant articles.
-
-
-
-###  🏭 Debutanizer Column  (DC)
-
-The **Debutanizer Column** is a critical unit in the desulfurization and naphtha splitter plant within petroleum refining processes. Its primary function is to remove propane and butane as overhead products from the naphtha stream. Since the butane content in the debutanizer bottom must be minimized—and direct measurement of this concentration is challenging—an accurate soft sensor for bottom butane concentration is highly valuable for enhancing process control performance.
-
-
-
-|Variables | Description                 | Type   |
-| --------- | --------------------------- | ------ |
-| U1        | Top temperature             | Input  |
-| U2        | Top pressure                | Input  |
-| U3        | Reflux flow                 | Input  |
-| U4        | Flow to next process        | Input  |
-| U5        | 6th tray temperature        | Input  |
-| U6        | Bottom temperature A        | Input  |
-| U7        | Bottom temperature B        | Input  |
-| Y         | the content of butane on C4 | Output |
-
-
-
-###  🏭 Sulfur Recovery Unit (SRU)
+### Sulfur Recovery Unit (SRU)
 
 The **Sulfur Recovery Unit** is a critical refinery process designed to convert acid gas streams into elemental sulfur. This project focuses on optimizing SRU operational performance, particularly during periods of sensor maintenance.
 
-Operational efficiency is primarily controlled by regulating the air-to-feed ratio. However, hardware sensors for $H_2S$ and $SO_2$ frequently suffer damage due to the corrosive nature of the gases. During routine maintenance or sensor failure, the lack of real-time concentration data significantly degrades the SRU's performance.
+Operational efficiency is primarily controlled by regulating the air-to-feed ratio. However, hardware sensors for $H_2S$ and $SO_2$ are frequently damaged due to the corrosive nature of the gases. During routine maintenance or sensor failure, the lack of real-time concentration data significantly degrades SRU performance.
 
+| Variable | Description | Type |
+| -------- | ----------- | ---- |
+| MEA GAS | Gas flow in the MEA zone | Input |
+| AIR MEA1 | Air flow in MEA zone 1 | Input |
+| AIR MEA 2 | Air flow in MEA zone 2 | Input |
+| AIR SWS | Air flow in the SWS zone | Input |
+| SWS GAS | Gas flow in the SWS zone | Input |
+| H2S | H2S concentration | Output |
+| SO2 | SO2 concentration | Output |
 
+### Ironmaking (IM)
 
-| Variables | Description                | Type   |
-| --------- | -------------------------- | ------ |
-| MEA GAS   | the gas flow in MEA zone   | Input  |
-| AIR MEA1  | the air flow in MEA zone 1 | Input  |
-| AIR MEA 2 | the air flow in MEA zone   | Input  |
-| AIR SWS   | the air flow in SWS zone   | Input  |
-| SWS GAS   | the gas flow in SWS zone   | Input  |
-| H2S       | the concentrate of H2S     | Output |
-| SO2       | the concentrate of SO2     | Output |
+This high-alumina ironmaking dataset is derived from the article *A Survey of Data-Driven Soft Sensing in Ironmaking System: Research Status and Opportunities*. The dataset contains **21 easily measured process variables** collected from an ironmaking production process, while **silicon content (Si)** is selected as the quality variable for soft sensor modeling.
 
+In practical ironmaking systems, key quality variables such as silicon content are difficult to measure online in real time because they usually require offline laboratory analysis, which is time-consuming and may introduce significant measurement delays. Soft sensor modeling provides an effective data-driven solution by estimating hard-to-measure quality variables from readily available process measurements.
 
+If you use this dataset or the related code in your research, please cite the following papers:
 
-### 🏭 Iron making (IM)
+**[1]** Yan F., Yang C., Zhang X., et al. BTPNet: A Probabilistic Spatial-Temporal Aware Network for Burn-Through Point Multistep Prediction in Sintering Process. *IEEE Transactions on Neural Networks and Learning Systems*, 2024.
 
-This high-alumina ironmaking dataset is derived from the article *“A Survey of Data-Driven Soft Sensing in Ironmaking System: Research Status and Opportunities”*. The dataset contains **21 easily measured process variables** collected from the ironmaking production process, while the **silicon content (Si)** is selected as the quality variable for soft sensor modeling.
+**[2]** Yan F., Yang C., Zhang X. DSTED: A denoising spatial-temporal encoder-decoder framework for multistep prediction of burn-through point in sintering process. *IEEE Transactions on Industrial Electronics*, 2022, 69(10): 10735-10744.
 
-In practical ironmaking systems, key quality variables such as **silicon content** are difficult to measure online in real time because they usually require offline laboratory analysis, which is time-consuming and may introduce significant measurement delays. Therefore, soft sensor modeling provides an effective data-driven solution by estimating hard-to-measure quality variables from readily available process measurements. This is particularly important for process monitoring, quality prediction, and operational optimization in high-alumina ironmaking processes.
+### Power Plant Gas Turbine (PPGAS)
 
-**If you use this dataset or the related code in your research, please cite the following papers.**
+The combustion process in combined cycle power plants is a major contributor to harmful emissions, especially nitrogen oxides (NOx) and carbon monoxide (CO). Under European Union emission regulations, NOx and CO emissions are limited to 25 parts per million by dry volume. Accurate detection and control of NOx emissions are therefore important for power plants.
 
-**[1] Yan F, Yang C, Zhang X, et al. BTPNet: A Probabilistic Spatial-Temporal Aware Network for Burn-Through Point Multistep Prediction in Sintering Process[J]. IEEE Transactions on Neural Networks and Learning Systems, 2024.**
+Soft sensor technology can estimate and predict key process variables, such as NOx emissions, using indirect measurements and mathematical models. This supports real-time estimation, timely decision-making, and emission mitigation.
 
-**[2] Yan F, Yang C, Zhang X. DSTED: A denoising spatial–temporal encoder–decoder framework for multistep prediction of burn-through point in sintering process[J]. IEEE Transactions on Industrial Electronics, 2022, 69(10): 10735-10744.**
+The gas turbine dataset is collected from hourly averaged sensor measurements of a power plant gas turbine in northwestern Turkey in 2011. The samples were collected under three rapid operating changes from part load (75%) to full load (100%). It includes 10 easily measurable process variables and 2 quality variables: NOx and CO.
 
+If you use this dataset or the related code in your research, please cite the following paper:
 
+**[1]** Kaya H., Tufekci P., and Uzun E. Predicting CO and NOx emissions from gas turbines: Novel data and a benchmark PEMS. *Turkish Journal of Electrical Engineering and Computer Sciences*, 2019, 27(6): 4783-4796.
 
-### 🏭 Power Plant Gas Turbine (PPGAS)
+### Dataset Citation Notice
 
-The combustion process occurring in combined cycle power plants represents a prominent contributor to the release of harmful pollutants, namely, nitrogen oxides (NOx) and carbon monoxide (CO), into the atmosphere. In accordance with the Energy Conservation Directive set forth by the European Union, stringent emission regulations have been imposed, mandating a limit of 25 parts per million by dry volume for NOx and CO emissions. Consequently, the accurate detection and effective control of NOx emissions during the combustion process are of paramount importance for power plants. To address this issue, soft sensor approach has been considered due to its advantages of lower development costs and feasibility. The soft sensor technology enables the estimation and prediction of key process variables, such as NOx emissions, using indirect measurements and mathematical models. By employing this approach, power plant operators can obtain real-time estimations of NOx emissions, facilitating timely decision-making and the implementation of appropriate strategies to mitigate emissions and ensure compliance with regulatory standards.
+If you use these datasets in your paper, please also cite:
 
+**L. Fortuna, S. Graziani, A. Rizzo, and M. G. Xibilia. Soft Sensors for Monitoring and Control of Industrial Processes. Advances in Industrial Control, 2007.**
 
-
- **The dataset from the gas turbine is collected from hourly averaged sensor measurements of a power plant gas turbine in northwestern Turkey in 2011, with samples collected under three rapid operating changes from part load (75%) to full load (100%). It includes 10 easily measurable process variables and 2 quality variables (NOx and CO).**
-
-
-
-**If you use this dataset or the related code in your research, please cite the following papers.**
-
-**[1] H. Kaya, P. Tufekci, and E. Uzun, “Predicting CO and NOx emissions from gas turbines: Novel data and a benchmark PEMS,” Turkish J. Elect.**
-**Eng. Comput. Sci., vol. 27, no. 6, pp. 4783–4796, 2019.**
-
-### **Notice:** 
-
-If you use these datasets in your paper, please remember to cite the following paper:
-
-**L. Fortuna, S. Graziani, A. Rizzo, and M. G. Xibilia, “Soft sensors for monitoring and control of industrial processes,” Advances in Industrial Control, 2007**
-
-## 📂 Project structure
+## 📂 Project Structure
 
 ```bash
-├── data/ # datasets
-   	|── data_interpolation.py # 
-   	|── data_loader.py # Provides data batches and preprocessing functions
-   	|── data_provider.py # Choose proper dataloader for each experiements
-   	|── DC/
-   		|── debutanizer_column.csv
-   	|── SRU/
-   		|── SRU_data.csv
-├── exp/ # experiment workflows
-	|── exp_basic.py # defines the basic interface and common methods for experiments
-	|── exp_factory.py # creates different experiment instances based on configuration
-   	|── exp_short_term_forecasting.py # Implements training, evaluation and testing for LSF tasks 
-   	|── exp_soft_sensor.py # Implements training, evaluation and and testing for SS tasks 
-   	|── losses.py # Instantiate the loss function for each model
-   	|── init__.py
-├── layers/ # Attention layers for models 
-	|──	SelfAttention_Family.py
-	|── Transformer_EncDec.py
-	|── DMRIFormer_EncDec.py
-	|── NystromAttention.py, etc
-├── models/             # Model implementations
-│   ├── ARDNN.py
-│   ├── Autoformer.py
-	├── PatchTST.py
-│   └── DMVAER.py, etc
-├── scripts/ 
-	├── SS task/
-		├── DC scripts
-		├──	SRU scripts
-	├── LSF task/ # long-short term forecasting run scripts
-		├── DC scripts # Debutanizer Columns run scripts
-		├──	SRU scripts # Sulfur Recovery Unit run scripts
-├── utils/              # utilities
-	├── configs.py # Parses and processes experiment configuration parameters
-	├── dtw.py
-	├── dtw_metric.py
-	├── ExpConfigs.py # Define variable type
-	├── logger.py # Provide Logger definition
-	├── masking.py # Masking for different attention
-	├── metrics.py # Experiment metrics
-	├── print_configs.py # formats and outputs experiment configurations
-	├── scaler.py # Provide data normalization classes
-	├── timefeatures.py
-	├── tools.py # Some functions like Early Stopping, Data Augmentation for SRU and DC dataset and tensorboad et al 
-           # run scripts
-├── results/            # saved results
-└── README.md # Official documents for introducing this repo
-└── requirements.txt # pip dependency list
-└── licenses.txt # pip dependecy list
-└── .gitignore.txt # ignore some files when git
-
+Industrial-Time-Series-Soft-Sensor/
+|-- data/                         # Datasets and data processing
+|   |-- data_loader.py             # Data batches and preprocessing
+|   |-- data_provider.py           # Dataloader selection for experiments
+|   |-- data_visualization.py      # Dataset visualization utilities
+|   |-- DC/
+|   |   |-- debutanizer_column.csv
+|   |   |-- mode_labels.txt
+|   |-- SRU/
+|   |   |-- SRU_data.csv
+|   |-- Ironmaking/
+|   |   |-- Ironmaking.csv
+|   |-- PPGAS/
+|       |-- gt_2012.csv
+|-- exp/                          # Experiment workflows
+|   |-- exp_basic.py              # Basic experiment interface
+|   |-- exp_factory.py            # Experiment factory
+|   |-- exp_short_term_forecasting.py
+|   |-- exp_soft_sensor.py
+|   |-- losses.py
+|-- layers/                       # Neural network layers
+|-- models/                       # Model implementations
+|-- scripts/
+|   |-- SS_task/                  # Soft sensor regression scripts
+|   |-- LSF_task/                 # Soft sensor forecasting scripts
+|-- utils/                        # Utility functions
+|   |-- configs.py
+|   |-- ExpConfigs.py
+|   |-- logger.py
+|   |-- metrics.py
+|   |-- scaler.py
+|   |-- tools.py
+|-- results/                      # Saved results
+|-- run.py                        # Command-line entry point
+|-- run_with_yaml.py              # YAML-based entry point
+|-- requirements.txt
+|-- LICENSE.txt
+|-- readme.md
 ```
 
-
-
-### Project Structure Overview
-
-This repository is organized into several key directories, each serving a specific purpose in the data processing, model training, and evaluation pipeline.
+### Directory Overview
 
 #### `data/`
 
-This directory is responsible for **dataset management and preprocessing**.
-
-- **Scripts:** It contains `data_loader.py` for providing data batches and preprocessing functions, `data_interpolation.py` for handling missing values, and `data_provider.py` to select the appropriate dataloader for specific experiments.
-- **Datasets:** The subdirectories `DC/` and `SRU/` store the raw CSV data files for the Debutanizer Column and Sulfur Recovery Unit processes, respectively.
+This directory is responsible for dataset management and preprocessing. It contains data loaders, provider functions, visualization utilities, and raw CSV data files.
 
 #### `exp/`
 
-This directory contains the **experimental logic and workflows**.
-
-- **Core Logic:** `exp_basic.py` defines the standard interface and common methods for experiments, while `exp_factory.py` handles the creation of experiment instances based on configuration.
-- **Tasks:** Specific implementations for tasks are found in `exp_short_term_forecasting.py` (for Long-Short Term Forecasting) and `exp_soft_sensor.py` (for Soft Sensor tasks).
-- **Losses:** The `losses.py` file instantiates the specific loss functions used during model training.
+This directory contains experimental logic and workflows. `exp_basic.py` defines the standard experiment interface, `exp_factory.py` creates experiment instances based on configuration, and task-specific files implement training, validation, testing, and evaluation.
 
 #### `layers/`
 
-This directory houses the **fundamental building blocks for the neural networks**. It includes various attention mechanisms and encoder-decoder architectures, such as `SelfAttention_Family.py`, `Transformer_EncDec.py`, `DMRIFormer_EncDec.py`, and `NystroAttention.py`.
+This directory contains neural network building blocks, including attention mechanisms and encoder-decoder architectures such as `SelfAttention_Family.py`, `Transformer_EncDec.py`, `DMRIFormer_EncDec.py`, and `NystromAttention.py`.
 
 #### `models/`
 
-This directory contains the **implementations of the specific deep learning models** used in the project, such as `ARDNN.py`, `Autoformer.py`, `PatchTST.py`, and `DMVAER.py`.
+This directory contains model implementations, such as `ARDNN.py`, `Autoformer.py`, `PatchTST.py`, `DMVAER.py`, `VALSTM.py`, and `iTransformer.py`.
 
 #### `scripts/`
 
-This directory stores the **execution scripts** used to run experiments. It is organized by task type (`SS task/` and `LSF task/`) and further divided by dataset (`DC scripts` and `SRU scripts`) to facilitate easy reproduction of results.
+This directory stores experiment scripts. It is organized by task type (`SS_task/` and `LSF_task/`) and dataset to facilitate reproducible experiments.
 
-#### ️ `utils/`
+#### `utils/`
 
-This directory provides **utility functions and helper tools** essential for the project's operation.
-
-- **Configuration:** `configs.py`, `ExpConfigs.py`, and `print_configs.py` handle parameter parsing and formatting.
-- **Metrics & Evaluation:** `metrics.py`, `dtw.py`, and `dtw_metric.py` are used for performance evaluation.
-- **Tools:** Other utilities include `logger.py` for logging, `masking.py` for attention masks, `scaler.py` for data normalization, and `tools.py` which contains functions for early stopping, data augmentation, and TensorBoard integration.
+This directory provides helper functions for configuration, logging, metrics, normalization, masking, early stopping, data augmentation, and TensorBoard integration.
 
 #### `results/`
 
-This directory is designated for **saving the outputs** of the experiments, including trained models and generated prediction data.
-
-------
-
-> **Note:** The project root also includes a `README.md` for official documentation and a `requirements.txt` file listing the necessary Python dependencies.
+This directory stores experiment outputs, including trained models, logs, metrics, and prediction results.
 
 
 
-## 🚀 Getting Started
+## 🚩 Installation
 
-We provide two primary entry points to execute the models, catering to different development workflows:
-
-### 1. Configuration-Driven Execution (`run_with_yaml.py`)
-
-**Best for:** Comprehensive experiments.
-
-- **How it works:** All hyperparameters and environment settings are managed via `.yaml` files, facilitating version control and systematic tracking.
-- **Usage:** You can run this script directly within your IDE (e.g., **PyCharm**, **VS Code**) or via the terminal.
-
-### 2. Command-Line Execution (`run.py`)
-
-**Best for:** Automated tasks and batch processing in Linux environments (windows also).
-
-- **How it works:** We provide pre-configured `.sh` scripts to streamline the execution process from the command line.
-
-- **Example Command:**
-
-  Bash
-
-  ```
-  bash scripts/LSF_task/DC_scripts/sh/iTransformer.sh
-  ```
-
-------
-
-### ⚠️ Important Notes
-
-**CUDA Configuration:** Before launching your first run, please ensure your hardware settings are correctly configured in the source code or config files:
-
-- **Enable CUDA:** Verify the `use_gpu` (or equivalent) flag is set correctly.
-- **Device Selection:** Specify the appropriate CUDA device index via the `gpu_idx` (default is `0`).
-
-
-
-
-
-## 🚀Installation
-
- **To clone the repository locally, run the following command:**
-
+Clone the repository:
 
 ```bash
 git clone https://github.com/YuAn-06/Industrial-Time-Series-Soft-Sensor.git
-cd InduTS-SS
+cd Industrial-Time-Series-Soft-Sensor
 ```
 
-**We recommend creating a new conda environment:**
+We recommend creating a new conda environment:
 
 ```bash
 conda create -n induts-ss python=3.10
 conda activate induts-ss
 ```
 
-**Install PyTorch with CUDA 12.8 support:**
+Install PyTorch with CUDA 12.8 support:
 
 ```bash
 pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128
 ```
 
-> Note: The command above installs PyTorch with CUDA 12.8 support. If your CUDA version is different, please install the corresponding PyTorch version from the official PyTorch website.
+If your CUDA version is different, please install the corresponding PyTorch version from the official PyTorch website.
 
-**Install the remaining dependencies:**
+Install the remaining dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## ❤️Acknowledge
+## Citation
 
-We gratefully acknowledge the contributions of the open-source community. This codebase has been influenced by and references several repositories  ([TSLib](https://github.com/thuml/Time-Series-Library)  and [PYITS](https://github.com/Master-PLC/PyITS)) in the field of deep learning and time series analysis. We thank the maintainers of these projects for their transparent documentation and modular design, which served as a valuable reference for structuring our `data`, `models`, and `exp` modules. We are also indebted to the developers of the core scientific computing libraries that made this implementation possible.
+If you find this repository useful for your research, please consider citing the relevant dataset papers, model papers, and this benchmark framework. The BibTeX entry for InduTS-SS will be updated after the related paper is available.
 
+## ❤️ Acknowledgements
 
+We gratefully acknowledge the contributions of the open-source community. This codebase has been influenced by and references several repositories, including [Time-Series-Library](https://github.com/thuml/Time-Series-Library) and [PyITS](https://github.com/Master-PLC/PyITS), in the field of deep learning and time-series analysis. We thank the maintainers of these projects for their transparent documentation and modular design, which served as valuable references for structuring our `data`, `models`, and `exp` modules. We are also indebted to the developers of the scientific computing libraries that made this implementation possible.
 
+## License
+
+This project is released under the Apache License 2.0. See [LICENSE.txt](LICENSE.txt) for details.
