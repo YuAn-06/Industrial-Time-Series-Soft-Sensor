@@ -1,7 +1,15 @@
-scikit-learn==1.7.0
-scipy==1.15.3
-tensorboard==2.20.0
-tqdm==4.67.1
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.7.1+cu128
 numpy==2.1.2
 pandas==2.3.1
+scikit-learn==1.7.0
+scipy==1.15.3
 matplotlib==3.10.3
+tensorboard==2.20.0
+tqdm==4.67.1
+PyYAML==6.0.2
+einops==0.8.1
+sympy==1.13.3
+statsmodels==0.14.6
+seaborn==0.13.2
