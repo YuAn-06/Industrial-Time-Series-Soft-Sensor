@@ -26,6 +26,7 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 - [What's New](#whats-new)
 - [Motivation](#motivation)
 - [Getting Started](#getting-started)
+- [Using TensorBoard](#using-tensorboard)
 - [What Is a Soft Sensor?](#what-is-a-soft-sensor)
 - [Data-Driven Soft Sensor Modeling](#data-driven-soft-sensor-modeling)
 - [Available Models for Soft Sensors](#available-models-for-soft-sensors)
@@ -89,6 +90,60 @@ Before launching your first run, please check the hardware settings in the sourc
 - **CUDA:** Set `use_gpu` or the equivalent option according to your environment.
 - **Device selection:** Set the CUDA device index through `gpu_idx` or the corresponding script argument. The default value is usually `0`.
 - **Windows:** Shell scripts are mainly designed for Linux-style environments. On Windows, you can run YAML configurations directly with `python run_with_yaml.py`, or use Git Bash, WSL, or another compatible shell.
+
+<a id="using-tensorboard"></a>
+
+## Using TensorBoard
+
+TensorBoard logging can be enabled from the experiment configuration file:
+
+```yaml
+use_tensorboard: True
+```
+
+After running an experiment, TensorBoard event files are saved under the corresponding result directory:
+
+```bash
+results/{model}/{experiment_setting}/exp_YYYYMMDD_HHMMSS/
+```
+
+For example, to view all ARDNN runs:
+
+```bash
+tensorboard --logdir ./results/ARDNN
+```
+
+Then open:
+
+```text
+http://localhost:6006
+```
+
+If the `tensorboard` command is not available in your terminal, first make sure the correct conda environment is activated:
+
+```bash
+conda activate induts-ss
+```
+
+On some Windows/conda installations, launch TensorBoard through Python instead:
+
+```bash
+python -m tensorboard.main --logdir ./results/ARDNN
+```
+
+Alternatively, call the executable from the environment directly:
+
+```bash
+path/to/conda/envs/induts-ss/Scripts/tensorboard.exe --logdir ./results/ARDNN
+```
+
+If port `6006` is already occupied, specify another port:
+
+```bash
+python -m tensorboard.main --logdir ./results/ARDNN --port 6007
+```
+
+The current training scripts log validation loss to the `Scalars` dashboard, such as `Loss/val`, and selected hyperparameters and test metrics after evaluation.
 
 <a id="what-is-a-soft-sensor"></a>
 

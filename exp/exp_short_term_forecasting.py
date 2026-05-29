@@ -267,11 +267,20 @@ class Exp_Short_Term_Forecasting(Exp_basic):
         # 只有在启用了TensorBoard的情况下才记录超参数和关闭writer
         if hasattr(self, 'writer'):
             hparams = select_tensorboard_hparams(self.args)
-            hparams['mae/hparam'] = float(mae)
-            hparams['mse/hparam'] = float(mse)
-            hparams['rmse/hparam'] = float(rmse)
-            metrics = {}
+            metrics = {
+                'mae/test': float(mae),
+                'mse/test': float(mse),
+                'rmse/test': float(rmse),
+                'mape/test': float(mape),
+                'mspe/test': float(mspe),
+                'wape/test': float(wape),
+                'corr/test': float(corr),
+            }
             self.writer.add_hparams(hparams, metrics)
+
+            for name, value in metrics.items():
+                self.writer.add_scalar(name, value, 0)
+
             self.writer.flush()
             self.writer.close()
             

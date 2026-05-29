@@ -9,7 +9,7 @@ from torch import optim, nn
 from matplotlib import pyplot as plt
 
 from exp import Exp_basic, Losses, TensorboardObserver
-from utils import metric, adjust_learning_rate, EarlyStopping, Logger
+from utils import metric, adjust_learning_rate, EarlyStopping, select_tensorboard_hparams, Logger
 from data import data_provider
 from data import data_provider, DataLoader, Dataset
 from typing import Any, Optional, Union, Dict
@@ -108,6 +108,7 @@ class Exp_Soft_Sensor(Exp_basic):
         
         for epoch in range(self.args.epoch):
             iter_count = 0
+            loss_list = []
             
             self.model.train()
             
@@ -126,6 +127,7 @@ class Exp_Soft_Sensor(Exp_basic):
                 
                 
                 loss.backward()
+                loss_list.append(loss.item())
                 model_optim.step()
                 
             vali_loss = self.vali(val_data, val_loader)
@@ -136,6 +138,8 @@ class Exp_Soft_Sensor(Exp_basic):
             # 记录验证损失和训练损失到TensorBoard
             if hasattr(self, 'writer'):
                 self.writer.add_scalar('Loss/val', vali_loss, epoch)
+                train_loss = np.mean(loss_list) if loss_list else 0
+                self.writer.add_scalar('Loss/train', train_loss, epoch)
               
             
             self.loss.print_loss(epoch, train_steps, vali_loss, logger)
@@ -218,18 +222,23 @@ class Exp_Soft_Sensor(Exp_basic):
         
         # 只有在启用了TensorBoard的情况下才记录超参数
         if hasattr(self, 'writer'):
-            hparams = {
-                'lr': self.args.learning_rate,
-                'batch_size': self.args.batch_size,
-                'model': self.args.model,
-                'epochs': self.args.epoch,
-            }
+            hparams = select_tensorboard_hparams(self.args)
             metrics = {
-                'mae/test': 6.5,
-                'mse/test': mse,
-                'rmse/test': rmse,
+                'mae/test': float(mae),
+                'mse/test': float(mse),
+                'rmse/test': float(rmse),
+                'mape/test': float(mape),
+                'mspe/test': float(mspe),
+                'wape/test': float(wape),
+                'corr/test': float(corr),
             }
             self.writer.add_hparams(hparams, metrics)
+
+            for name, value in metrics.items():
+                self.writer.add_scalar(name, value, 0)
+
+            self.writer.flush()
+            self.writer.close()
         
         plt.figure()
         plt.plot(trues, label='GT')  # Assuming trues is a 3D array, adjust indices as needed
