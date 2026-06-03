@@ -15,9 +15,10 @@ class TensorboardObserver():
     
     def __init__(self, folder_path) -> None:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_dir = os.path.join(folder_path, f"exp_{timestamp}")
-        print(log_dir)
-        self._writer = SummaryWriter(log_dir)
+        self.log_dir = os.path.normpath(os.path.join(folder_path, f"exp_{timestamp}"))
+        os.makedirs(self.log_dir, exist_ok=True)
+        print(self.log_dir)
+        self._writer = SummaryWriter(self.log_dir)
     
     @property
     def observer(self):
@@ -27,7 +28,9 @@ class TensorboardObserver():
         self._writer.add_scalar(tag, scalar_value, global_step)
 
     def add_hparams(self, hparams, metrics, global_step=None):
-        self._writer.add_hparams(hparams, metrics)
+        run_name = f"hparams_step_{0 if global_step is None else global_step}"
+        os.makedirs(os.path.join(self.log_dir, run_name), exist_ok=True)
+        self._writer.add_hparams(hparams, metrics, run_name=run_name, global_step=global_step)
     
     def close(self):
         self._writer.close()
@@ -130,25 +133,31 @@ class CVAESMC_Loss(BaseLoss):
 
         z_mu_p = preds['mu_posterior']
         z_logvar_p = preds['logvar_posterior']
-        y_mu = preds['mean_dec'] # [num_samples,B  C_y]
-        y_logvar = preds['logvar_dec'] # [ num_samples, B, C_y]
+        y_mu = preds['mean_dec'] # [num_samples, B, pred_len, C_y]
+        y_logvar = preds['logvar_dec'] # [1, C_y]
         y_true = true
 
-        y_true = y_true.squeeze(1)
+        if y_mu.ndim == 3:
+            y_mu = y_mu.unsqueeze(2)
 
-        y_true = y_true.unsqueeze(0).expand(y_mu.shape[0], -1, -1)
+        if y_true.ndim == 2:
+            y_true = y_true.unsqueeze(1)
+        if y_true.shape[-1] != y_mu.shape[-1]:
+            y_true = y_true[..., -y_mu.shape[-1]:]
 
+        y_true = y_true.unsqueeze(0).expand(y_mu.shape[0], -1, y_mu.shape[2], -1)
 
-        sigma_w = torch.exp(y_logvar)
-        mse = torch.sum((y_mu - y_true)**2, dim=-1)
-        mse = mse.mean(dim=(0,1))
-        recon_loss = 0.5 *(mse/(2 * sigma_w) + 0.5 *torch.log(2*torch.pi * sigma_w))
+        sigma_w = torch.exp(y_logvar).view(1, 1, 1, -1)
+        recon_loss = 0.5 * (
+            ((y_mu - y_true) ** 2) / (sigma_w + 1e-8)
+            + torch.log(2 * torch.pi * sigma_w + 1e-8)
+        )
+        recon_loss = recon_loss.mean()
         
         kl = -0.5 * (
             1 + z_logvar_p - z_mu_p.pow(2) - z_logvar_p.exp()
         )
-        kl_loss = kl.sum()
-        kl_loss = kl_loss.mean()
+        kl_loss = kl.sum(dim=-1).mean()
 
         loss = recon_loss +  kl_loss
         

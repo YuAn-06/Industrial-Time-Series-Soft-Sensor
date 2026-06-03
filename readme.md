@@ -229,13 +229,13 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al.) | NeurIPS 2017 | Yes | Yes | Transformer-based time-series foundation model | Available |
 | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | NeurIPS 2015 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter and Schmidhuber) | Neural Computation 1997 | Yes | Yes | RNN-based time-series soft sensor model | Available |
-| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | IEEE TC 2026 |  | Yes | CNN-based time-series soft sensor model | Debugging in progress |
+| [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | IEEE TC 2026 |  | Yes | CNN-based time-series soft sensor model | Available |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | IEEE Sensors Journal 2025 | Yes |  | MLP-based time-series soft sensor model | Available |
 | [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
-| [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Debugging in progress |
+| [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Available |
 | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | IEEE TC 2024 | Yes |  | GNN-based time-series soft sensor model | Available |
 | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | IEEE TASE 2024 |  | Yes | RNN-based time-series soft sensor model | Available |
-| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al.) | IEEE TII 2023 | Yes |  | VAE-based time-series soft sensor model | SMC sampling for multi-step prediction is not yet available |
+| [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al.) | IEEE TII 2023 | Yes |  | VAE-based time-series soft sensor mode                       | Available |
 | [DMRIFormer](https://doi.org/10.1109/TII.2022.3227731) (Liu et al.) | IEEE TII 2022 | Yes |  | Transformer-based time-series soft sensor model | Available |
 | [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al.) | IEEE TII 2022 |  | Yes | DVAE-based time-series soft sensor model | Available |
 | [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al.) | IEEE TII 2021 | Yes | Yes | Transformer and highway-network-based time-series soft sensor model | Available |
