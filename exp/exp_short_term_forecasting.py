@@ -81,7 +81,7 @@ class Exp_Short_Term_Forecasting(Exp_basic):
             if flag == 'train':
                 return self._select_forecast_target(batch_y) # 通过x(1:t)和y(1:t-1)预测y(t)
             else:
-                return batch_y[:, -self.args.pred_len:, :]
+                return self._select_forecast_target(batch_y)
           
         else: # 其他模型
             return self._select_forecast_target(batch_y) # for inverse, not select target dimension
