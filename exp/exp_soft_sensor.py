@@ -240,9 +240,11 @@ class Exp_Soft_Sensor(Exp_basic):
             self.writer.flush()
             self.writer.close()
         
+        plot_trues = trues[:, -1, :] if trues.ndim == 3 else trues
+        plot_preds = preds[:, -1, :] if preds.ndim == 3 else preds
         plt.figure()
-        plt.plot(trues, label='GT')  # Assuming trues is a 3D array, adjust indices as needed
-        plt.plot(preds, label='Predicted')  # Assuming preds is a 3D array, adjust indices as needed
+        plt.plot(plot_trues, label='GT')
+        plt.plot(plot_preds, label='Predicted')
         plt.legend()
         plt.savefig(self.args.save_dir + 'test.png')  # 
         logger.info(f"Saved plot as 'test.png' in {self.args.save_dir}")

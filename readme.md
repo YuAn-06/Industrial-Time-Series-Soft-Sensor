@@ -230,11 +230,13 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | NeurIPS 2015 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter and Schmidhuber) | Neural Computation 1997 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | IEEE TC 2026 |  | Yes | CNN-based time-series soft sensor model | Available |
+| [STDTAEm]() | IEEE TII 2026 | | Yes | MLP-based time-series soft sensor model | Unavailable |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | IEEE Sensors Journal 2025 | Yes |  | MLP-based time-series soft sensor model | Available |
 | [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
 | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Available |
 | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | IEEE TC 2024 | Yes |  | GNN-based time-series soft sensor model | Available |
 | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | IEEE TASE 2024 |  | Yes | RNN-based time-series soft sensor model | Available |
+| [GraphSAGE-IMATCN](https://www.sciencedirect.com/science/article/abs/pii/S0957582024009959?via%3Dihub=) (Tuo et al.) | PSER 2024 | | Yes | GNN-based time-series soft sensor model | Unavailable |
 | [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al.) | IEEE TII 2023 | Yes |  | VAE-based time-series soft sensor mode                       | Available |
 | [DMRIFormer](https://doi.org/10.1109/TII.2022.3227731) (Liu et al.) | IEEE TII 2022 | Yes |  | Transformer-based time-series soft sensor model | Available |
 | [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al.) | IEEE TII 2022 |  | Yes | DVAE-based time-series soft sensor model | Available |
@@ -244,9 +246,11 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | IEEE TNNLS 2020 |  | Yes | RNN-based time-series soft sensor model | Available |
 | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | CJCE 2019 |  | Yes | RNN-based time-series soft sensor model | Available |
 
+
+
 <a id="available-datasets"></a>
 
-### 🏭 Available Datasets
+## 🏭 Available Datasets
 
 We provide two classic benchmarks and two public datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
 

@@ -1,6 +1,7 @@
 --extra-index-url https://download.pytorch.org/whl/cu128
 
 torch==2.7.1+cu128
+torch_geometric==2.7.0
 numpy==2.1.2
 pandas==2.3.1
 scikit-learn==1.7.0

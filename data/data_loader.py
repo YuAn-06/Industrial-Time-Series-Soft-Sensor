@@ -22,7 +22,7 @@ preprocess_data_dict = {
     'SRU': SRU_preprocess
 }
 
-MINMAX_MODELS = ['HSAM_dGRUs', 'ARDNN', 'GTFTS', 'GCT']
+MINMAX_MODELS = ['HSAM_dGRUs', 'ARDNN', 'GTFTS', 'GCT', 'STDTAEm','GraphSAGE_IMATCN']
 
 
 def _get_borders(data_len: int, seq_len: int, set_type: int):
@@ -344,8 +344,12 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         """
         s_begin = index
         s_end = s_begin + self.args.seq_len
-        r_begin = s_begin + self.args.seq_len - 1
-        r_end = r_begin + 1
+        if self.args.model == 'STDTAEm':
+            r_begin = s_begin
+            r_end = s_end
+        else:
+            r_begin = s_begin + self.args.seq_len - 1
+            r_end = r_begin + 1
 
         seq_x = self.data_x[s_begin:s_end]
         seq_y = self.data_y[r_begin:r_end]
@@ -384,6 +388,10 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
 
     def inverse_transform(self, data: np.ndarray) -> np.ndarray:
         # only y need inverse transform
+        shape = data.shape
+        if data.ndim == 3:
+            data = data.reshape(-1, shape[-1])
+            return self.scaler_y.inverse_transform(data).reshape(shape)
         return self.scaler_y.inverse_transform(data)
 
 
