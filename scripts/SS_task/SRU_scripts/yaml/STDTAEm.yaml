@@ -21,8 +21,8 @@ params:
   seq_len: 8
   label_len: 8
   pred_len: 1
-  hidden_dim: 16
-  latent_dim: 32
+  hidden_dim: 32 # 32
+  latent_dim: 64 # 64
   dropout: 0.3
   e_layers: 1
   activation: 'gelu'
@@ -35,7 +35,7 @@ params:
   tae_mask_ratio: 0.1
   tae_backbone: 'mlp'
   tae_hidden_dims: [16]
-  freeze_tae: True
+  freeze_tae: False
 
   # Stage Overrides
   pretrain_epoch: 50

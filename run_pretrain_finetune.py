@@ -49,6 +49,7 @@ def make_stage_args(base_args, stage, pretrained_ckpt=""):
 
     stage_epoch = getattr(args, f"{stage}_epoch", -1)
     stage_learning_rate = getattr(args, f"{stage}_learning_rate", -1.0)
+    
     if stage_epoch > 0:
         args.epoch = stage_epoch
     if stage_learning_rate > 0:
@@ -85,9 +86,14 @@ def load_args_from_yaml(yaml_path):
         sys.argv = original_argv
 
 
-def run_stage_pipeline(yaml_path, stages=STAGES, test_stages=TEST_STAGES):
+def run_stage_pipeline(yaml_path, stages, test_stages, initial_ckpt=""):
     base_args = load_args_from_yaml(yaml_path)
-    previous_ckpt = ""
+    if initial_ckpt:
+        if not os.path.exists(initial_ckpt):
+            raise FileNotFoundError(f"initial checkpoint not found: {initial_ckpt}")
+        stages = ("finetune",)
+
+    previous_ckpt = initial_ckpt
     stage_results = {}
 
     for stage in stages:
@@ -108,13 +114,26 @@ def run_stage_pipeline(yaml_path, stages=STAGES, test_stages=TEST_STAGES):
 
 
 def main():
-
+    """
+    yaml_path: str = path to the yaml file
+    stages: tuple = ("pretrain", "finetune") if you want to run pretrain and finetune, else ("finetune")
+    test_stages: tuple = ("finetune")
+    initial_ckpt: str = path to the initial checkpoint, # if you have a initial checkpoint, 
+                        please provide the path as "./results/STDTAEm/{results_name}/checkpoint.pth" and set stages = ("finetune",)
+    """
 
     yaml_path = "./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml"
     stages = ("pretrain", "finetune")
     test_stages = ("finetune")
+    initial_ckpt = "" 
 
-    results = run_stage_pipeline(yaml_path, stages=stages, test_stages=test_stages)
+
+    results = run_stage_pipeline(
+        yaml_path,
+        stages=stages,
+        test_stages=test_stages,
+        initial_ckpt=initial_ckpt,
+    )
 
     print("==== done ====")
     for stage, result in results.items():
