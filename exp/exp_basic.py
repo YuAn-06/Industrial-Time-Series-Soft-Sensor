@@ -47,6 +47,8 @@ from models import (
     GCT,
     SOFTS,
     FEDformer,
+    STDTAEm,
+    GraphSAGE_IMATCN,
 )
 
 
@@ -88,6 +90,8 @@ MODEL_REGISTRY = {
     'GCT': GCT,
     'SOFTS': SOFTS,
     'FEDformer': FEDformer,
+    'STDTAEm': STDTAEm,
+    'GraphSAGE_IMATCN': GraphSAGE_IMATCN,
 }
 
 

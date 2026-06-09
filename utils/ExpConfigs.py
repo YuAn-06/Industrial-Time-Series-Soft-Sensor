@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import List
 
@@ -46,6 +48,12 @@ class ExpConfigs:
     patience: int 
     lradj: str 
     weight_decay: float
+    model_stage: str
+    pretrained_ckpt: str
+    pretrain_epoch: int
+    finetune_epoch: int
+    pretrain_learning_rate: float
+    finetune_learning_rate: float
     save_dir: str 
 
     # Test Config
@@ -112,6 +120,14 @@ class ExpConfigs:
     # GTFTS
     latent_dim: int
     n_fft: int
+    std_window: int
+    tae_beta: float
+    triplet_margin: float
+    tae_noise_std: float
+    tae_mask_ratio: float
+    tae_backbone: str
+    tae_hidden_dims: list[int]
+    freeze_tae: bool
 
     # TimeFilter
     alpha: float
@@ -120,6 +136,9 @@ class ExpConfigs:
 
     # TCN
     num_channels: list
+    graph_build_method: str
+    graph_threshold: float
+    graph_sample_size: int
 
     # SparseTSF
     model_type: str

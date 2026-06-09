@@ -37,6 +37,8 @@ def build_setting(args):
         "VRNN": [("dm", "d_model"), ("xed", "x_embed_dim"), ("zed", "z_embed_dim"), ("zd", "z_dim")],
         "GCT": [ ("dm", "d_model"), ("dff", "d_ff"), ("ks", "kernel_size"), ("ll", "label_len")],
         "VALSTM": [("hd", "hidden_dim")],
+        "STDTAEm": [("hd", "hidden_dim"), ("ld", "latent_dim"), ("th", "tae_hidden_dims"), ("sw", "std_window"), ("tb", "tae_backbone"), ("stage", "model_stage")],
+        "GraphSAGE_IMATCN": [("dm", "d_model"), ("nc", "num_channels"), ("ks", "kernel_size"), ("nh", "n_heads"), ("gm", "graph_build_method"), ("gt", "graph_threshold")],
         
     }
 
@@ -95,6 +97,12 @@ def Init_parser():
     parser.add_argument('--patience', type=int, default=10,help='Patience for early stopping')                  
     parser.add_argument('--lradj', type=str, default='cosine',help="Learning rate adjustment strategy: ['type1', 'type2', 'cosine']")
     parser.add_argument('--weight_decay', type=float, default=0.0,help='L2 regularization weight')         
+    parser.add_argument('--model_stage', type=str, default='finetune', choices=['pretrain', 'finetune'], help='Model stage for models with pretraining')
+    parser.add_argument('--pretrained_ckpt', type=str, default='', help='Checkpoint path for loading pretrained weights')
+    parser.add_argument('--pretrain_epoch', type=int, default=-1, help='Optional epoch override for pretraining')
+    parser.add_argument('--finetune_epoch', type=int, default=-1, help='Optional epoch override for finetuning')
+    parser.add_argument('--pretrain_learning_rate', type=float, default=-1.0, help='Optional learning-rate override for pretraining')
+    parser.add_argument('--finetune_learning_rate', type=float, default=-1.0, help='Optional learning-rate override for finetuning')
 
     # Test Config
     parser.add_argument('--inverse', action='store_true',
@@ -162,12 +170,24 @@ def Init_parser():
     # GTFTS
     parser.add_argument('--latent_dim', type=int, default=10,help='Latent dimension for GTFTS')
     parser.add_argument('--n_fft', type=int, default=8,help='nfft dimension in STFT for GTFTS')
+    # STDTAEm
+    parser.add_argument('--std_window', type=int, default=5, help='Moving average window for STDTAEm decomposition')
+    parser.add_argument('--tae_beta', type=float, default=1.0, help='Triplet loss weight for STDTAEm pretraining')
+    parser.add_argument('--triplet_margin', type=float, default=1.0, help='Triplet margin for STDTAEm pretraining')
+    parser.add_argument('--tae_noise_std', type=float, default=0.05, help='Positive sample Gaussian noise for STDTAEm')
+    parser.add_argument('--tae_mask_ratio', type=float, default=0.1, help='Positive sample random mask ratio for STDTAEm')
+    parser.add_argument('--tae_backbone', type=str, default='mlp', choices=['mlp', 'lstm'], help='TAE encoder backbone for STDTAEm')
+    parser.add_argument('--tae_hidden_dims', type=int, nargs='+', default=[], help='Hidden dimensions for STDTAEm MLP TAE')
+    parser.add_argument('--freeze_tae', action='store_true', help='Freeze pretrained TAE branches during STDTAEm finetuning')
     # SparseTSF
     parser.add_argument('--model_type', type=str, default='linear',help='[linear, mlp]')
     parser.add_argument('--period_len', type=int, default=10,help='Period length for SparseTSF')
     
     # TCN
-    parser.add_argument('--num_channels', type=list, nargs='+', default=[16, 32, 64],help='Number of channels for TCN')
+    parser.add_argument('--num_channels', type=int, nargs='+', default=[16, 32, 64],help='Number of channels for TCN')
+    parser.add_argument('--graph_build_method', type=str, default='mi', choices=['mi', 'corr'], help='Graph construction method for GraphSAGE_IMATCN')
+    parser.add_argument('--graph_threshold', type=float, default=0.4, help='Edge threshold for GraphSAGE_IMATCN graph construction')
+    parser.add_argument('--graph_sample_size', type=int, default=64, help='Training samples used to estimate GraphSAGE_IMATCN graph edges')
 
 
     # TimeFilter
@@ -262,6 +282,7 @@ def Parse_arguments(yaml_path: str = None):
         "num_layers", "period_len", "model_type", "down_sampling_layers",
         "down_sampling_window", "x_embed_dim", "z_embed_dim", "z_dim",
         "node_dim", "conv_channel", "skip_channel", "propalpha", "gcn_depth",
+        "model_stage", "std_window", "latent_dim", "tae_backbone", "tae_hidden_dims",
     ]
     
     args.setting = ", ".join(f"{k}: {v}" for k, v in config_dict.items() if k in selected_keys)

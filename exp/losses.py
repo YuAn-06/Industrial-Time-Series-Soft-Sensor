@@ -441,6 +441,69 @@ class HuberLoss(BaseLoss):
         if flag == 'train':
             self._append_loss('loss', loss.item())
         return loss
+
+
+class STDTAEm_Loss(BaseLoss):
+    def __init__(self, args):
+        super().__init__(args)
+        self.MSEloss = nn.MSELoss(reduction='mean')
+        self.beta = getattr(args, 'tae_beta', 1.0)
+        self.margin = getattr(args, 'triplet_margin', 1.0)
+        self.stage = getattr(args, 'model_stage', 'finetune')
+        self._register_loss_list('loss')
+        self._register_loss_list('regression_loss')
+        self._register_loss_list('recon_loss')
+        self._register_loss_list('triplet_loss')
+
+    @property
+    def mean_regression_loss(self):
+        return np.mean(self._loss_lists['regression_loss'])
+
+    @property
+    def mean_recon_loss(self):
+        return np.mean(self._loss_lists['recon_loss'])
+
+    @property
+    def mean_triplet_loss(self):
+        return np.mean(self._loss_lists['triplet_loss'])
+
+    def _branch_loss(self, branch):
+        recon_loss = self.MSEloss(branch['rec'], branch['target'])
+        d_pos = F.pairwise_distance(branch['z'], branch['z_pos'], p=2)
+        d_neg = F.pairwise_distance(branch['z'], branch['z_neg'], p=2)
+        triplet_loss = torch.relu(d_pos - d_neg + self.margin).mean()
+        return recon_loss, triplet_loss
+
+    def forward(self, preds, true, flag: str = 'train'):
+        if not isinstance(preds, dict):
+            if true.shape != preds.shape:
+                true = true[..., -preds.shape[-1]:]
+            reg_loss = self.MSEloss(preds, true)
+            if flag == 'train':
+                self._append_loss('loss', reg_loss.item())
+                self._append_loss('regression_loss', reg_loss.item())
+                self._append_loss('recon_loss', 0.0)
+                self._append_loss('triplet_loss', 0.0)
+            return reg_loss
+
+        trend_recon, trend_triplet = self._branch_loss(preds['trend'])
+        seasonal_recon, seasonal_triplet = self._branch_loss(preds['seasonal'])
+        recon_loss = trend_recon + seasonal_recon
+        triplet_loss = trend_triplet + seasonal_triplet
+        loss = recon_loss + self.beta * triplet_loss
+
+        if flag == 'train':
+            self._append_loss('loss', loss.item())
+            self._append_loss('regression_loss', 0.0)
+            self._append_loss('recon_loss', recon_loss.item())
+            self._append_loss('triplet_loss', triplet_loss.item())
+        return loss
+
+    def print_loss_details(self):
+        if self.stage == 'pretrain':
+            print(f'Recon Loss: {self.mean_recon_loss:.4f}, Triplet Loss: {self.mean_triplet_loss:.4f}')
+        else:
+            print(f'Regression Loss: {self.mean_regression_loss:.4f}')
     
 losses_dict = {
     'Nystroformer': MSE_Loss,
@@ -480,6 +543,8 @@ losses_dict = {
     'GCT': MSE_Loss,
     'SOFTS': MSE_Loss,
     'FEDformer': MSE_Loss,
+    'STDTAEm': STDTAEm_Loss,
+    'GraphSAGE_IMATCN': MSE_Loss,
     
 }
 

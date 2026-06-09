@@ -1,0 +1,64 @@
+# configs.yaml
+
+params:
+  # Data Config
+  model: 'STDTAEm'
+  task: 'soft_sensor'
+  data_name: "SRU"
+  data_path: './data/SRU/SRU_data.csv'
+  target: 'SO2'
+  data_aug: True
+  use_amp: False
+  num_workers: 1
+  if_missing: False
+  missing_rate: 0
+
+  # Model Config
+  enc_in: 20
+  dec_in: 20
+  C_in: 20
+  C_out: 1
+  seq_len: 8
+  label_len: 8
+  pred_len: 1
+  hidden_dim: 32 # 32
+  latent_dim: 64 # 64
+  dropout: 0.3
+  e_layers: 1
+  activation: 'gelu'
+
+  # STD-TAEm Config
+  std_window: 4
+  tae_beta: 0.5
+  triplet_margin: 0.5
+  tae_noise_std: 0.01
+  tae_mask_ratio: 0.1
+  tae_backbone: 'mlp'
+  tae_hidden_dims: [16]
+  freeze_tae: False
+
+  # Stage Overrides
+  pretrain_epoch: 50
+  finetune_epoch: 300
+  pretrain_learning_rate: 0.001
+  finetune_learning_rate: 0.001
+
+  # Train Config
+  batch_size: 32
+  learning_rate: 0.001
+  epoch: 300
+  patience: 10
+  lradj: 'cosine'
+  weight_decay: 0.0
+  use_tensorboard: False
+
+  # Test Config
+  inverse: True
+
+  # GPU config
+  use_cuda: True
+  device: "cuda"
+  gpu: 0
+  seed: 2021
+  device_ids: [0]
+  use_multi_gpu: False
