@@ -41,6 +41,8 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 
 ## 📢 What's New
 
+**Update - 2026/6/06:** Now, InduTS-SS can support pre-training and fine-tuning models. We provide `run_pretrain_finetune.py` to provide the whole training procedure for pretraining models. Meanwhile, we provide two new models, including a GNN-based model and an AE-based model, while their hyperparameters are not determined accurately.
+
 **Update - 2026/5/25:** We have released the first version of InduTS-SS. Papers based on this benchmark framework are currently under submission. We welcome users to try the library, report issues, and contribute improvements.
 
 <a id="motivation"></a>
@@ -55,7 +57,7 @@ To bridge this gap, we introduce **InduTS-SS**, an open-source library that prov
 
 ## 🚀 Getting Started
 
-InduTS-SS provides two primary entry points for running experiments.
+InduTS-SS provides three primary entry points for running experiments.
 
 ### 1. Configuration-Driven Execution (`run_with_yaml.py`)
 
@@ -73,7 +75,40 @@ Then run:
 python run_with_yaml.py
 ```
 
-### 2. Command-Line Execution (`run.py`)
+### 2. Pretraining and Finetuning Execution (`run_pretrain_finetune.py`)
+
+For models that require a two-stage workflow, such as pretraining followed by finetuning, use `run_pretrain_finetune.py`. The runner first trains with `model_stage="pretrain"`, saves the checkpoint, and then automatically passes that checkpoint to the finetuning stage.
+
+The stage-specific training settings can be configured in the YAML file:
+
+```yaml
+pretrain_epoch: 50
+finetune_epoch: 300
+pretrain_learning_rate: 0.001
+finetune_learning_rate: 0.001
+```
+
+Then run:
+
+```bash
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml
+```
+
+You can also choose stages from the command line:
+
+```bash
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --stages pretrain finetune --test_stages finetune
+```
+
+To skip pretraining and directly finetune from an existing checkpoint, pass `--initial_ckpt`:
+
+```bash
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --initial_ckpt ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
+```
+
+When `initial_ckpt` is not empty, the runner will use only the finetuning stage.
+
+### 3. Command-Line Execution (`run.py`)
 
 This mode is useful for automated tasks and batch processing. Pre-configured shell scripts are provided for common settings.
 

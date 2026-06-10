@@ -194,7 +194,7 @@ class Exp_Soft_Sensor(Exp_basic):
           
                 
                 
-                outputs = self.model(**batch)
+                outputs = self.model(**batch, flag='test')
                 outputs = self._select_pred(outputs, flag='test')
                 gt = self._select_gt(**batch, flag='test')
 

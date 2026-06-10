@@ -7,19 +7,19 @@ into model_stage='finetune'.
 """
 
 import copy
+import argparse
 import os
 import sys
 from dataclasses import asdict
 
-from exp import get_exp_by_model_and_task
-from utils import Logger, Parse_arguments, print_args, setup_seed
-from utils.configs import build_setting
 
-
+VALID_STAGES = ("pretrain", "finetune")
 
 
 
 def refresh_run_fields(args):
+    from utils.configs import build_setting
+
     setting = build_setting(args)
     save_dir = os.path.join(".", "results", args.model, setting) + os.sep
     os.makedirs(save_dir, exist_ok=True)
@@ -59,6 +59,9 @@ def make_stage_args(base_args, stage, pretrained_ckpt=""):
 
 
 def run_stage(args, stage_name, do_test=False):
+    from exp import get_exp_by_model_and_task
+    from utils import Logger, print_args, setup_seed
+
     logger = Logger(args.save_dir)
     try:
         print(f"==== {stage_name}: {args.model} ====")
@@ -78,6 +81,8 @@ def run_stage(args, stage_name, do_test=False):
 
 
 def load_args_from_yaml(yaml_path):
+    from utils import Parse_arguments
+
     original_argv = sys.argv
     try:
         sys.argv = [original_argv[0]]
@@ -113,26 +118,46 @@ def run_stage_pipeline(yaml_path, stages, test_stages, initial_ckpt=""):
     return stage_results
 
 
+def parse_pipeline_args():
+    parser = argparse.ArgumentParser(
+        description="Run pretraining and finetuning from one YAML file."
+    )
+    parser.add_argument(
+        "--yaml",
+        "--yaml_path",
+        dest="yaml_path",
+        default="./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml",
+        help="Path to the YAML configuration file.",
+    )
+    parser.add_argument(
+        "--stages",
+        nargs="+",
+        default=("pretrain", "finetune"), # ('pretrain', 'finetune') ('pretrain',)  ('finetune',)
+        choices=VALID_STAGES,
+        help="Stages to run, for example: --stages pretrain finetune",
+    )
+    parser.add_argument(
+        "--test_stages",
+        nargs="+",
+        default=("finetune",),
+        choices=VALID_STAGES,
+        help="Stages to test after training, for example: --test_stages finetune",
+    )
+    parser.add_argument(
+        "--initial_ckpt",
+        default="",
+        help="Existing pretrain checkpoint for direct finetuning.",
+    ) # if you have a initial checkpoint, please provide the path as "./results/STDTAEm/{results_name}/checkpoint.pth" and set stages = ("finetune",)
+    return parser.parse_args()
+
+
 def main():
-    """
-    yaml_path: str = path to the yaml file
-    stages: tuple = ("pretrain", "finetune") if you want to run pretrain and finetune, else ("finetune")
-    test_stages: tuple = ("finetune")
-    initial_ckpt: str = path to the initial checkpoint, # if you have a initial checkpoint, 
-                        please provide the path as "./results/STDTAEm/{results_name}/checkpoint.pth" and set stages = ("finetune",)
-    """
-
-    yaml_path = "./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml"
-    stages = ("pretrain", "finetune")
-    test_stages = ("finetune")
-    initial_ckpt = "" 
-
-
+    cli_args = parse_pipeline_args()
     results = run_stage_pipeline(
-        yaml_path,
-        stages=stages,
-        test_stages=test_stages,
-        initial_ckpt=initial_ckpt,
+        cli_args.yaml_path,
+        stages=tuple(cli_args.stages),
+        test_stages=tuple(cli_args.test_stages),
+        initial_ckpt=cli_args.initial_ckpt,
     )
 
     print("==== done ====")
