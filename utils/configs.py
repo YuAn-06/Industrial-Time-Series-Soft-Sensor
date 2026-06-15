@@ -28,7 +28,7 @@ def build_setting(args):
         "DAGRU": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers")],
         "DLinear": [("ma", "moving_avg"), ("ind", "individual")],
         "EnvFormer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("ks", "kernel_size")],
-        "HSAM_dGRUs": [("hd", "hidden_dim"),("dm", "d_model"),("nh", "n_heads")],
+        "HSAM_dGRUs": [("hd", "hidden_dim"), ("uty", "use_true_y_in_train"), ("dm", "d_model"), ("nh", "n_heads")],
         "Informer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("distil", "distil")],
         "MSGNet": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("nd", "node_dim"), ("cc", "conv_channel"), ("sc", "skip_channel"), ("pa", "propalpha"), ("gcn", "gcn_depth")],
         "SparseTSF": [("dm", "d_model"), ("prl", "period_len"), ("mt", "model_type")],
@@ -124,6 +124,10 @@ def Init_parser():
 
     # HSAM_dGRUs CVAESMC VA-LSTM
     parser.add_argument('--hidden_dim', type=int, default=10,help='hidden dimension for each distributed GRU unit')
+    parser.add_argument('--use_true_y_in_train', dest='use_true_y_in_train', action='store_true', default=True,
+                        help='Use the current ground-truth y_t as the HSAM_dGRUs quality query during training')
+    parser.add_argument('--no_use_true_y_in_train', dest='use_true_y_in_train', action='store_false',
+                        help='Use y_{t-1} instead of the current ground-truth y_t as the HSAM_dGRUs quality query during training')
 
     # Autoformer
     parser.add_argument('--moving_avg', type=int, default=25,help='moving average for Autoformer')
@@ -278,7 +282,7 @@ def Parse_arguments(yaml_path: str = None):
         "data_name", "model", "task", "seq_len", "label_len", "pred_len",
         "dropout", "activation", "batch_size", "learning_rate", "epoch",
         "patience", "d_model", "d_ff", "n_heads", "e_layers", "d_layers",
-        "hidden_dim", "moving_avg", "individual", "kernel_size", "distil",
+        "hidden_dim", "use_true_y_in_train", "moving_avg", "individual", "kernel_size", "distil",
         "num_layers", "period_len", "model_type", "down_sampling_layers",
         "down_sampling_window", "x_embed_dim", "z_embed_dim", "z_dim",
         "node_dim", "conv_channel", "skip_channel", "propalpha", "gcn_depth",

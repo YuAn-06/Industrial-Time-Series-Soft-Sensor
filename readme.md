@@ -41,6 +41,8 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 
 ## 📢 What's New
 
+**Update - 2026/6/15:** We have added the **Mining Process (MP)** dataset to InduTS-SS. We sincerely thank **Mr. Eduardo Magalhaes Oliveira** for releasing this valuable real-world industrial dataset and confirming its authenticity.
+
 **Update - 2026/6/06:** Now, InduTS-SS can support pre-training and fine-tuning models. We provide `run_pretrain_finetune.py` to provide the whole training procedure for pretraining models. Meanwhile, we provide two new models, including a GNN-based model and an AE-based model, while their hyperparameters are not determined accurately.
 
 **Update - 2026/5/25:** We have released the first version of InduTS-SS. Papers based on this benchmark framework are currently under submission. We welcome users to try the library, report issues, and contribute improvements.
@@ -200,15 +202,78 @@ Unlike mathematical and mechanistic models, data-driven models use process and q
 
 We first define the main variables:
 
-- **Process Variables ($u_t$):** Denoted as $u_t \in \mathbb{R}^{N_x}$, where $N_x$ is the number of process variables. These variables represent high-frequency measurements from industrial sensors, such as temperature, pressure, and flow rate.
-- **Quality Variables ($y_t$):** Denoted as $y_t \in \mathbb{R}^{N_y}$, where $N_y$ is the number of quality indicators. These variables represent key product properties, such as concentration and purity, that are often difficult, costly, or time-delayed to measure.
-- **Mode Labels ($m_t$):** Denoted as $m_t \in \{1, \dots, K\}$, where $K$ is the number of operating modes. These labels characterize different industrial regimes, such as steady states, transitions, and fault conditions.
+- **Process Variables:** Denoted as
+
+$$
+\mathbf{u}_t \in \mathbb{R}^{N_x},
+$$
+
+where $N_x$ is the number of process variables. These variables represent high-frequency measurements from industrial sensors, such as temperature, pressure, and flow rate.
+
+- **Quality Variables:** Denoted as
+
+$$
+\mathbf{y}_t \in \mathbb{R}^{N_y},
+$$
+
+where $N_y$ is the number of quality indicators. These variables represent key product properties, such as concentration and purity, that are often difficult, costly, or time-delayed to measure.
+
+- **Mode Labels:** Denoted as
+
+$$
+m_t \in \{1, \ldots, K\},
+$$
+
+where $K$ is the number of operating modes. These labels characterize different industrial regimes, such as steady states, transitions, and fault conditions.
 
 Based on existing soft sensor modeling studies, we define three tasks:
 
-1. **Soft Sensor Regression:** Given a historical sequence of process variables of length $T$, denoted as $\mathbf{X}_R = \{\mathbf{u}_t\}_{t=1}^T \in \mathbb{R}^{T \times N_x}$, the objective is to learn a mapping that infers the synchronous quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$ at the current time step $T$.
-2. **Soft Sensor Forecasting:** Given a historical sequence of length $T$ containing both process and quality variables, denoted as $\mathbf{X}_F = \{(\mathbf{u}_t, \mathbf{y}_t)\}_{t=1}^T \in \mathbb{R}^{T \times (N_x + N_y)}$, the objective is to learn a mapping $f$ that forecasts the future quality variables $\hat{\mathbf{Y}} = \{\hat{\mathbf{y}}_{t}\}_{t=T+1}^{T+H} \in \mathbb{R}^{H \times N_y}$ over a look-ahead horizon $H$.
-3. **Soft Sensor Sequential Estimation:** Given a historical sequence consisting of process variables up to time $T$ and past quality variables up to $T-1$, denoted as $\mathbf{X}_S = \{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\}$, the objective is to learn a mapping $f$ that estimates the current quality variable $\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}$.
+1. **Soft Sensor Regression:** Given a historical sequence of process variables of length $T$, denoted as
+
+$$
+\mathbf{X}_R =
+\left\{\mathbf{u}_t\right\}_{t=1}^{T}
+\in \mathbb{R}^{T \times N_x},
+$$
+
+the objective is to learn a mapping that infers the synchronous quality variable
+
+$$
+\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}
+$$
+
+at the current time step $T$.
+
+2. **Soft Sensor Forecasting:** Given a historical sequence of length $T$ containing both process and quality variables, denoted as
+
+$$
+\mathbf{X}_F =
+\left\{(\mathbf{u}_t, \mathbf{y}_t)\right\}_{t=1}^{T}
+\in \mathbb{R}^{T \times (N_x + N_y)},
+$$
+
+the objective is to learn a mapping $f$ that forecasts the future quality variables
+
+$$
+\hat{\mathbf{Y}} =
+\left\{\hat{\mathbf{y}}_t\right\}_{t=T+1}^{T+H}
+\in \mathbb{R}^{H \times N_y}
+$$
+
+over a look-ahead horizon $H$.
+
+3. **Soft Sensor Sequential Estimation:** Given a historical sequence consisting of process variables up to time $T$ and past quality variables up to $T-1$, denoted as
+
+$$
+\mathbf{X}_S =
+\left\{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\right\},
+$$
+
+the objective is to learn a mapping $f$ that estimates the current quality variable
+
+$$
+\hat{\mathbf{y}}_T \in \mathbb{R}^{N_y}.
+$$
 
 The first formulation aligns closely with the classical definition of soft sensing: estimating the current value of one or more quality variables $Y$ using only contemporaneous or historical measurements of easily accessible process variables $\mathbf{U}$. This setting is common in real-time monitoring scenarios where physical analyzers are unavailable or too slow.
 
@@ -287,7 +352,7 @@ Some models have been adapted to support both tasks. Please refer to the files i
 
 ## 🏭 Available Datasets
 
-We provide two classic benchmarks and two public datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
+We provide two classic benchmarks and three public datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
 
 ### Debutanizer Column (DC)
 
@@ -332,6 +397,20 @@ If you use this dataset or the related code in your research, please cite the fo
 
 **[2]** Yan F., Yang C., Zhang X. DSTED: A denoising spatial-temporal encoder-decoder framework for multistep prediction of burn-through point in sintering process. *IEEE Transactions on Industrial Electronics*, 2022, 69(10): 10735-10744.
 
+### Mining Process (MP)
+
+The **Mining Process** dataset is a real-world iron ore froth flotation dataset released on Kaggle as *Quality Prediction in a Mining Process*. Froth flotation is a key mineral processing stage used to concentrate iron ore, and the dataset is intended for predicting final ore concentrate quality from routinely measured process variables.
+
+The local file `MP_data.csv` contains **3,614 hourly samples** and **24 columns** from March 2017 to September 2017. It includes feed quality variables, reagent flows, ore pulp measurements, and flotation column air-flow and level measurements. The final laboratory quality measurements are **% Silica Concentrate**.
+
+The main soft sensor target is **% Silica Concentrate**, which represents the impurity level in the iron ore concentrate. Since this quality variable is measured in the laboratory and is delayed by at least one hour, accurate soft sensor modeling can provide earlier quality estimates for process engineers and support timely corrective control.
+
+The version provided in this repository has been preprocessed by our team, including removing duplicated timestamps and correcting abnormal values. Users who need the original raw file can access it from Kaggle.
+
+Dataset source: https://www.kaggle.com/datasets/edumagalhaes/quality-prediction-in-a-mining-process.
+
+We sincerely thank **[Mr. Eduardo Magalhaes Oliveira](https://www.linkedin.com/in/eduardomoliveira/)** for releasing this valuable industrial dataset and for confirming its background. According to his kind information, there is no specific paper associated with this dataset; however, it is a real dataset from a large-scale mining industry, donated under the condition of anonymity, with its authenticity guaranteed.
+
 ### Power Plant Gas Turbine (PPGAS)
 
 The combustion process in combined cycle power plants is a major contributor to harmful emissions, especially nitrogen oxides (NOx) and carbon monoxide (CO). Under European Union emission regulations, NOx and CO emissions are limited to 25 parts per million by dry volume. Accurate detection and control of NOx emissions are therefore important for power plants.
@@ -367,6 +446,8 @@ Industrial-Time-Series-Soft-Sensor/
 |   |   |-- SRU_data.csv
 |   |-- Ironmaking/
 |   |   |-- Ironmaking.csv
+|   |-- MP/
+|   |   |-- MP_data.csv
 |   |-- PPGAS/
 |       |-- gt_2012.csv
 |-- exp/                          # Experiment workflows

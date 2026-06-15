@@ -129,7 +129,10 @@ class Model(nn.Module):
 
         if self.configs.task == 'soft_sensor':
             if flag == 'train':
-                y_query_single = y_enc_query[:, -1:].repeat(1, x_features.shape[1])
+                if self.configs.use_true_y_in_train:
+                    y_query_single = y_enc_query[:, -1:].repeat(1, x_features.shape[1])
+                else:
+                    y_query_single = y_enc_query[:, -2:-1].repeat(1, x_features.shape[1])
             else:
                 y_query_single = y_enc_query[:, -2:-1].repeat(1, x_features.shape[1])
             return self.soft_sensor(x_features, x_mark_enc, y_query_single)

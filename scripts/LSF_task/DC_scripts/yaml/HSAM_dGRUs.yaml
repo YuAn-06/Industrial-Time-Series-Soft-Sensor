@@ -28,7 +28,7 @@ params:
   d_layers: 1
   activation: 'GELU'
   hidden_dim: 2 # dGRU hidden dimension
-  num_layers: 1 # The number of GRU layers
+  e_layers: 1 # The number of GRU layers
 
 # Train Configs
   batch_size: 128 #128

@@ -76,6 +76,7 @@ class ExpConfigs:
 
     # HSAM_dGRUs & VALSTM
     hidden_dim: int
+    use_true_y_in_train: bool
 
     # Autoformer & TimesNet
     moving_avg: int

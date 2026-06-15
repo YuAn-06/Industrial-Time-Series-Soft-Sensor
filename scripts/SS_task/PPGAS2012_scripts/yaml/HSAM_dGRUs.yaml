@@ -33,7 +33,7 @@ params:
   dropout: 0.05
   activation: 'GELU'
   hidden_dim: 10 # dGRU hidden dimension
-  num_layers: 1 # The number of GRU layers
+  e_layers: 1 # The number of GRU layers
 
 # Train Config
   batch_size: 64 #128
