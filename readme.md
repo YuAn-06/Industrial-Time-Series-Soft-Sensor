@@ -232,7 +232,7 @@ Based on existing soft sensor modeling studies, we define three tasks:
 
 $$
 \mathbf{X}_R =
-\left\{\mathbf{u}_t\right\}_{t=1}^{T}
+\{\mathbf{u}_t\}_{t=1}^{T}
 \in \mathbb{R}^{T \times N_x},
 $$
 
@@ -248,7 +248,7 @@ at the current time step $T$.
 
 $$
 \mathbf{X}_F =
-\left\{(\mathbf{u}_t, \mathbf{y}_t)\right\}_{t=1}^{T}
+\{(\mathbf{u}_t, \mathbf{y}_t)\}_{t=1}^{T}
 \in \mathbb{R}^{T \times (N_x + N_y)},
 $$
 
@@ -256,7 +256,7 @@ the objective is to learn a mapping $f$ that forecasts the future quality variab
 
 $$
 \hat{\mathbf{Y}} =
-\left\{\hat{\mathbf{y}}_t\right\}_{t=T+1}^{T+H}
+\{\hat{\mathbf{y}}_t\}_{t=T+1}^{T+H}
 \in \mathbb{R}^{H \times N_y}
 $$
 
@@ -266,7 +266,7 @@ over a look-ahead horizon $H$.
 
 $$
 \mathbf{X}_S =
-\left\{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\right\},
+\{\mathbf{u}_{1:T}, \mathbf{y}_{1:T-1}\},
 $$
 
 the objective is to learn a mapping $f$ that estimates the current quality variable
