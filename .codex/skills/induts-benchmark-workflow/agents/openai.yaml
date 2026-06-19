@@ -1,0 +1,4 @@
+interface:
+  display_name: "InduTS Benchmark Workflow"
+  short_description: "Top-level workflow map for InduTS-SS benchmark tasks."
+  default_prompt: "Use $induts-benchmark-workflow to route an InduTS-SS benchmark task to the right workflow and helper skill."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "InduTS Characteristics"
+  short_description: "Analyze InduTS dataset behavior and plots."
+  default_prompt: "Use $induts-characteristics to summarize dataset stationarity, outliers, correlations, and visual patterns."

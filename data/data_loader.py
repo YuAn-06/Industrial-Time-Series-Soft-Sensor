@@ -45,16 +45,8 @@ def _get_borders(data_len: int, seq_len: int, set_type: int):
 
 
 def _get_feature_columns(df_raw: pd.DataFrame, data_name: str, target: str, include_target_when_no_x: bool):
-    columns_with_x = [col for col in df_raw.columns if col.startswith("x_")]
-    del_col = del_columns(data_name, target)
-
-    if columns_with_x == []:
-        excluded = {del_col, "date", "mode"}
-        if not include_target_when_no_x:
-            excluded.add(target)
-        columns_with_x = [col for col in df_raw.columns if col not in excluded]
-
-    return columns_with_x
+    excluded = {"date", "mode", target}
+    return [col for col in df_raw.columns if col not in excluded]
 
 
 def _build_time_features(df_raw: pd.DataFrame, border1: int, border2: int, timeenc: int, freq: str):

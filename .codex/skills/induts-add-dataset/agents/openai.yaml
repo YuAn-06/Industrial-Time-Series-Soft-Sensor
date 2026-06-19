@@ -1,0 +1,4 @@
+interface:
+  display_name: "InduTS Add Dataset"
+  short_description: "Inspect, scaffold, and validate new InduTS-SS datasets."
+  default_prompt: "Use $induts-add-dataset to inspect a new dataset, scaffold YAML configs, and run dataset smoke checks."

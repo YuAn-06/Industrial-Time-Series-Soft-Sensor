@@ -7,91 +7,52 @@
 
 
 import os
+import importlib
 import torch
+from types import ModuleType
 from typing import Dict, Union
-from models import (
-    Nystromformer,
-    DAGRU,
-    DMVAER,
-    VRNN,
-    T_CVAE,
-    iTransformer,
-    Transformer,
-    EnvFormer,
-    Fredformer,
-    HSAM_dGRUs,
-    PatchTST,
-    Autoformer,
-    DLinear,
-    ARDNN,
-    MSACNN,
-    CVAESMC,
-    LDCNN,
-    Nonstationary_Transformer,
-    DMRIFormer,
-    Informer,
-    VALSTM,
-    LSTM,
-    Crossformer,
-    TimeMixer,
-    TimesNet,
-    GTFTS,
-    SparseTSF,
-    TCN,
-    TimeFilter,
-    STALSTM,
-    Koopa,
-    TimeKAN,
-    MSGNet,
-    DLSTM,
-    GCT,
-    SOFTS,
-    FEDformer,
-    STDTAEm,
-    GraphSAGE_IMATCN,
-)
 
 
 MODEL_REGISTRY = {
-    'Nystromformer': Nystromformer,
-    'DAGRU': DAGRU,
-    'DMVAER': DMVAER,
-    'VRNN': VRNN,
-    'TCVAE': T_CVAE,
-    'iTransformer': iTransformer,
-    'Transformer': Transformer,
-    'EnvFormer': EnvFormer,
-    'Fredformer': Fredformer,
-    'HSAM_dGRUs': HSAM_dGRUs,
-    'PatchTST': PatchTST,
-    'Autoformer': Autoformer,
-    'DLinear': DLinear,
-    'ARDNN': ARDNN,
-    'MSACNN': MSACNN,
-    'CVAESMC': CVAESMC,
-    'LDCNN': LDCNN,
-    'Nonstationary_Transformer': Nonstationary_Transformer,
-    'DMRIFormer': DMRIFormer,
-    'Informer': Informer,
-    'LSTM': LSTM,
-    'VALSTM': VALSTM,
-    'Crossformer': Crossformer,
-    'TimeMixer': TimeMixer,
-    'TimesNet': TimesNet,
-    'GTFTS': GTFTS,
-    'SparseTSF': SparseTSF,
-    'TCN': TCN,
-    'TimeFilter': TimeFilter,
-    'STALSTM': STALSTM,
-    'Koopa': Koopa,
-    'TimeKAN': TimeKAN,
-    'MSGNet': MSGNet,
-    'DLSTM': DLSTM,
-    'GCT': GCT,
-    'SOFTS': SOFTS,
-    'FEDformer': FEDformer,
-    'STDTAEm': STDTAEm,
-    'GraphSAGE_IMATCN': GraphSAGE_IMATCN,
+    'Nystromformer': 'models.Nystromformer',
+    'DAGRU': 'models.DAGRU',
+    'DMVAER': 'models.DMVAER',
+    'VRNN': 'models.VRNN',
+    'TCVAE': 'models.T_CVAE',
+    'iTransformer': 'models.iTransformer',
+    'Transformer': 'models.Transformer',
+    'EnvFormer': 'models.EnvFormer',
+    'Fredformer': 'models.Fredformer',
+    'HSAM_dGRUs': 'models.HSAM_dGRUs',
+    'PatchTST': 'models.PatchTST',
+    'Autoformer': 'models.Autoformer',
+    'DLinear': 'models.DLinear',
+    'ARDNN': 'models.ARDNN',
+    'MSACNN': 'models.MSACNN',
+    'CVAESMC': 'models.CVAESMC',
+    'LDCNN': 'models.LDCNN',
+    'Nonstationary_Transformer': 'models.Nonstationary_Transformer',
+    'DMRIFormer': 'models.DMRIFormer',
+    'Informer': 'models.Informer',
+    'LSTM': 'models.LSTM',
+    'VALSTM': 'models.VALSTM',
+    'Crossformer': 'models.Crossformer',
+    'TimeMixer': 'models.TimeMixer',
+    'TimesNet': 'models.TimesNet',
+    'GTFTS': 'models.GTFTS',
+    'SparseTSF': 'models.SparseTSF',
+    'TCN': 'models.TCN',
+    'TimeFilter': 'models.TimeFilter',
+    'STALSTM': 'models.STALSTM',
+    'Koopa': 'models.Koopa',
+    'TimeKAN': 'models.TimeKAN',
+    'MSGNet': 'models.MSGNet',
+    'DLSTM': 'models.DLSTM',
+    'GCT': 'models.GCT',
+    'SOFTS': 'models.SOFTS',
+    'FEDformer': 'models.FEDformer',
+    'STDTAEm': 'models.STDTAEm',
+    'GraphSAGE_IMATCN': 'models.GraphSAGE_IMATCN',
 }
 
 
@@ -102,6 +63,7 @@ class Exp_basic(object):
         self.device = self._acquire_device()
         
         self.model_dict = MODEL_REGISTRY
+        self._model_module_cache: Dict[str, ModuleType] = {}
     
 
         self.model = self._build_model().to(self.device)
@@ -115,12 +77,17 @@ class Exp_basic(object):
 
     def _get_model_module(self, model_name):
         try:
-            model_module = self.model_dict[model_name]
+            module_path = self.model_dict[model_name]
         except KeyError:
             supported_models = ', '.join(sorted(self.model_dict.keys()))
             raise ValueError(
                 f"Unsupported model: {model_name}. Supported models: {supported_models}"
             )
+
+        if model_name not in self._model_module_cache:
+            self._model_module_cache[model_name] = importlib.import_module(module_path)
+
+        model_module = self._model_module_cache[model_name]
 
         if not hasattr(model_module, "Model"):
             raise AttributeError(f"Model module '{model_name}' must define 'Model'.")

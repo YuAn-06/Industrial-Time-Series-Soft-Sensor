@@ -27,6 +27,8 @@ data_dict = {
     # Ironmaking
     'Ironmaking': Dataset_Custom,
     'Ironmaking_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
+    'MP': Dataset_Custom,
+    'MP_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
 }   
 
 

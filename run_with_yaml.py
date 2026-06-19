@@ -28,8 +28,8 @@ from utils.configs import Parse_arguments
 
 if __name__ == '__main__':
 
-    # yaml_name = "LSF_task/DC_scripts/sl16_pl6/PatchTST.yaml"
-    yaml_name = "SS_task/SRU_scripts/yaml/STDTAEm.yaml"
+    yaml_name = "SS_task/DC_scripts/yaml/PatchTST.yaml"
+    # yaml_name = "SS_task/SRU_scripts/yaml/STDTAEm.yaml"
     yaml_path = f"./scripts/{yaml_name}"
     
 
