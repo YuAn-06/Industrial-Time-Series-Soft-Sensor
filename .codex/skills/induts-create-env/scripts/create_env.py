@@ -105,26 +105,31 @@ def detect_nvidia() -> dict[str, Any]:
     if not nvidia_smi:
         return result
 
+    overview = run_capture([nvidia_smi])
+    cuda_match = re.search(r"CUDA Version:\s*([0-9.]+)", overview.get("stdout", ""))
+    smi_cuda_version = cuda_match.group(1) if cuda_match else None
+
     query = [
         nvidia_smi,
-        "--query-gpu=name,memory.total,driver_version,cuda_version",
+        "--query-gpu=name,memory.total,driver_version",
         "--format=csv,noheader",
     ]
     output = run_capture(query)
     result["raw"] = output
+    result["overview"] = overview
     if not output["ok"] or not output["stdout"]:
         return result
 
     result["available"] = True
     for line in output["stdout"].splitlines():
         parts = [part.strip() for part in line.split(",")]
-        if len(parts) >= 4:
+        if len(parts) >= 3:
             result["gpus"].append(
                 {
                     "name": parts[0],
                     "memory_total": parts[1],
                     "driver_version": parts[2],
-                    "cuda_version": parts[3],
+                    "cuda_version": smi_cuda_version,
                 }
             )
     return result
@@ -450,8 +455,12 @@ def write_report(path: Path, report: dict[str, Any], commands: list[list[str]], 
         lines.append(
             "- Recommended backend does not match the pinned requirements. Do not install blindly; choose a matching torch wheel or update the driver."
         )
-    if nvidia["available"] and req.get("cuda_tag"):
+    if nvidia["available"] and req.get("cuda_tag") and backend.get("matches_requirements"):
         lines.append("- NVIDIA GPU detected. The repository CUDA PyTorch requirements are appropriate to try first.")
+    elif nvidia["available"] and req.get("cuda_tag"):
+        lines.append(
+            "- NVIDIA GPU detected, but the pinned CUDA PyTorch requirement does not match this driver. Use the recommended backend or update the driver."
+        )
     if args.dry_run or not args.create:
         lines.append("- Dry-run only: no conda environment or packages were installed.")
 
