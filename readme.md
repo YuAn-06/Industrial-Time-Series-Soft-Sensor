@@ -31,6 +31,7 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 - [Data-Driven Soft Sensor Modeling](#data-driven-soft-sensor-modeling)
 - [Available Models for Soft Sensors](#available-models-for-soft-sensors)
 - [Available Datasets](#available-datasets)
+- [Codex and Claude Code Skills](#codex-and-claude-code-skills)
 - [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Citation](#citation)
@@ -40,6 +41,8 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 <a id="whats-new"></a>
 
 ## 📢 What's New
+
+**Update - 2026/6/21:** We now have built-in support for **agent coding** workflows such as **Codex** and **Claude Code** skills. These skills help agents better understand benchmark tasks and help users get started more easily. Features include environment creation, dataset onboarding, model integration, smoke tests, and full-loop model performance reporting. Please see the sections below for details.
 
 **Update - 2026/6/15:** We have added the **Mining Process (MP)** dataset to InduTS-SS. We sincerely thank **Mr. Eduardo Magalhaes Oliveira** for releasing this valuable real-world industrial dataset and confirming its authenticity.
 
@@ -352,7 +355,7 @@ Some models have been adapted to support both tasks. Please refer to the files i
 
 ## 🏭 Available Datasets
 
-We provide two classic benchmarks and three public datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
+We provide two classic benchmarks and four public or local industrial datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, **Power Plant Gas Turbine (PPGAS)**, and **Tennessee Eastman Process (TE)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
 
 ### Debutanizer Column (DC)
 
@@ -423,11 +426,81 @@ If you use this dataset or the related code in your research, please cite the fo
 
 **[1]** Kaya H., Tufekci P., and Uzun E. Predicting CO and NOx emissions from gas turbines: Novel data and a benchmark PEMS. *Turkish Journal of Electrical Engineering and Computer Sciences*, 2019, 27(6): 4783-4796.
 
+### Tennessee Eastman Process (TE)
+
+The **Tennessee Eastman Process** dataset is provided locally as `data/TE/TEP.csv`. This repository uses `xmeas_38` as the soft sensor target. The current file contains **10,000 samples** and **17 numeric columns**, including 16 process/manipulated variables and one target variable.
+
 ### Dataset Citation Notice
 
 If you use these datasets in your paper, please also cite:
 
 **L. Fortuna, S. Graziani, A. Rizzo, and M. G. Xibilia. Soft Sensors for Monitoring and Control of Industrial Processes. Advances in Industrial Control, 2007.**
+
+<a id="codex-and-claude-code-skills"></a>
+
+## Agent Skills
+
+InduTS-SS includes repository-local instructions and skills for **Codex** and **Claude Code** style workflows. These files help AI coding agents understand the benchmark structure, preserve fair-comparison rules, and reuse validated helper scripts instead of rewriting one-off commands.
+
+Entry files:
+
+- `AGENTS.md`: Codex-oriented routing and repository rules.
+- `CLAUDE.md`: Claude Code-oriented routing and repository rules.
+- `.codex/skills/`: task-specific skills and reusable scripts.
+
+Supported skill workflows include:
+
+| Workflow | Skill |
+| --- | --- |
+| Environment setup, CUDA/PyTorch selection, conda troubleshooting | `.codex/skills/induts-create-env/` |
+| Dataset characteristics reports: stationarity, outliers, correlations, split drift, plots | `.codex/skills/induts-characteristics/` |
+| New dataset onboarding: CSV inspection, target validation, YAML scaffolding, smoke checks | `.codex/skills/induts-add-dataset/` |
+| New or edited model smoke tests | `.codex/skills/induts-smoke/` |
+| Best-result export and cross-dataset/model summaries | `.codex/skills/induts-results-best-export/` |
+
+Example prompts for Codex or Claude Code:
+
+```text
+Create a conda environment for this project and choose the correct PyTorch wheel for my GPU.
+```
+
+```text
+帮我创建适配这个项目和本机 GPU 的 conda 环境。（可自行定义镜像源）
+```
+
+```text
+Analyze all local datasets and generate stationarity, outlier, correlation, and visualization reports.
+```
+
+```text
+帮我分析所有本地数据集，生成平稳性、异常值、相关性和可视化报告。
+```
+
+```text
+Add {file_path}/你的数据集.csv as a new dataset. The target variable is xmeas_38. Generate soft-sensor YAML and run a smoke check.
+```
+
+```text
+帮我把 {file_path}/你的数据集.csv 加到仓库中，target 变量是 xmeas_38，并生成软测量 YAML 后跑 smoke 检查。
+```
+
+```text
+Add my new model in {file_path}/VALSTM.py to the model library, register it, create a DC YAML, and run a CPU smoke test.
+```
+
+```text
+这是我的新模型 {file_path}/VALSTM.py，帮我加入模型库，完成注册，创建 DC YAML，并跑一个 CPU smoke test。
+```
+
+```text
+Summarize the best soft-sensor results for PatchTST, ARDNN, HSAM_dGRUs, and iTransformer by MSE, and export a report.
+```
+
+```text
+帮我整理 PatchTST、ARDNN、HSAM_dGRUs、iTransformer 在软测量任务上的最好结果，按 MSE 排序并导出报告。
+```
+
+
 
 <a id="project-structure"></a>
 
@@ -435,6 +508,8 @@ If you use these datasets in your paper, please also cite:
 
 ```bash
 Industrial-Time-Series-Soft-Sensor/
+|-- .codex/
+|   |-- skills/                   # Codex/Claude Code benchmark workflows
 |-- data/                         # Datasets and data processing
 |   |-- data_loader.py             # Data batches and preprocessing
 |   |-- data_provider.py           # Dataloader selection for experiments
@@ -449,7 +524,9 @@ Industrial-Time-Series-Soft-Sensor/
 |   |-- MP/
 |   |   |-- MP_data.csv
 |   |-- PPGAS/
-|       |-- gt_2012.csv
+|   |   |-- gt_2012.csv
+|   |-- TE/
+|       |-- TEP.csv
 |-- exp/                          # Experiment workflows
 |   |-- exp_basic.py              # Basic experiment interface
 |   |-- exp_factory.py            # Experiment factory
@@ -469,6 +546,8 @@ Industrial-Time-Series-Soft-Sensor/
 |   |-- scaler.py
 |   |-- tools.py
 |-- results/                      # Saved results
+|-- AGENTS.md                     # Codex entry instructions
+|-- CLAUDE.md                     # Claude Code entry instructions
 |-- run.py                        # Command-line entry point
 |-- run_with_yaml.py              # YAML-based entry point
 |-- requirements.txt
