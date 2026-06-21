@@ -42,7 +42,7 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 
 ## 📢 What's New
 
-**Update - 2026/6/21:** We now have built-in support for **agent coding** workflows such as **Codex** and **Claude Code** skills. These skills help agents better understand benchmark tasks and help users get started more easily. Features include environment creation, dataset onboarding, model integration, smoke tests, and full-loop model performance reporting. Please see the sections below for details.
+**Update - 2026/6/21:** We now have built-in support for **agent coding** workflows such as **Codex** and **Claude Code** skills. These skills help agents better understand benchmark tasks and help users get started more easily. Features include environment creation, dataset onboarding, model integration, smoke tests, and full-loop model performance reporting. Please see the sections below for details. Please see the `Codex` branch.
 
 **Update - 2026/6/15:** We have added the **Mining Process (MP)** dataset to InduTS-SS. We sincerely thank **Mr. Eduardo Magalhaes Oliveira** for releasing this valuable real-world industrial dataset and confirming its authenticity.
 
@@ -440,7 +440,7 @@ If you use these datasets in your paper, please also cite:
 
 ## Agent Skills
 
-InduTS-SS includes repository-local instructions and skills for **Codex** and **Claude Code** style workflows. These files help AI coding agents understand the benchmark structure, preserve fair-comparison rules, and reuse validated helper scripts instead of rewriting one-off commands.
+InduTS-SS includes repository-local instructions and skills for **Codex** and **Claude Code** style workflows. These files help AI coding agents understand the benchmark structure, preserve fair-comparison rules, and reuse validated helper scripts instead of rewriting one-off commands. Please git clone `codex` branch.
 
 Entry files:
 
@@ -462,41 +462,14 @@ Example prompts for Codex or Claude Code:
 
 ```text
 Create a conda environment for this project and choose the correct PyTorch wheel for my GPU.
-```
-
-```text
 帮我创建适配这个项目和本机 GPU 的 conda 环境。（可自行定义镜像源）
-```
-
-```text
 Analyze all local datasets and generate stationarity, outlier, correlation, and visualization reports.
-```
-
-```text
 帮我分析所有本地数据集，生成平稳性、异常值、相关性和可视化报告。
-```
-
-```text
 Add {file_path}/你的数据集.csv as a new dataset. The target variable is xmeas_38. Generate soft-sensor YAML and run a smoke check.
-```
-
-```text
 帮我把 {file_path}/你的数据集.csv 加到仓库中，target 变量是 xmeas_38，并生成软测量 YAML 后跑 smoke 检查。
-```
-
-```text
 Add my new model in {file_path}/VALSTM.py to the model library, register it, create a DC YAML, and run a CPU smoke test.
-```
-
-```text
 这是我的新模型 {file_path}/VALSTM.py，帮我加入模型库，完成注册，创建 DC YAML，并跑一个 CPU smoke test。
-```
-
-```text
 Summarize the best soft-sensor results for PatchTST, ARDNN, HSAM_dGRUs, and iTransformer by MSE, and export a report.
-```
-
-```text
 帮我整理 PatchTST、ARDNN、HSAM_dGRUs、iTransformer 在软测量任务上的最好结果，按 MSE 排序并导出报告。
 ```
 
