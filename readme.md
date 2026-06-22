@@ -15,6 +15,10 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="readme_cn.md">简体中文介绍</a>
+</p>
+
 ---
 
 **Industrial Time-Series Soft Sensor (InduTS-SS)** is an open-source library designed for researchers working on time-series data analysis and soft sensor modeling for complex industrial processes.
@@ -355,7 +359,7 @@ Some models have been adapted to support both tasks. Please refer to the files i
 
 ## 🏭 Available Datasets
 
-We provide two classic benchmarks and four public or local industrial datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, **Power Plant Gas Turbine (PPGAS)**, and **Tennessee Eastman Process (TE)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
+We provide two classic benchmarks and three public or local industrial datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
 
 ### Debutanizer Column (DC)
 
@@ -426,9 +430,7 @@ If you use this dataset or the related code in your research, please cite the fo
 
 **[1]** Kaya H., Tufekci P., and Uzun E. Predicting CO and NOx emissions from gas turbines: Novel data and a benchmark PEMS. *Turkish Journal of Electrical Engineering and Computer Sciences*, 2019, 27(6): 4783-4796.
 
-### Tennessee Eastman Process (TE)
 
-The **Tennessee Eastman Process** dataset is provided locally as `data/TE/TEP.csv`. This repository uses `xmeas_38` as the soft sensor target. The current file contains **10,000 samples** and **17 numeric columns**, including 16 process/manipulated variables and one target variable.
 
 ### Dataset Citation Notice
 
