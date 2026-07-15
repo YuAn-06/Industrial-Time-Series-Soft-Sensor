@@ -155,7 +155,7 @@ class EarlyStopping:
         if self.verbose:
             print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).')
            
-        torch.save(model.state_dict(),path + '/' + 'checkpoint.pth')
+        torch.save(model.state_dict(), os.path.join(path, 'checkpoint.pth'))
         self.val_loss_min = val_loss
 
 
@@ -176,7 +176,11 @@ def adjust_learning_rate(optimizer: torch.optim.Optimizer, epoch: int, args):
     if epoch in lr_adjust.keys():
         lr = lr_adjust[epoch]
         for param_group in optimizer.param_groups:
-            param_group['lr'] = lr
+            initial_lr = param_group.get('initial_lr')
+            if initial_lr is not None and args.learning_rate:
+                param_group['lr'] = lr * initial_lr / args.learning_rate
+            else:
+                param_group['lr'] = lr
         print('Updating learning rate to {}'.format(lr))
 
 
@@ -206,8 +210,11 @@ def setup_seed(seed):
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
     random.seed(seed)
-    # torch.backends.cudnn.deterministic = True
-    # torch.backends.cudnn.benchmark = False
+    # Keep CUDA's faster default kernels. Exact repeatability across GPU runs
+    # is not guaranteed, even when the random seed is fixed.
+    torch.use_deterministic_algorithms(False)
+    torch.backends.cudnn.deterministic = False
+    torch.backends.cudnn.benchmark = True
 
 def select_tensorboard_hparams(args):
     """

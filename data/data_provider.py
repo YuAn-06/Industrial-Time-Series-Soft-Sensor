@@ -6,7 +6,7 @@ Copyright (C) 2024
 @ Eamil: yuan_l1106@163.com
 @ Software: PyCharm
 """
-from data import Dataset_Custom, Dataset_Custom_4_Soft_Sensor, Dataset_MultiMode, Dataset_MultiMode_4_Soft_Sensor
+from data import Dataset_Custom, Dataset_Custom_4_Soft_Sensor, Dataset_LaggedMatrix_4_Soft_Sensor, Dataset_MultiMode, Dataset_MultiMode_4_Soft_Sensor
 from torch.utils.data import DataLoader, Dataset
 from typing import Union
 
@@ -30,6 +30,8 @@ data_dict = {
     'MP': Dataset_Custom,
     'MP_Soft_Sensor': Dataset_Custom_4_Soft_Sensor,
 }   
+
+LAGGED_MATRIX_MODELS = ['FASConvAELSTM']
 
 
 def data_provider(args, flag: str)-> Union[Dataset, DataLoader]:
@@ -56,10 +58,13 @@ def data_provider(args, flag: str)-> Union[Dataset, DataLoader]:
 
 
     
-    Data = data_dict[data_name]
+    if args.model in LAGGED_MATRIX_MODELS and args.task == 'soft_sensor' and args.data_name == 'SRU':
+        Data = Dataset_LaggedMatrix_4_Soft_Sensor
+    else:
+        Data = data_dict[data_name]
 
     timeenc = 0 if args.embed != "timeF" else 1
-    if flag == 'test':
+    if flag in ['valid', 'test']:
         shuffle_flag = False
         drop_last = False
         batch_size = args.batch_size

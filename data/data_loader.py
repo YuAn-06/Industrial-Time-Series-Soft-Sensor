@@ -22,7 +22,15 @@ preprocess_data_dict = {
     'SRU': SRU_preprocess
 }
 
-MINMAX_MODELS = ['HSAM_dGRUs', 'ARDNN', 'GTFTS', 'GCT', 'STDTAEm','GraphSAGE_IMATCN']
+MINMAX_MODELS = [
+    'HSAM_dGRUs',
+    'ARDNN',
+    'GTFTS',
+    'GCT',
+    'STDTAEm',
+    'GraphSAGE_IMATCN',
+    'FASConvAELSTM',
+]
 
 
 def _get_borders(data_len: int, seq_len: int, set_type: int):
@@ -291,7 +299,7 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         """
         For certain models, we need the target variable as input. Otherwise, we only use the input variables.
         """       
-        if self.args.model in ['DAGRU','HSAM_dGRUs','GCT','STALSTM']:
+        if self.args.model in ['DAGRU','HSAM_dGRUs','GCT','STALSTM','TSLambdaGRU']:
             data_x = self.df_raw[columns_with_x + [self.target]].values 
         else:
              data_x = self.df_raw[columns_with_x].values
@@ -385,6 +393,100 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
             data = data.reshape(-1, shape[-1])
             return self.scaler_y.inverse_transform(data).reshape(shape)
         return self.scaler_y.inverse_transform(data)
+
+
+class Dataset_LaggedMatrix_4_Soft_Sensor(Dataset_Custom_4_Soft_Sensor):
+    """
+    Soft-sensor dataset that builds a two-dimensional lag matrix for CNN-style
+    models. For each sample at time t, x_enc rows are selected by lag offsets
+    such as [0, 3, 5, 9], producing [num_lags, num_variables].
+    """
+
+    def process(self):
+        if self.args.if_missing:
+            self.scaler_x = ZeroMaskStandardScaler()
+            self.scaler_y = ZeroMaskStandardScaler()
+        else:
+            if self.args.model in MINMAX_MODELS:
+                self.scaler_x = MinMaxScaler()
+                self.scaler_y = MinMaxScaler()
+            else:
+                self.scaler_x = StandardScaler()
+                self.scaler_y = StandardScaler()
+
+        self.lag_offsets = [int(lag) for lag in getattr(self.args, "fa_lags", [0, 3, 5, 9])]
+        if not self.lag_offsets or min(self.lag_offsets) < 0:
+            raise ValueError("fa_lags must contain non-negative integer offsets.")
+        self.max_lag = max(self.lag_offsets)
+
+        border1s, border2s, border1, border2 = _get_borders(
+            self.data.shape[0], self.max_lag + 1, self.set_type
+        )
+
+        columns_with_x = _get_feature_columns(
+            self.df_raw, self.data_name, self.target, include_target_when_no_x=False
+        )
+        if self.data_name == "SRU":
+            columns_with_x = [col for col in columns_with_x if col != "H2S"]
+        elif self.data_name != "DC":
+            raise ValueError(
+                "Dataset_LaggedMatrix_4_Soft_Sensor currently supports SRU and DC."
+            )
+
+        data_x = self.df_raw[columns_with_x].values
+        data_y = self.df_raw[self.target].values.reshape(-1, 1)
+
+        self.scaler_x.fit(data_x[border1s[0]:border2s[0]])
+        self.scaler_y.fit(data_y[border1s[0]:border2s[0]])
+
+        data_x = self.scaler_x.transform(data_x)
+        data_y = self.scaler_y.transform(data_y)
+
+        self.data_stamp, self.use_stamp = _build_time_features(
+            self.df_raw, border1, border2, self.timeenc, self.args.freq
+        )
+        self.data_x = data_x
+        self.data_y = data_y
+        self.border1 = border1
+        self.border2 = border2
+        self.feature_columns = columns_with_x
+
+    def __getitem__(self, index):
+        center = self.border1 + self.max_lag + index
+        # LSTM expects time to move from the oldest observation to the newest.
+        # For fa_lags=[0, 3, 5, 9], feed [t-9, t-5, t-3, t] without changing
+        # the configured lag points themselves.
+        lag_indices = [
+            center - lag
+            for lag in sorted(self.lag_offsets, reverse=True)
+        ]
+        seq_x = self.data_x[lag_indices]
+        seq_y = self.data_y[center:center + 1]
+
+        dec_inp = np.zeros_like(seq_y)
+        if self.use_stamp:
+            seq_x_mark = self.data_stamp[index + self.max_lag:index + self.max_lag + 1]
+            seq_x_mark = np.repeat(seq_x_mark, len(self.lag_offsets), axis=0)
+            seq_y_mark = self.data_stamp[index + self.max_lag:index + self.max_lag + 1]
+            return {
+                'x_enc': torch.Tensor(seq_x).float(),
+                'x_dec': torch.Tensor(dec_inp).float(),
+                'x_mark_enc': torch.Tensor(seq_x_mark).float(),
+                'x_mark_dec': torch.Tensor(seq_y_mark).float(),
+                'batch_y': torch.Tensor(seq_y).float(),
+            }
+
+        seq_x_mark = torch.empty((0, 0), dtype=torch.float32)
+        return {
+            'x_enc': torch.Tensor(seq_x).float(),
+            'x_dec': torch.Tensor(dec_inp).float(),
+            'x_mark_enc': seq_x_mark,
+            'x_mark_dec': seq_x_mark,
+            'batch_y': torch.Tensor(seq_y).float(),
+        }
+
+    def __len__(self):
+        return self.border2 - self.border1 - self.max_lag
 
 
 class Dataset_MultiMode(Dataset):

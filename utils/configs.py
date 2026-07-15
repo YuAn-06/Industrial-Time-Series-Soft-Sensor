@@ -5,6 +5,14 @@ import yaml
 from dataclasses import asdict
 import os
 
+def _format_setting_value(value):
+    if isinstance(value, (list, tuple)):
+        return "-".join(_format_setting_value(item) for item in value)
+    if isinstance(value, float):
+        text = f"{value:g}"
+        return text.replace("-", "m").replace(".", "p")
+    return str(value)
+
 def build_setting(args):
     common_keys = [
         ("sl", "seq_len"),
@@ -29,6 +37,7 @@ def build_setting(args):
         "DLinear": [("ma", "moving_avg"), ("ind", "individual")],
         "EnvFormer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("ks", "kernel_size")],
         "HSAM_dGRUs": [("hd", "hidden_dim"), ("uty", "use_true_y_in_train"), ("dm", "d_model"), ("nh", "n_heads")],
+        "TSLambdaGRU": [("hd", "hidden_dim"), ("el", "e_layers"), ("l1", "lambda1"), ("l2", "lambda2"), ("drop", "dropout")],
         "Informer": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("distil", "distil")],
         "MSGNet": [("dm", "d_model"), ("dff", "d_ff"), ("nh", "n_heads"), ("el", "e_layers"), ("dl", "d_layers"), ("nd", "node_dim"), ("cc", "conv_channel"), ("sc", "skip_channel"), ("pa", "propalpha"), ("gcn", "gcn_depth")],
         "SparseTSF": [("dm", "d_model"), ("prl", "period_len"), ("mt", "model_type")],
@@ -39,12 +48,13 @@ def build_setting(args):
         "VALSTM": [("hd", "hidden_dim")],
         "STDTAEm": [("hd", "hidden_dim"), ("ld", "latent_dim"), ("th", "tae_hidden_dims"), ("sw", "std_window"), ("tb", "tae_backbone"), ("stage", "model_stage")],
         "GraphSAGE_IMATCN": [("dm", "d_model"), ("nc", "num_channels"), ("ks", "kernel_size"), ("nh", "n_heads"), ("gm", "graph_build_method"), ("gt", "graph_threshold")],
+        "FASConvAELSTM": [("lags", "fa_lags"), ("fk", "fa_kernel_sizes"), ("fc", "fa_channels"), ("flr", "fa_pretrain_learning_rates"), ("hd", "hidden_dim"), ("el", "e_layers"), ("stage", "model_stage")],
         
     }
 
     setting_parts = [args.data_name, args.model, args.task]
     for prefix, key in common_keys + model_keys.get(args.model, default_model_keys):
-        setting_parts.append(f"{prefix}{getattr(args, key)}")
+        setting_parts.append(f"{prefix}{_format_setting_value(getattr(args, key))}")
     return "_".join(str(part) for part in setting_parts)
 
 def Init_parser():
@@ -97,7 +107,13 @@ def Init_parser():
     parser.add_argument('--patience', type=int, default=10,help='Patience for early stopping')                  
     parser.add_argument('--lradj', type=str, default='cosine',help="Learning rate adjustment strategy: ['type1', 'type2', 'cosine']")
     parser.add_argument('--weight_decay', type=float, default=0.0,help='L2 regularization weight')         
-    parser.add_argument('--model_stage', type=str, default='finetune', choices=['pretrain', 'finetune'], help='Model stage for models with pretraining')
+    parser.add_argument(
+        '--model_stage',
+        type=str,
+        default='finetune',
+        choices=['pretrain', 'pretrain_l1', 'pretrain_l2', 'pretrain_l3', 'finetune'],
+        help='Model stage for models with pretraining'
+    )
     parser.add_argument('--pretrained_ckpt', type=str, default='', help='Checkpoint path for loading pretrained weights')
     parser.add_argument('--pretrain_epoch', type=int, default=-1, help='Optional epoch override for pretraining')
     parser.add_argument('--finetune_epoch', type=int, default=-1, help='Optional epoch override for finetuning')
@@ -128,6 +144,14 @@ def Init_parser():
                         help='Use the current ground-truth y_t as the HSAM_dGRUs quality query during training')
     parser.add_argument('--no_use_true_y_in_train', dest='use_true_y_in_train', action='store_false',
                         help='Use y_{t-1} instead of the current ground-truth y_t as the HSAM_dGRUs quality query during training')
+    parser.add_argument('--lambda1', type=float, default=0.9, help='TS-lambda-GRU short-term memory regulator')
+    parser.add_argument('--lambda2', type=float, default=0.9, help='TS-lambda-GRU long-term memory regulator')
+
+    # FA-SConvAE-LSTM
+    parser.add_argument('--fa_lags', type=int, nargs='+', default=[0, 3, 5, 9], help='Lag offsets used to build FA/CNN input matrices')
+    parser.add_argument('--fa_kernel_sizes', type=int, nargs='+', default=[3, 2, 2], help='Feature-aligned ConvAE kernel sizes')
+    parser.add_argument('--fa_channels', type=int, nargs='+', default=[6, 10, 1], help='Feature-aligned ConvAE output channels')
+    parser.add_argument('--fa_pretrain_learning_rates', type=float, nargs='+', default=[0.005, 0.01, 0.01], help='Layer-wise FA-SConvAE pretraining learning rates')
 
     # Autoformer
     parser.add_argument('--moving_avg', type=int, default=25,help='moving average for Autoformer')
@@ -287,6 +311,7 @@ def Parse_arguments(yaml_path: str = None):
         "down_sampling_window", "x_embed_dim", "z_embed_dim", "z_dim",
         "node_dim", "conv_channel", "skip_channel", "propalpha", "gcn_depth",
         "model_stage", "std_window", "latent_dim", "tae_backbone", "tae_hidden_dims",
+        "fa_lags", "fa_kernel_sizes", "fa_channels", "fa_pretrain_learning_rates",
     ]
     
     args.setting = ", ".join(f"{k}: {v}" for k, v in config_dict.items() if k in selected_keys)

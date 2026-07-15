@@ -2,18 +2,52 @@
 Run pretraining and finetuning from one YAML file.
 
 The runner keeps exp classes unchanged: it derives two argument objects from the
-same YAML, trains model_stage='pretrain', then injects the produced checkpoint
-into model_stage='finetune'.
+same YAML, trains pretraining stages, then injects the produced checkpoint into
+model_stage='finetune'. FA-SConvAE-LSTM can use layer-wise stages:
+pretrain_l1 -> pretrain_l2 -> pretrain_l3 -> finetune.
 """
 
 import copy
 import argparse
 import os
+import shutil
 import sys
 from dataclasses import asdict
 
 
-VALID_STAGES = ("pretrain", "finetune")
+VALID_STAGES = ("pretrain", "pretrain_l1", "pretrain_l2", "pretrain_l3", "finetune")
+
+STAGE_DEPENDENCIES = {
+    "pretrain_l2": ("pretrain_l1",),
+    "pretrain_l3": ("pretrain_l2",),
+    "finetune": ("pretrain_l3", "pretrain", "pretrain_l2", "pretrain_l1"),
+}
+
+
+def stage_checkpoint_path(checkpoint_dir, stage):
+    """Return the shared checkpoint filename for one pipeline stage."""
+    return os.path.join(checkpoint_dir, f"checkpoint_{stage}.pth")
+
+
+def resolve_stage_input(checkpoint_dir, stage, previous_ckpt=""):
+    """Find the checkpoint that should initialize a stage."""
+    if previous_ckpt:
+        return previous_ckpt
+
+    for dependency in STAGE_DEPENDENCIES.get(stage, ()):
+        checkpoint = stage_checkpoint_path(checkpoint_dir, dependency)
+        if os.path.isfile(checkpoint):
+            return checkpoint
+
+    return ""
+
+
+def archive_stage_checkpoint(source_path, checkpoint_dir, stage):
+    """Copy a stage's best checkpoint into the shared checkpoint folder."""
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    destination = stage_checkpoint_path(checkpoint_dir, stage)
+    shutil.copy2(source_path, destination)
+    return destination
 
 
 
@@ -34,6 +68,7 @@ def refresh_run_fields(args):
         "down_sampling_window", "x_embed_dim", "z_embed_dim", "z_dim",
         "node_dim", "conv_channel", "skip_channel", "propalpha", "gcn_depth",
         "model_stage", "std_window", "latent_dim",
+        "fa_lags", "fa_kernel_sizes", "fa_channels", "fa_pretrain_learning_rates",
     ]
     config_dict = asdict(args)
     args.setting = ", ".join(
@@ -45,10 +80,11 @@ def refresh_run_fields(args):
 def make_stage_args(base_args, stage, pretrained_ckpt=""):
     args = copy.deepcopy(base_args)
     args.model_stage = stage
-    args.pretrained_ckpt = "" if stage == "pretrain" else pretrained_ckpt
+    args.pretrained_ckpt = "" if stage in ("pretrain", "pretrain_l1") else pretrained_ckpt
 
-    stage_epoch = getattr(args, f"{stage}_epoch", -1)
-    stage_learning_rate = getattr(args, f"{stage}_learning_rate", -1.0)
+    stage_prefix = "pretrain" if stage.startswith("pretrain_l") else stage
+    stage_epoch = getattr(args, f"{stage_prefix}_epoch", -1)
+    stage_learning_rate = getattr(args, f"{stage_prefix}_learning_rate", -1.0)
     
     if stage_epoch > 0:
         args.epoch = stage_epoch
@@ -91,8 +127,24 @@ def load_args_from_yaml(yaml_path):
         sys.argv = original_argv
 
 
-def run_stage_pipeline(yaml_path, stages, test_stages, initial_ckpt=""):
+def run_stage_pipeline(
+    yaml_path,
+    stages,
+    test_stages,
+    checkpoint_dir="",
+    initial_ckpt="",
+):
     base_args = load_args_from_yaml(yaml_path)
+
+    if not checkpoint_dir:
+        # Use the normal model_stage=pretrain setting folder as the shared
+        # checkpoint folder. This keeps all layer-wise checkpoints beside the
+        # standard pretraining run instead of creating a separate directory.
+        checkpoint_dir = make_stage_args(base_args, "pretrain").save_dir
+    checkpoint_dir = os.path.normpath(checkpoint_dir)
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    print(f"Shared checkpoint folder: {checkpoint_dir}")
+
     if initial_ckpt:
         if not os.path.exists(initial_ckpt):
             raise FileNotFoundError(f"initial checkpoint not found: {initial_ckpt}")
@@ -102,15 +154,52 @@ def run_stage_pipeline(yaml_path, stages, test_stages, initial_ckpt=""):
     stage_results = {}
 
     for stage in stages:
-        stage_args = make_stage_args(base_args, stage, pretrained_ckpt=previous_ckpt)
+        pretrained_ckpt = resolve_stage_input(
+            checkpoint_dir,
+            stage,
+            previous_ckpt=previous_ckpt,
+        )
+        if stage in ("pretrain_l2", "pretrain_l3") and not pretrained_ckpt:
+            expected = ", ".join(
+                stage_checkpoint_path(checkpoint_dir, dependency)
+                for dependency in STAGE_DEPENDENCIES[stage]
+            )
+            raise FileNotFoundError(
+                f"{stage} requires a preceding layer checkpoint. Expected: {expected}"
+            )
+        if stage == "finetune" and checkpoint_dir and not pretrained_ckpt:
+            print(
+                f"Warning: no pretrained checkpoint found in {checkpoint_dir}; "
+                "finetuning will start from randomly initialized weights."
+            )
+
+        stage_args = make_stage_args(
+            base_args,
+            stage,
+            pretrained_ckpt=pretrained_ckpt,
+        )
         run_stage(stage_args, stage, do_test=stage in test_stages)
 
-        checkpoint = os.path.join(stage_args.save_dir, "checkpoint.pth")
-        if not os.path.exists(checkpoint):
-            raise FileNotFoundError(f"{stage} checkpoint not found: {checkpoint}")
+        source_checkpoint = os.path.join(stage_args.save_dir, "checkpoint.pth")
+        if not os.path.exists(source_checkpoint):
+            raise FileNotFoundError(
+                f"{stage} checkpoint not found: {source_checkpoint}"
+            )
+        if stage.startswith("pretrain"):
+            checkpoint = archive_stage_checkpoint(
+                source_checkpoint,
+                checkpoint_dir,
+                stage,
+            )
+        else:
+            # Fine-tuning is a separate experiment. Keep its best model in the
+            # normal stagefinetune result folder instead of mixing it with the
+            # shared pretraining checkpoints.
+            checkpoint = source_checkpoint
 
         stage_results[stage] = {
             "checkpoint": checkpoint,
+            "source_checkpoint": source_checkpoint,
             "save_dir": stage_args.save_dir,
         }
         previous_ckpt = checkpoint
@@ -126,15 +215,16 @@ def parse_pipeline_args():
         "--yaml",
         "--yaml_path",
         dest="yaml_path",
-        default="./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml",
+        default="./scripts/SS_task/SRU_scripts/yaml/FASConvAELSTM.yaml",
         help="Path to the YAML configuration file.",
     )
     parser.add_argument(
         "--stages",
         nargs="+",
-        default=("pretrain", "finetune"), # ('pretrain', 'finetune') ('pretrain',)  ('finetune',)
+        # default=("pretrain_l1", "pretrain_l2", "pretrain_l3", "finetune"),
+        default=("finetune",),
         choices=VALID_STAGES,
-        help="Stages to run, for example: --stages pretrain finetune",
+        help="Stages to run, for example: --stages pretrain_l1 pretrain_l2 pretrain_l3 finetune",
     )
     parser.add_argument(
         "--test_stages",
@@ -144,10 +234,23 @@ def parse_pipeline_args():
         help="Stages to test after training, for example: --test_stages finetune",
     )
     parser.add_argument(
+        "--checkpoint_dir",
+        # default="",
+        default="./results/FASConvAELSTM/SRU_FASConvAELSTM_soft_sensor_sl4_ll4_pl6_bt100_lr0p01_ep200_pat30_lags0-3-5-9_fk3-2-2_fc6-10-1_flr0p005-0p01-0p01_hd64_el1_stagepretrain/",
+        help=(
+            "Shared folder used to save and auto-load stage checkpoints. "
+            "Files are named checkpoint_<stage>.pth. When omitted, the normal "
+            "model_stage=pretrain result folder is used."
+        ),
+    )
+    parser.add_argument(
         "--initial_ckpt",
         default="",
-        help="Existing pretrain checkpoint for direct finetuning.",
-    ) # if you have a initial checkpoint, please provide the path as "./results/STDTAEm/{results_name}/checkpoint.pth" and set stages = ("finetune",)
+        help=(
+            "Legacy option: one explicit checkpoint for direct finetuning. "
+            "Prefer --checkpoint_dir."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -157,13 +260,23 @@ def main():
         cli_args.yaml_path,
         stages=tuple(cli_args.stages),
         test_stages=tuple(cli_args.test_stages),
+        checkpoint_dir=cli_args.checkpoint_dir,
         initial_ckpt=cli_args.initial_ckpt,
     )
 
     print("==== done ====")
+    pretrain_checkpoints = [
+        result["checkpoint"]
+        for stage, result in results.items()
+        if stage.startswith("pretrain")
+    ]
+    if pretrain_checkpoints:
+        print(
+            "pretrain_checkpoint_dir: "
+            f"{os.path.dirname(pretrain_checkpoints[0])}"
+        )
     for stage, result in results.items():
         print(f"{stage}_checkpoint: {result['checkpoint']}")
-        print(f"{stage}_save_dir: {result['save_dir']}")
 
 
 if __name__ == "__main__":

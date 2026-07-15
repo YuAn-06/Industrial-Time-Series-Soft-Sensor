@@ -504,6 +504,45 @@ class STDTAEm_Loss(BaseLoss):
             print(f'Recon Loss: {self.mean_recon_loss:.4f}, Triplet Loss: {self.mean_triplet_loss:.4f}')
         else:
             print(f'Regression Loss: {self.mean_regression_loss:.4f}')
+
+
+class FASConvAELSTM_Loss(BaseLoss):
+    def __init__(self, args):
+        super().__init__(args)
+        self.stage = getattr(args, 'model_stage', 'finetune')
+        self.MSEloss = nn.MSELoss(reduction='mean')
+        self._register_loss_list('loss')
+        self._register_loss_list('recon_loss')
+
+    @property
+    def mean_recon_loss(self):
+        return np.mean(self._loss_lists['recon_loss'])
+
+    def forward(self, preds, true, flag: str = 'train'):
+        if not self.stage.startswith('pretrain'):
+            loss = self.MSEloss(preds, true)
+            if flag == 'train':
+                self._append_loss('loss', loss.item())
+                self._append_loss('recon_loss', 0.0)
+            return loss
+
+        branches = preds['fa_sconvae']
+        if isinstance(branches, dict):
+            loss = self.MSEloss(branches['rec'], branches['target'])
+        else:
+            recon_losses = [
+                self.MSEloss(branch['rec'], branch['target'])
+                for branch in branches
+            ]
+            loss = torch.stack(recon_losses).mean()
+        if flag == 'train':
+            self._append_loss('loss', loss.item())
+            self._append_loss('recon_loss', loss.item())
+        return loss
+
+    def print_loss_details(self):
+        if self.stage.startswith('pretrain'):
+            print(f'Recon Loss: {self.mean_recon_loss:.4f}')
     
 losses_dict = {
     'Nystroformer': MSE_Loss,
@@ -545,6 +584,8 @@ losses_dict = {
     'FEDformer': MSE_Loss,
     'STDTAEm': STDTAEm_Loss,
     'GraphSAGE_IMATCN': MSE_Loss,
+    'FASConvAELSTM': FASConvAELSTM_Loss,
+    'TSLambdaGRU': MSE_Loss,
     
 }
 

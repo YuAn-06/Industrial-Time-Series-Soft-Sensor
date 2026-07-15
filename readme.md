@@ -42,6 +42,8 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 
 ## 📢 What's New
 
+**Update - 2026/7/15:** We have added two soft-sensor models: **FA-SConvAE-LSTM**, a feature-aligned convolutional autoencoder with layer-wise pretraining and LSTM regression, and **TS-λ-GRUs**, a two-stream recurrent model that separately captures temporal quality correlations and dynamic causal relationships. Model registration, dedicated losses and configuration fields, and reproducible DC/SRU YAML scripts are included. We also fixed several training-pipeline issues, including empty validation loaders and `NaN` validation losses when the validation set is smaller than the batch size, model-specific optimizer parameter groups, metric and checkpoint saving, stable experiment-setting names for list/float parameters, and checkpoint handoff across pretraining and fine-tuning stages.
+
 **Update - 2026/6/21:** We now have built-in support for **agent coding** workflows such as **Codex** and **Claude Code** skills. These skills help agents better understand benchmark tasks and help users get started more easily. Features include environment creation, dataset onboarding, model integration, smoke tests, and full-loop model performance reporting. Please see the sections below for details. Please see the `Codex` branch.
 
 **Update - 2026/6/15:** We have added the **Mining Process (MP)** dataset to InduTS-SS. We sincerely thank **Mr. Eduardo Magalhaes Oliveira** for releasing this valuable real-world industrial dataset and confirming its authenticity.
@@ -333,7 +335,8 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | NeurIPS 2015 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter and Schmidhuber) | Neural Computation 1997 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | IEEE TC 2026 |  | Yes | CNN-based time-series soft sensor model | Available |
-| [STDTAEm]() | IEEE TII 2026 | | Yes | MLP-based time-series soft sensor model | Unavailable |
+| [STDTAEm]() | IEEE TII 2026 | | Yes | MLP-based time-series soft sensor model | available |
+| [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354) (Wu et al.) | EAAI 2025 |  | Yes | CNN-based pretrained time-series soft sensor model | Available |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | IEEE Sensors Journal 2025 | Yes |  | MLP-based time-series soft sensor model | Available |
 | [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
 | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Available |
@@ -347,7 +350,55 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al.) | IEEE TII 2021 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (Yuan et al.) | IEEE TII 2021 |  | Yes | RNN-based time-series soft sensor model | Available |
 | [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | IEEE TNNLS 2020 |  | Yes | RNN-based time-series soft sensor model | Available |
+| [TS-lambda-GRUs](https://doi.org/10.1109/TIE.2019.2927197) (Xie et al.) | IEEE TIE 2020 |  | Yes | Two-stream lambda-GRU soft sensor model | Available |
 | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | CJCE 2019 |  | Yes | RNN-based time-series soft sensor model | Available |
+
+### Models by Architecture
+
+The table is grouped by model architecture. Within each architecture, models are ordered by publication year from newest to oldest.
+
+| Architecture | Model | Year | Journal/Conference | F | R | Status |
+| --- | --- | ---: | --- | :-: | :-: | --- |
+| **Autoencoder / Generative** | STDTAEm | 2026 | IEEE TII |  | Yes | Available |
+| **Autoencoder / Generative** | [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al.) | 2023 | IEEE TII | Yes |  | Available |
+| **Autoencoder / Generative** | [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al.) | 2022 | IEEE TII |  | Yes | Available |
+| **Autoencoder / Generative** | [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al.) | 2019 | IJCAI | Yes |  | Available |
+| **Autoencoder / Generative** | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | 2015 | NeurIPS | Yes | Yes | Available |
+| **CNN ** | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | 2026 | IEEE TC |  | Yes | Available |
+| **CNN**                      | [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354) (Wu et al.) | 2025 | EAAI                 |      | Yes  | Available |
+| **CNN**                      | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | 2024 | IEEE TC              |      | Yes  | Available |
+| **CNN **                     | [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al.) | 2023 | ICLR                 | Yes  | Yes  | Available |
+| **CNN **                     | [TCN](https://arxiv.org/abs/1803.01271) (Bai et al.)         | 2018 | arXiv                | Yes  | Yes  | Available |
+| **GNN**                      | [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al.)   | 2025 | ICML                 | Yes  | Yes  | Available |
+| **GNN**                      | [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al.) | 2024 | AAAI                 | Yes  | Yes  | Available |
+| **GNN**                      | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | 2024 | IEEE TC              | Yes  |      | Available |
+| **GNN**                      | [GraphSAGE-IMATCN](https://www.sciencedirect.com/science/article/abs/pii/S0957582024009959?via%3Dihub=) (Tuo et al.) | 2024 | PSER | Yes | Yes | Available |
+| **MLP **                     | [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al.) | 2026 | IEEE TPAMI           | Yes  |      | Available |
+| **MLP ** | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | 2025 | IEEE Sensors Journal | Yes |  | Available |
+| **MLP** | [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al.) | 2024 | ICLR | Yes | Yes | Available |
+| **MLP** | [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al.) | 2023 | AAAI | Yes | Yes | Available |
+| **RNN** | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | 2024 | IEEE TASE |  | Yes | Available |
+| **RNN** | [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al.) | 2021 | IEEE TII | Yes | Yes | Available |
+| **RNN** | [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (Yuan et al.) | 2021 | IEEE TII |  | Yes | Available |
+| **RNN** | [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | 2020 | IEEE TNNLS |  | Yes | Available |
+| **RNN** | [TS-lambda-GRUs](https://doi.org/10.1109/TIE.2019.2927197) (Xie et al.) | 2020 | IEEE TIE |  | Yes | Available |
+| **RNN** | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | 2019 | CJCE |  | Yes | Available |
+| **RNN** | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter et al) | 1997 | Neural Computation | Yes | Yes | Available |
+| **Transformer** | [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al.) | 2024 | NeurIPS | Yes | Yes | Available |
+| **Transformer** | [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al.) | 2024 | ICLR | Yes | Yes | Available |
+| **Transformer** | [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al.) | 2024 | KDD | Yes | Yes | Available |
+| **Transformer** | [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | 2024 | IEEE TIM | Yes |  | Available |
+| **Transformer** | [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al.) | 2023 | ICLR | Yes | Yes | Available |
+| **Transformer** | [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al.) | 2023 | ICLR | Yes | Yes | Available |
+| **Transformer** | [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu et al.) | 2022 | NeurIPS | Yes | Yes | Available |
+| **Transformer** | [FEDformer](https://proceedings.mlr.press/v162/zhou22g.html) (Zhou et al.) | 2022 | ICML | Yes | Yes | Available |
+| **Transformer** | [DMRIFormer](https://doi.org/10.1109/TII.2022.3227731) (Liu et al.) | 2022 | IEEE TII | Yes |  | Available |
+| **Transformer** | [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al.) | 2021 | NeurIPS | Yes | Yes | Available |
+| **Transformer** | [Nystromformer](https://arxiv.org/abs/2102.03902) (Xiong et al.) | 2021 | AAAI | Yes |  | Available |
+| **Transformer** | [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al.) | 2021 | IEEE TII | Yes | Yes | Available |
+| **Transformer** | [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al.) | 2017 | NeurIPS | Yes | Yes | Available |
+| **Other** | [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al.) | 2023 | NeurIPS | Yes |  | Available |
+| **Other** | [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al.)   | 2025 | ICLR                 | Yes  | Yes | Available |
 
 
 

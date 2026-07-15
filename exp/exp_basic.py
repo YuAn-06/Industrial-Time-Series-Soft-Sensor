@@ -53,6 +53,8 @@ MODEL_REGISTRY = {
     'FEDformer': 'models.FEDformer',
     'STDTAEm': 'models.STDTAEm',
     'GraphSAGE_IMATCN': 'models.GraphSAGE_IMATCN',
+    'FASConvAELSTM': 'models.FASConvAELSTM',
+    'TSLambdaGRU': 'models.TSLambdaGRU',
 }
 
 

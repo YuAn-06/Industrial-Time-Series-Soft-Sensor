@@ -78,6 +78,16 @@ class ExpConfigs:
     hidden_dim: int
     use_true_y_in_train: bool
 
+    # FASConvAELSTM
+    fa_lags: list[int]
+    fa_kernel_sizes: list[int]
+    fa_channels: list[int]
+    fa_pretrain_learning_rates: list[float]
+
+    # TSLambdaGRU
+    lambda1: float
+    lambda2: float
+
     # Autoformer & TimesNet
     moving_avg: int
 

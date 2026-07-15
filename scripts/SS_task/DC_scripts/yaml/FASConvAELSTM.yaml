@@ -1,0 +1,57 @@
+params:
+  # Data Config
+  model: 'FASConvAELSTM'
+  task: 'soft_sensor'
+  data_name: 'DC'
+  data_path: './data/DC/debutanizer_column.csv'
+  target: 'y_1'
+  data_aug: True
+  use_amp: False
+  num_workers: 1
+  if_missing: False
+  missing_rate: 0
+
+  # Model Config
+  enc_in: 13
+  dec_in: 13
+  C_in: 13
+  C_out: 1
+  seq_len: 4
+  label_len: 16
+  pred_len: 1
+  embed: 'TimeF'
+  freq: 's'
+  factor: 1
+  fa_kernel_sizes: [3, 2, 2]
+  fa_channels: [6, 10, 1]
+  hidden_dim: 64
+  e_layers: 1
+  dropout: 0.05
+  activation: 'sigmoid'
+  freeze_tae: False
+
+  # Stage Overrides
+  pretrain_epoch: 50
+  finetune_epoch: 300
+  pretrain_learning_rate: 0.01
+  finetune_learning_rate: 0.001
+
+  # Train Config
+  batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 0.0
+  epoch: 300
+  patience: 10
+  lradj: 'cosine'
+  use_tensorboard: False
+
+  # Test Config
+  inverse: True
+
+  # GPU Config
+  use_cuda: True
+  device: 'cuda'
+  gpu: 0
+  seed: 2021
+  device_ids: [0]
+  use_multi_gpu: False
