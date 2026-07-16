@@ -62,6 +62,8 @@ InduTS-SS 为工业软测量提供统一框架，涵盖数据集加载、预处�
 
 ## 🚀 快速开始
 
+完整教程涵盖环境配置、数据集准备、标准及分阶段运行、模型接入、损失函数和实验流程，详见 **[InduTS-SS 快速上手](docs/Getting_started_cn.md)**。同时提供[英文版教程](docs/Getting_started.md)。
+
 InduTS-SS 提供三种主要的实验运行入口。
 
 ### 1. 配置驱动运行（`run_with_yaml.py`）
@@ -99,19 +101,19 @@ finetune_learning_rate: 0.001
 python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml
 ```
 
-也可以通过命令行选择阶段：
+完整模式会从模型的 `ModelSpec.pretrain_stages` 读取所需预训练阶段，然后执行微调和测试：
 
 ```bash
-python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --stages pretrain finetune --test_stages finetune
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --mode full
 ```
 
-若要跳过预训练，直接从已有检查点进行微调，请传入 `--initial_ckpt`：
+若要跳过预训练，直接从已有预训练检查点进行微调，请使用 `--mode finetune` 和 `--checkpoint`：
 
 ```bash
-python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --initial_ckpt ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --mode finetune --checkpoint ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
 ```
 
-当 `initial_ckpt` 非空时，运行器只执行微调阶段。
+可使用 `--no_test` 在训练完成后停止，或通过 `--checkpoint_dir` 指定预训练阶段 checkpoint 的共享归档目录。
 
 ### 3. 命令行运行（`run.py`）
 
@@ -332,7 +334,7 @@ $$
 | [STDTAEm]() | IEEE TII 2026 | | 是 | 基于 MLP 的时间序列软测量模型 | 参数待定 |
 | [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354)（Wu 等） | EAAI 2025 |  | 是 | 基于 CNN 的预训练时间序列软测量模型 | 可用 |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404)（Chen 等） | IEEE Sensors Journal 2025 | 是 |  | 基于 MLP 的时间序列软测量模型 | 可用 |
-| [Envformer](https://ieeexplore.ieee.org/document/10699388)（Xie 等） | IEEE TIM 2024 | 是 |  | 基于 Transformer 的时间序列软测量模型 | 可用 |
+| [EnvFormer](https://ieeexplore.ieee.org/document/10699388)（Xie 等） | IEEE TIM 2024 | 是 |  | 基于 Transformer 的时间序列软测量模型 | 可用 |
 | [MSACNN](https://ieeexplore.ieee.org/document/10465636)（Yuan 等） | IEEE TC 2024 |  | 是 | 基于 CNN 的时间序列软测量模型 | 可用 |
 | [GTFTS](https://ieeexplore.ieee.org/document/10664532)（Yan 等） | IEEE TC 2024 | 是 |  | 基于 GNN 的时间序列软测量模型 | 可用 |
 | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000)（He 等） | IEEE TASE 2024 |  | 是 | 基于 RNN 的时间序列软测量模型 | 可用 |
@@ -381,7 +383,7 @@ $$
 | **Transformer** | [SOFTS](https://arxiv.org/pdf/2404.14197)（Lu 等） | 2024 | NeurIPS | 是 | 是 | 可用 |
 | **Transformer** | [iTransformer](https://arxiv.org/abs/2310.06625)（Liu 等） | 2024 | ICLR | 是 | 是 | 可用 |
 | **Transformer** | [FredFormer](https://arxiv.org/abs/2406.09009)（Piao 等） | 2024 | KDD | 是 | 是 | 可用 |
-| **Transformer** | [Envformer](https://ieeexplore.ieee.org/document/10699388)（Xie 等） | 2024 | IEEE TIM | 是 |  | 可用 |
+| **Transformer** | [EnvFormer](https://ieeexplore.ieee.org/document/10699388)（Xie 等） | 2024 | IEEE TIM | 是 |  | 可用 |
 | **Transformer** | [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie)（Zhang 等） | 2023 | ICLR | 是 | 是 | 可用 |
 | **Transformer** | [PatchTST](https://arxiv.org/abs/2211.14730)（Nie 等） | 2023 | ICLR | 是 | 是 | 可用 |
 | **Transformer** | [Nonstationary Transformer](https://arxiv.org/abs/2205.14415)（Liu 等） | 2022 | NeurIPS | 是 | 是 | 可用 |
@@ -568,13 +570,24 @@ Industrial-Time-Series-Soft-Sensor/
 |   |-- exp_soft_sensor.py
 |   |-- losses.py
 |-- layers/                        # 神经网络层
-|-- models/                        # 模型实现
+|-- models/                        # 自包含模型包
+|   |-- base/                      # 公共 Config 与 ModelSpec 定义
+|   |-- registry.py                # 规范模型注册表与别名
+|   |-- <Model>/
+|       |-- model_arch.py          # 模型架构
+|       |-- model_config.py        # 模型配置 dataclass
+|       |-- model_spec.py          # Benchmark 集成能力声明
+|       |-- __init__.py            # 模型包公开接口
+|-- runner/                        # 实验流程编排
+|   |-- builder.py                 # 配置、实验、日志与 checkpoint 构建
+|   |-- train_test.py              # 普通训练与测试
+|   |-- test_checkpoint.py         # 已有 checkpoint 的独立测试
+|   |-- pretrain_finetune.py       # 完整预训练微调与只微调流程
 |-- scripts/
 |   |-- SS_task/                   # 软测量回归脚本
 |   |-- LSF_task/                  # 软测量预测脚本
 |-- utils/                         # 工具函数
 |   |-- configs.py
-|   |-- ExpConfigs.py
 |   |-- logger.py
 |   |-- metrics.py
 |   |-- scaler.py
@@ -584,6 +597,7 @@ Industrial-Time-Series-Soft-Sensor/
 |-- CLAUDE.md                      # Claude Code 入口说明
 |-- run.py                         # 命令行入口
 |-- run_with_yaml.py               # 基于 YAML 的入口
+|-- run_pretrain_finetune.py       # 预训练与微调入口
 |-- requirements.txt
 |-- LICENSE.txt
 |-- readme.md
@@ -605,7 +619,9 @@ Industrial-Time-Series-Soft-Sensor/
 
 #### `models/`
 
-该目录包含模型实现，如 `ARDNN.py`、`Autoformer.py`、`PatchTST.py`、`DMVAER.py`、`VALSTM.py` 和 `iTransformer.py`。
+每个模型都是一个自包含包，包含模型架构、模型配置和 benchmark 能力声明。`models/registry.py` 管理规范模型名称，并加载模型包导出的 `Model`、`MODEL_CONFIG` 和 `MODEL_SPEC`。
+
+`MODEL_SPEC` 声明模型支持的任务、数据表示、Loss 类型和可选预训练阶段；模型超参数保留在模型自己的 `MODEL_CONFIG` dataclass 和 YAML 中。
 
 #### `scripts/`
 

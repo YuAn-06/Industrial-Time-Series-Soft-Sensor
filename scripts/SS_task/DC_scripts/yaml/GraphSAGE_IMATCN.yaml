@@ -10,8 +10,6 @@ params:
   data_aug: True
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0
 
 
 # Model Config
@@ -24,12 +22,9 @@ params:
   pred_len: 1
   num_channels: [64,64]
   kernel_size: 2
-  stride: 1
   d_model: 64
   n_heads: 8
-  factor: 1
   dropout: 0.05
-  activation: 'relu'
   graph_build_method: 'mi'
   graph_threshold: 0.4
   graph_sample_size: 64

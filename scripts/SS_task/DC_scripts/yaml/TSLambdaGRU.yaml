@@ -7,8 +7,6 @@ params:
   data_aug: True
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0
 
   enc_in: 13
   dec_in: 13

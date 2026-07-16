@@ -8,8 +8,6 @@ params:
   data_aug: False
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0
   
 
   # Model Config
@@ -20,17 +18,10 @@ params:
   seq_len: 16
   embed: 'TimeF'
   freq: 's'
-  factor: 1
   label_len: 16
   pred_len: 1
-  n_components: 5
   d_model: 64
-  n_heads: 4
   e_layers: 1
-  d_layers: 1
-  d_ff: 128
-  dropout: 0.05
-  activation: 'gelu'
 
   # Train Config
   batch_size: 64

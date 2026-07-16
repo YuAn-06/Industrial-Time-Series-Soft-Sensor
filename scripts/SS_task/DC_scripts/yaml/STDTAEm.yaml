@@ -10,8 +10,6 @@ params:
   data_aug: True
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0
 
   # Model Config
   enc_in: 13
@@ -24,7 +22,6 @@ params:
   hidden_dim: 8
   latent_dim: 4
   dropout: 0.1
-  activation: 'gelu'
 
   # STD-TAEm Config
   std_window: 4

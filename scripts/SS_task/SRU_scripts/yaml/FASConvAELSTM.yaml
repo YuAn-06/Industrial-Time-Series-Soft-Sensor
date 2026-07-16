@@ -8,8 +8,6 @@ params:
   data_aug: False
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0.0
 
   # Model Config
   enc_in: 5
@@ -21,7 +19,6 @@ params:
   pred_len: 6
   embed: 'TimeF'
   freq: 's'
-  factor: 1
   fa_lags: [0, 3, 5, 9]
   fa_kernel_sizes: [3, 2, 2]
   fa_channels: [6, 10, 1]

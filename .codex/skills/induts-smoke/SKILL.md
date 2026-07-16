@@ -37,7 +37,7 @@ conda run -n time_series_v2 python .codex/skills/induts-smoke/scripts/smoke_mode
 
 ## Workflow
 
-1. Run smoke after adding a model file, editing `MODEL_REGISTRY`, changing a model forward signature, porting a model, or generating/editing YAMLs.
+1. Run smoke after adding or editing a model package, changing `models/registry.py`, `MODEL_CONFIG`, `MODEL_SPEC`, a model forward signature, or benchmark YAMLs.
 2. Prefer small public YAMLs such as DC/DLinear first, then smoke the changed model's real YAML.
 3. Let the script create temporary YAMLs under `smoke_runs/tmp_yaml/`; do not edit benchmark YAMLs for smoke settings.
 4. Confirm the report shows `status: passed`, forward probe shapes, train/test batch counts, and `test batch shapes`.
@@ -64,7 +64,7 @@ By default the runner executes only `--max-train-batches 2` and `--max-test-batc
 A smoke run passes only when:
 
 - The YAML parses through `utils.configs.Parse_arguments`.
-- The model resolves through `exp.exp_basic.MODEL_REGISTRY`.
+- The model resolves through `models.registry`, and its package exports `Model`, `MODEL_CONFIG`, and `MODEL_SPEC`.
 - The experiment and dataloaders instantiate on CPU.
 - A forward probe produces a tensor selected by the experiment's normal prediction selector.
 - The selected prediction shape matches the selected ground-truth shape.

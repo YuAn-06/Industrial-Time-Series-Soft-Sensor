@@ -7,6 +7,7 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 from utils import Logger
 from typing import Any, Optional, Union, Dict
+from models.registry import get_model_spec
 
 class TensorboardObserver():
     """
@@ -72,7 +73,16 @@ class BaseLoss(nn.Module):
 
 class Losses:  
     def __init__(self, args, folder_path: str = None):
-        self.calculate_loss = losses_dict[args.model](args)
+        loss_type = get_model_spec(args.model).loss_type
+        try:
+            loss_class = LOSS_REGISTRY[loss_type]
+        except KeyError as exc:
+            supported = ", ".join(sorted(LOSS_REGISTRY))
+            raise ValueError(
+                f"Unsupported loss type '{loss_type}' for model "
+                f"'{args.model}'. Supported loss types: {supported}."
+            ) from exc
+        self.calculate_loss = loss_class(args)
         self.args = args
     
         
@@ -544,49 +554,16 @@ class FASConvAELSTM_Loss(BaseLoss):
         if self.stage.startswith('pretrain'):
             print(f'Recon Loss: {self.mean_recon_loss:.4f}')
     
-losses_dict = {
-    'Nystroformer': MSE_Loss,
-    'DAGRU': MSE_Loss,
-    'DMVAER': DMVAER_Loss,
-    'VRNN': VRNN_Loss,
-    'TCVAE': TCVAE_Loss,
-    'iTransformer': MSE_Loss,
-    'Transformer': MSE_Loss,
-    'EnvFormer': MSE_Loss,
-    'Fredformer': MSE_Loss,
-    'HSAM_dGRUs': HuberLoss,
-    'PatchTST': MSE_Loss,
-    'Autoformer': MSE_Loss,
-    'DLinear': MSE_Loss,
-    'ARDNN': MSE_Loss,
-    'MSACNN': MSE_Loss,
-    'CVAESMC': CVAESMC_Loss,
-    'LDCNN': MSE_Loss,
-    'Nonstationary_Transformer': MSE_Loss,
-    'DMRIFormer': MSE_Loss,
-    'Informer': MSE_Loss,
-    'VALSTM': MSE_Loss,
-    'Crossformer': MSE_Loss,
-    'LSTM': MSE_Loss,
-    'TimeMixer': MSE_Loss,
-    'TimesNet': MSE_Loss,
-    'GTFTS': GTFTS_Loss,
-    'SparseTSF': MSE_Loss,
-    'TCN': MSE_Loss,
-    'TimeFilter': MSE_Loss,
-    'STALSTM': MSE_Loss,
-    'Koopa': MSE_Loss,
-    'TimeKAN': MSE_Loss,
-    'MSGNet': MSE_Loss,
-    'DLSTM': MSE_Loss,
-    'GCT': MSE_Loss,
-    'SOFTS': MSE_Loss,
-    'FEDformer': MSE_Loss,
-    'STDTAEm': STDTAEm_Loss,
-    'GraphSAGE_IMATCN': MSE_Loss,
-    'FASConvAELSTM': FASConvAELSTM_Loss,
-    'TSLambdaGRU': MSE_Loss,
-    
+LOSS_REGISTRY = {
+    'mse': MSE_Loss,
+    'huber': HuberLoss,
+    'cvaesmc': CVAESMC_Loss,
+    'dmvaer': DMVAER_Loss,
+    'vrnn': VRNN_Loss,
+    'tcvae': TCVAE_Loss,
+    'gtfts': GTFTS_Loss,
+    'stdtaem': STDTAEm_Loss,
+    'fasconvaelstm': FASConvAELSTM_Loss,
 }
 
 

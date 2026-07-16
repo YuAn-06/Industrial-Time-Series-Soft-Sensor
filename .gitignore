@@ -219,6 +219,11 @@ cython_debug/
 /results/
 results/
 
+# Local smoke-test and migration artifacts
+/smoke_runs/
+/tmp/
+/models/*/backups/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

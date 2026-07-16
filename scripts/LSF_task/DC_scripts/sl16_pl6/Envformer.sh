@@ -1,13 +1,13 @@
 
             echo "========================================"
-            echo "Run model: Envformer"
+            echo "Run model: EnvFormer"
             echo "Experiment: short_term_forecasting on DC"
             echo "Input data: ./data/DC/debutanizer_column.csv"
             echo "Output target: y_1"
             echo "Window: seq_len=16, pred_len=6"
             echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
             echo "========================================"
-            python -u run.py --model 'Envformer' \
+            python -u run.py --model 'EnvFormer' \
                          --task 'short_term_forecasting' \
                          --data_name "DC" \
                          --data_path './data/DC/debutanizer_column.csv' \

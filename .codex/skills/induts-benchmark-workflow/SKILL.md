@@ -29,8 +29,8 @@ Keep fairness, reproducibility, and task consistency visible in every recommenda
 Important root files:
 
 - `readme.md`: user-facing benchmark overview, supported models/datasets, installation, and project structure.
-- `run_with_yaml.py`: recommended reproducible single-experiment entry point for YAML configs.
-- `run_pretrain_finetune.py`: two-stage pretrain/finetune runner for models such as `STDTAEm`.
+- `run_with_yaml.py`: convenient code-edited YAML entry point for a standard train/test run.
+- `run_pretrain_finetune.py`: full pretrain/finetune or finetune-only entry point.
 - `run.py`: command-line runner used by shell scripts and batch workflows.
 - `requirements.txt`: Python dependencies.
 
@@ -38,9 +38,10 @@ Core packages:
 
 - `data/`: dataset classes, preprocessing, split/scaling logic, and CSV data folders.
 - `exp/`: experiment lifecycle. `exp_factory.py` selects `Exp_Soft_Sensor` or `Exp_Short_Term_Forecasting`.
-- `models/`: model implementations. Each model is usually a single `models/<Model>.py` file.
+- `models/`: self-contained model packages. Each `models/<Model>/` exports `Model`, `MODEL_CONFIG`, and `MODEL_SPEC`; `models/registry.py` owns canonical names and aliases.
 - `layers/`: shared neural network blocks used by model files.
-- `utils/`: config parsing, dataclass config surface, logging, metrics, scalers, seeds, and training helpers.
+- `runner/`: orchestration for standard train/test, existing-checkpoint evaluation, full pretrain/finetune, and finetune-only workflows.
+- `utils/`: dynamic config loading, logging, metrics, scalers, seeds, and training helpers.
 - `scripts/`: benchmark YAML and shell matrices, grouped by task and dataset.
 - `results/`: experiment outputs, checkpoints, logs, metrics, predictions, and TensorBoard events.
 
@@ -48,14 +49,20 @@ Core packages:
 
 YAML-driven flow:
 
-1. `run_with_yaml.py` chooses a YAML under `scripts/`.
-2. `utils.configs.Parse_arguments(yaml_path)` builds defaults from `Init_parser()`, overlays YAML `params`, validates with `ExpConfigs`, builds `args.setting`, and creates `results/<model>/<setting>/`.
+1. `run_with_yaml.py` calls `runner.train_test_from_yaml` for a YAML under `scripts/`; `run.py` parses model-owned CLI fields and calls the same prepared train/test workflow.
+2. `utils.configs.load_config(yaml_path)` selects the model package through `models.registry`, validates YAML fields with that model's `MODEL_CONFIG`, and has no result-directory side effect. `prepare_run(args)` then builds `args.setting` and `args.save_dir`.
 3. `exp.exp_factory.get_exp_by_model_and_task(args)` selects:
    - `Exp_Soft_Sensor` for `task: soft_sensor`
    - `Exp_Short_Term_Forecasting` for `task: short_term_forecasting`
 4. The experiment builds dataloaders through `data.data_provider.data_provider`.
-5. The dataloader chooses a dataset class from `data_dict` using `data_name`, task, multimode settings, and selected model.
+5. `data.data_provider` reads `MODEL_SPEC.dataset_type` and selects a Dataset class from `(task, dataset_type)`, such as standard, multimode, or lagged-matrix input.
 6. The experiment trains, validates, tests, logs metrics, and saves outputs under `results/`.
+
+Pretraining flow:
+
+1. `run_pretrain_finetune.py --mode full` calls `runner.run_pretrain_finetune`.
+2. The runner reads `MODEL_SPEC.pretrain_stages`, archives each stage checkpoint, then runs finetuning and optional testing.
+3. `--mode finetune --checkpoint <path>` skips pretraining and starts finetuning from explicit pretrained weights.
 
 ## Config And Script Layout
 
@@ -70,7 +77,7 @@ Common YAML fields are under a top-level `params` object. Important keys include
 - Data/task: `task`, `data_name`, `data_path`, `target`, `C_in`, `C_out`, `seq_len`, `label_len`, `pred_len`
 - Training: `batch_size`, `learning_rate`, `epoch`, `patience`, `seed`, `lradj`, `weight_decay`
 - Hardware: `use_cuda`, `device`, `gpu`, `device_ids`, `use_multi_gpu`
-- Model: `model`, `d_model`, `d_ff`, `n_heads`, `e_layers`, `d_layers`, plus model-specific keys in `utils/configs.py`
+- Model: `model`, `d_model`, `d_ff`, `n_heads`, `e_layers`, `d_layers`, plus fields declared by `models/<Model>/model_config.py`
 - Two-stage: `model_stage`, `pretrained_ckpt`, `pretrain_epoch`, `finetune_epoch`, `pretrain_learning_rate`, `finetune_learning_rate`
 
 When changing configs, keep identical dataset split, seed, sequence length, prediction length, training budget, scaler behavior, and metric definitions for fair model comparisons.
@@ -98,13 +105,22 @@ The standard split is 70% train, 10% validation, 20% test through `_get_borders`
 
 ## Models
 
-Model implementations live in `models/`. Examples include classical soft-sensor models, time-series foundation models, transformer variants, recurrent models, CNN models, VAE models, GNN-style models, and newer architectures.
+Model implementations live in self-contained packages under `models/<Model>/`:
+
+- `model_arch.py`: architecture and forward implementation.
+- `model_config.py`: the model-owned dataclass extending `BaseExpConfig`.
+- `model_spec.py`: stable framework capabilities (`supported_tasks`, `dataset_type`, `loss_type`, and `pretrain_stages`).
+- `__init__.py`: exports `Model`, `MODEL_CONFIG`, and `MODEL_SPEC`.
+
+`models/registry.py` is the single registry for canonical model names and package import paths. Loss selection, Dataset representation, and pretraining stages must read `MODEL_SPEC`; do not recreate model-name tables elsewhere.
 
 Before adding or editing a model:
 
-- Check an adjacent model with similar call signature.
+- Start from `models/_template/` or check an adjacent model package with a similar call signature.
 - Check `Exp_*` model invocation and loss handling.
-- Add model-specific config defaults in `utils/configs.py` and `utils/ExpConfigs.py` if needed.
+- Add model-specific fields to `models/<Model>/model_config.py`; common data/training/runtime fields belong in `models/base/model_config.py`.
+- Declare Dataset representation, loss type, supported tasks, and pretraining stages in `model_spec.py`.
+- Register the canonical package path in `models/registry.py`.
 - Add YAMLs under both task families only when the model genuinely supports those tasks.
 - Run a small YAML smoke run before expanding the benchmark matrix.
 
@@ -138,7 +154,7 @@ When reporting results, include:
 
 ## Maintenance Rules
 
-- Preserve current directory conventions under `models/`, `data/`, `exp/`, `utils/`, `scripts/`, and `results/`.
+- Preserve current directory conventions under `models/`, `data/`, `exp/`, `runner/`, `utils/`, `scripts/`, and `results/`.
 - Do not silently change benchmark settings that would invalidate comparisons.
 - Treat YAML matrices and shell scripts as public reproducibility artifacts.
 - Keep Windows users in mind: prefer YAML/Python commands unless the task explicitly uses shell scripts.

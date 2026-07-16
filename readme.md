@@ -64,6 +64,8 @@ To bridge this gap, we introduce **InduTS-SS**, an open-source library that prov
 
 ## 🚀 Getting Started
 
+For the complete tutorial—including environment setup, datasets, standard and staged runs, model integration, loss functions, and experiment internals—see **[Getting Started with InduTS-SS](docs/Getting_started.md)**. The [Chinese version](docs/Getting_started_cn.md) is also available.
+
 InduTS-SS provides three primary entry points for running experiments.
 
 ### 1. Configuration-Driven Execution (`run_with_yaml.py`)
@@ -101,19 +103,22 @@ Then run:
 python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml
 ```
 
-You can also choose stages from the command line:
+The full mode reads the required pretraining stages from the model's
+`ModelSpec.pretrain_stages`, then runs finetuning and testing:
 
 ```bash
-python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --stages pretrain finetune --test_stages finetune
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --mode full
 ```
 
-To skip pretraining and directly finetune from an existing checkpoint, pass `--initial_ckpt`:
+To skip pretraining and directly finetune from an existing pretrained
+checkpoint, use `--mode finetune` and `--checkpoint`:
 
 ```bash
-python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --initial_ckpt ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --mode finetune --checkpoint ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
 ```
 
-When `initial_ckpt` is not empty, the runner will use only the finetuning stage.
+Use `--no_test` to finish after training, or `--checkpoint_dir` to select the
+shared directory used for archived pretraining checkpoints.
 
 ### 3. Command-Line Execution (`run.py`)
 
@@ -338,7 +343,7 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [STDTAEm]() | IEEE TII 2026 | | Yes | MLP-based time-series soft sensor model | available |
 | [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354) (Wu et al.) | EAAI 2025 |  | Yes | CNN-based pretrained time-series soft sensor model | Available |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | IEEE Sensors Journal 2025 | Yes |  | MLP-based time-series soft sensor model | Available |
-| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
+| [EnvFormer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
 | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Available |
 | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | IEEE TC 2024 | Yes |  | GNN-based time-series soft sensor model | Available |
 | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | IEEE TASE 2024 |  | Yes | RNN-based time-series soft sensor model | Available |
@@ -387,7 +392,7 @@ The table is grouped by model architecture. Within each architecture, models are
 | **Transformer** | [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al.) | 2024 | NeurIPS | Yes | Yes | Available |
 | **Transformer** | [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al.) | 2024 | ICLR | Yes | Yes | Available |
 | **Transformer** | [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al.) | 2024 | KDD | Yes | Yes | Available |
-| **Transformer** | [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | 2024 | IEEE TIM | Yes |  | Available |
+| **Transformer** | [EnvFormer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | 2024 | IEEE TIM | Yes |  | Available |
 | **Transformer** | [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al.) | 2023 | ICLR | Yes | Yes | Available |
 | **Transformer** | [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al.) | 2023 | ICLR | Yes | Yes | Available |
 | **Transformer** | [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu et al.) | 2022 | NeurIPS | Yes | Yes | Available |
@@ -558,13 +563,24 @@ Industrial-Time-Series-Soft-Sensor/
 |   |-- exp_soft_sensor.py
 |   |-- losses.py
 |-- layers/                       # Neural network layers
-|-- models/                       # Model implementations
+|-- models/                       # Self-contained model packages
+|   |-- base/                     # Shared Config and ModelSpec schemas
+|   |-- registry.py               # Canonical model registry and aliases
+|   |-- <Model>/
+|       |-- model_arch.py         # Model architecture
+|       |-- model_config.py       # Model-owned configuration dataclass
+|       |-- model_spec.py         # Benchmark integration capabilities
+|       |-- __init__.py           # Public model package exports
+|-- runner/                       # Experiment orchestration
+|   |-- builder.py                # Config/Experiment/Logger builders
+|   |-- train_test.py             # Standard training and testing
+|   |-- test_checkpoint.py        # Evaluation of an existing checkpoint
+|   |-- pretrain_finetune.py      # Full pipeline and finetune-only workflows
 |-- scripts/
 |   |-- SS_task/                  # Soft sensor regression scripts
 |   |-- LSF_task/                 # Soft sensor forecasting scripts
 |-- utils/                        # Utility functions
 |   |-- configs.py
-|   |-- ExpConfigs.py
 |   |-- logger.py
 |   |-- metrics.py
 |   |-- scaler.py
@@ -574,6 +590,7 @@ Industrial-Time-Series-Soft-Sensor/
 |-- CLAUDE.md                     # Claude Code entry instructions
 |-- run.py                        # Command-line entry point
 |-- run_with_yaml.py              # YAML-based entry point
+|-- run_pretrain_finetune.py      # Pretraining/finetuning entry point
 |-- requirements.txt
 |-- LICENSE.txt
 |-- readme.md
@@ -595,7 +612,13 @@ This directory contains neural network building blocks, including attention mech
 
 #### `models/`
 
-This directory contains model implementations, such as `ARDNN.py`, `Autoformer.py`, `PatchTST.py`, `DMVAER.py`, `VALSTM.py`, and `iTransformer.py`.
+Each model is a self-contained package with its architecture, configuration,
+and benchmark capability card. `models/registry.py` provides canonical model
+names and loads the package exports `Model`, `MODEL_CONFIG`, and `MODEL_SPEC`.
+
+`MODEL_SPEC` declares stable framework integration such as supported tasks,
+dataset representation, loss type, and optional pretraining stages. Model
+hyperparameters remain in the model-owned `MODEL_CONFIG` dataclass and YAML.
 
 #### `scripts/`
 

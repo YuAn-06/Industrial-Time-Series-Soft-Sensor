@@ -17,8 +17,6 @@
                          --pred_len 1 \
                          --reduction_ratio 6 \
                          --stride 1 \
-                         --dropout 0.05 \
-                         --activation 'GELU' \
                          --batch_size 64 \
                          --learning_rate 0.001 \
                          --epoch 300 \

@@ -32,7 +32,6 @@ python -u run.py \
     --d_model 128 \
     --n_heads 4 \
     --e_layers 1 \
-    --d_layers 1 \
     --d_ff 128 \
     --dropout 0.05 \
     --activation 'gelu' \

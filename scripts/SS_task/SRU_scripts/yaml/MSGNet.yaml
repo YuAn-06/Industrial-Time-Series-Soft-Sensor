@@ -8,8 +8,6 @@ params:
   data_aug: True
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0.0
 
   # Model Config
   enc_in: 20
@@ -21,7 +19,6 @@ params:
   pred_len: 6
   embed: 'TimeF'
   freq: 's'
-  factor: 1
   conv_channel: 12
   skip_channel: 6
   gcn_depth: 2
@@ -32,7 +29,6 @@ params:
   e_layers: 1
   d_ff: 512
   dropout: 0.05
-  activation: 'gelu'
 
   # Train Config
   batch_size: 64

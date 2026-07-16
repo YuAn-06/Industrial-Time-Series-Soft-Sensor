@@ -89,7 +89,6 @@ class Dataset_Custom(Dataset):
         - data_path: Path to the CSV file.
         - data_name: Name of the dataset for specific preprocessing logic.
         - target: The name of the column to be predicted.
-        - if_missing: Boolean flag for handling missing values.
         - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
         - seq_len: Input sequence length (look-back window).
         - label_len: Start token length for the decoder.
@@ -121,13 +120,10 @@ class Dataset_Custom(Dataset):
     
     def process(self):
 
-        if self.args.if_missing:
-            self.scaler = ZeroMaskStandardScaler()
+        if self.args.model in MINMAX_MODELS:
+            self.scaler = MinMaxScaler()
         else:
-            if self.args.model in MINMAX_MODELS:
-                self.scaler = MinMaxScaler()
-            else:
-                self.scaler = StandardScaler()  # 
+            self.scaler = StandardScaler()
         
         border1s, border2s, border1, border2 = _get_borders(
             self.data.shape[0], self.args.seq_len, self.set_type
@@ -235,7 +231,6 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         - data_path: Path to the CSV file.
         - data_name: Name of the dataset for specific preprocessing logic.
         - target: The name of the column to be predicted.
-        - if_missing: Boolean flag for handling missing values.
         - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
         - seq_len: Input sequence length (look-back window).
         - label_len: Start token length for the decoder.
@@ -272,16 +267,12 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
 
     def process(self):
 
-        if self.args.if_missing:
-            self.scaler_x = ZeroMaskStandardScaler()
-            self.scaler_y = ZeroMaskStandardScaler()
+        if self.args.model in MINMAX_MODELS:
+            self.scaler_x = MinMaxScaler()
+            self.scaler_y = MinMaxScaler()
         else:
-            if self.args.model in MINMAX_MODELS:
-                self.scaler_x = MinMaxScaler()
-                self.scaler_y = MinMaxScaler()
-            else:
-                self.scaler_x = StandardScaler() 
-                self.scaler_y = StandardScaler()
+            self.scaler_x = StandardScaler()
+            self.scaler_y = StandardScaler()
 
         border1s, border2s, border1, border2 = _get_borders(
             self.data.shape[0], self.args.seq_len, self.set_type
@@ -325,11 +316,6 @@ class Dataset_Custom_4_Soft_Sensor(Dataset):
         self.data_y = data_y[border1:border2]
         
         
-        if self.args.if_missing:
-            self.mask_label = pd.read_csv(self.args.missing_path).values
-            self.mask_label = self.mask_label[border1:border2]
-        
-
     def __getitem__(self, index):
         """
         Retrieves a single data sample (a sliding window) for the model.
@@ -403,16 +389,12 @@ class Dataset_LaggedMatrix_4_Soft_Sensor(Dataset_Custom_4_Soft_Sensor):
     """
 
     def process(self):
-        if self.args.if_missing:
-            self.scaler_x = ZeroMaskStandardScaler()
-            self.scaler_y = ZeroMaskStandardScaler()
+        if self.args.model in MINMAX_MODELS:
+            self.scaler_x = MinMaxScaler()
+            self.scaler_y = MinMaxScaler()
         else:
-            if self.args.model in MINMAX_MODELS:
-                self.scaler_x = MinMaxScaler()
-                self.scaler_y = MinMaxScaler()
-            else:
-                self.scaler_x = StandardScaler()
-                self.scaler_y = StandardScaler()
+            self.scaler_x = StandardScaler()
+            self.scaler_y = StandardScaler()
 
         self.lag_offsets = [int(lag) for lag in getattr(self.args, "fa_lags", [0, 3, 5, 9])]
         if not self.lag_offsets or min(self.lag_offsets) < 0:
@@ -501,7 +483,6 @@ class Dataset_MultiMode(Dataset):
         - data_path: Path to the CSV file.
         - data_name: Name of the dataset for specific preprocessing logic.
         - target: The name of the column to be predicted.
-        - if_missing: Boolean flag for handling missing values.
         - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
         - seq_len: Input sequence length (look-back window).
         - label_len: Start token length for the decoder.
@@ -530,16 +511,12 @@ class Dataset_MultiMode(Dataset):
     
     def process(self):
 
-        if self.args.if_missing:
-            self.scaler_x = ZeroMaskStandardScaler()
-            self.scaler_y = ZeroMaskStandardScaler()
+        if self.args.model == 'HSAM_dGRUs':
+            self.scaler_x = MinMaxScaler()
+            self.scaler_y = MinMaxScaler()
         else:
-            if self.args.model == 'HSAM_dGRUs':
-                self.scaler_x = MinMaxScaler()
-                self.scaler_y = MinMaxScaler()
-            else:
-                self.scaler_x = StandardScaler() 
-                self.scaler_y = StandardScaler() 
+            self.scaler_x = StandardScaler()
+            self.scaler_y = StandardScaler()
 
         border1s, border2s, border1, border2 = _get_borders(
             self.data.shape[0], self.args.seq_len, self.set_type
@@ -677,7 +654,6 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
         - data_path: Path to the CSV file.
         - data_name: Name of the dataset for specific preprocessing logic.
         - target: The name of the column to be predicted.
-        - if_missing: Boolean flag for handling missing values.
         - model: Model name used to determine scaling strategy (e.g., MinMaxScaler for certain models).
         - seq_len: Input sequence length (look-back window).
         - label_len: Start token length for the decoder.
@@ -709,12 +685,8 @@ class Dataset_MultiMode_4_Soft_Sensor(Dataset):
     
     def process(self):
 
-        if self.args.if_missing:
-            self.scaler_x = ZeroMaskStandardScaler()
-            self.scaler_y = ZeroMaskStandardScaler()
-        else:
-            self.scaler_x = StandardScaler()
-            self.scaler_y = StandardScaler()
+        self.scaler_x = StandardScaler()
+        self.scaler_y = StandardScaler()
         
         border1s, border2s, border1, border2 = _get_borders(
             self.data.shape[0], self.args.seq_len, self.set_type

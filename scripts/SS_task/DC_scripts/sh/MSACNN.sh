@@ -26,9 +26,6 @@ python -u run.py \
     --pred_len 1 \
     --stride 1 \
     --reduction_ratio 32 \
-    --d_model 16 \
-    --dropout 0.05 \
-    --activation 'GELU' \
     --batch_size 64 \
     --learning_rate 0.001 \
     --epoch 400 \

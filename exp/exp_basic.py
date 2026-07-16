@@ -7,55 +7,11 @@
 
 
 import os
-import importlib
 import torch
 from types import ModuleType
 from typing import Dict, Union
 
-
-MODEL_REGISTRY = {
-    'Nystromformer': 'models.Nystromformer',
-    'DAGRU': 'models.DAGRU',
-    'DMVAER': 'models.DMVAER',
-    'VRNN': 'models.VRNN',
-    'TCVAE': 'models.T_CVAE',
-    'iTransformer': 'models.iTransformer',
-    'Transformer': 'models.Transformer',
-    'EnvFormer': 'models.EnvFormer',
-    'Fredformer': 'models.Fredformer',
-    'HSAM_dGRUs': 'models.HSAM_dGRUs',
-    'PatchTST': 'models.PatchTST',
-    'Autoformer': 'models.Autoformer',
-    'DLinear': 'models.DLinear',
-    'ARDNN': 'models.ARDNN',
-    'MSACNN': 'models.MSACNN',
-    'CVAESMC': 'models.CVAESMC',
-    'LDCNN': 'models.LDCNN',
-    'Nonstationary_Transformer': 'models.Nonstationary_Transformer',
-    'DMRIFormer': 'models.DMRIFormer',
-    'Informer': 'models.Informer',
-    'LSTM': 'models.LSTM',
-    'VALSTM': 'models.VALSTM',
-    'Crossformer': 'models.Crossformer',
-    'TimeMixer': 'models.TimeMixer',
-    'TimesNet': 'models.TimesNet',
-    'GTFTS': 'models.GTFTS',
-    'SparseTSF': 'models.SparseTSF',
-    'TCN': 'models.TCN',
-    'TimeFilter': 'models.TimeFilter',
-    'STALSTM': 'models.STALSTM',
-    'Koopa': 'models.Koopa',
-    'TimeKAN': 'models.TimeKAN',
-    'MSGNet': 'models.MSGNet',
-    'DLSTM': 'models.DLSTM',
-    'GCT': 'models.GCT',
-    'SOFTS': 'models.SOFTS',
-    'FEDformer': 'models.FEDformer',
-    'STDTAEm': 'models.STDTAEm',
-    'GraphSAGE_IMATCN': 'models.GraphSAGE_IMATCN',
-    'FASConvAELSTM': 'models.FASConvAELSTM',
-    'TSLambdaGRU': 'models.TSLambdaGRU',
-}
+from models.registry import MODEL_REGISTRY, get_model_package
 
 
 class Exp_basic(object):
@@ -78,16 +34,8 @@ class Exp_basic(object):
         return None
 
     def _get_model_module(self, model_name):
-        try:
-            module_path = self.model_dict[model_name]
-        except KeyError:
-            supported_models = ', '.join(sorted(self.model_dict.keys()))
-            raise ValueError(
-                f"Unsupported model: {model_name}. Supported models: {supported_models}"
-            )
-
         if model_name not in self._model_module_cache:
-            self._model_module_cache[model_name] = importlib.import_module(module_path)
+            self._model_module_cache[model_name] = get_model_package(model_name)
 
         model_module = self._model_module_cache[model_name]
 

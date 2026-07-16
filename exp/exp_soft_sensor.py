@@ -262,5 +262,5 @@ class Exp_Soft_Sensor(Exp_basic):
         plt.savefig(self.args.save_dir + 'test.png')  # 
         logger.info(f"Saved plot as 'test.png' in {self.args.save_dir}")
 
-        plt.show()
+        plt.close()
         return
