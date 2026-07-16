@@ -375,17 +375,17 @@ The table is grouped by model architecture. Within each architecture, models are
 | **Autoencoder / Generative** | [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al.) | 2022 | IEEE TII |  | Yes | Available |
 | **Autoencoder / Generative** | [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al.) | 2019 | IJCAI | Yes |  | Available |
 | **Autoencoder / Generative** | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | 2015 | NeurIPS | Yes | Yes | Available |
-| **CNN ** | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | 2026 | IEEE TC |  | Yes | Available |
+| **CNN** | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | 2026 | IEEE TC |  | Yes | Available |
 | **CNN**                      | [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354) (Wu et al.) | 2025 | EAAI                 |      | Yes  | Available |
 | **CNN**                      | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | 2024 | IEEE TC              |      | Yes  | Available |
-| **CNN **                     | [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al.) | 2023 | ICLR                 | Yes  | Yes  | Available |
-| **CNN **                     | [TCN](https://arxiv.org/abs/1803.01271) (Bai et al.)         | 2018 | arXiv                | Yes  | Yes  | Available |
+| **CNN**                     | [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al.) | 2023 | ICLR                 | Yes  | Yes  | Available |
+| **CNN**                     | [TCN](https://arxiv.org/abs/1803.01271) (Bai et al.)         | 2018 | arXiv                | Yes  | Yes  | Available |
 | **GNN**                      | [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al.)   | 2025 | ICML                 | Yes  | Yes  | Available |
 | **GNN**                      | [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al.) | 2024 | AAAI                 | Yes  | Yes  | Available |
 | **GNN**                      | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | 2024 | IEEE TC              | Yes  |      | Available |
 | **GNN**                      | [GraphSAGE-IMATCN](https://www.sciencedirect.com/science/article/abs/pii/S0957582024009959?via%3Dihub=) (Tuo et al.) | 2024 | PSER | Yes | Yes | Available |
-| **MLP **                     | [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al.) | 2026 | IEEE TPAMI           | Yes  |      | Available |
-| **MLP ** | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | 2025 | IEEE Sensors Journal | Yes |  | Available |
+| **MLP**                     | [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al.) | 2026 | IEEE TPAMI           | Yes  |      | Available |
+| **MLP** | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | 2025 | IEEE Sensors Journal | Yes |  | Available |
 | **MLP** | [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al.) | 2024 | ICLR | Yes | Yes | Available |
 | **MLP** | [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al.) | 2023 | AAAI | Yes | Yes | Available |
 | **RNN** | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | 2024 | IEEE TASE |  | Yes | Available |
