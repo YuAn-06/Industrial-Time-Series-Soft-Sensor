@@ -1,0 +1,56 @@
+params:
+  # Data Config
+  model: 'FASConvAELSTM'
+  task: 'soft_sensor'
+  data_name: 'SRU'
+  data_path: './data/SRU/SRU_data.csv'
+  target: 'SO2'
+  data_aug: False
+  use_amp: False
+  num_workers: 1
+
+  # Model Config
+  enc_in: 5
+  dec_in: 5
+  C_in: 5
+  C_out: 1
+  seq_len: 4
+  label_len: 4
+  pred_len: 6
+  embed: 'TimeF'
+  freq: 's'
+  fa_lags: [0, 3, 5, 9]
+  fa_kernel_sizes: [3, 2, 2]
+  fa_channels: [6, 10, 1]
+  fa_pretrain_learning_rates: [0.005, 0.01, 0.001]
+  hidden_dim: 64
+  e_layers: 1
+  dropout: 0.05
+  activation: 'sigmoid'
+  freeze_tae: False
+
+  # Stage Overrides
+  pretrain_epoch: 200
+  finetune_epoch: 300
+  pretrain_learning_rate: 0.01
+  finetune_learning_rate: 0.01
+
+  # Train Config
+  batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 0.0
+  epoch: 300
+  patience: 30
+  lradj: 'cosine'
+  use_tensorboard: False
+
+  # Test Config
+  inverse: True
+
+  # GPU Config
+  use_cuda: True
+  device: 'cuda'
+  gpu: 0
+  seed: 2021
+  device_ids: [0]
+  use_multi_gpu: False

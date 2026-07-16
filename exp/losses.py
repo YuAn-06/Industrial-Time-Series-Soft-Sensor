@@ -7,6 +7,7 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 from utils import Logger
 from typing import Any, Optional, Union, Dict
+from models.registry import get_model_spec
 
 class TensorboardObserver():
     """
@@ -72,7 +73,16 @@ class BaseLoss(nn.Module):
 
 class Losses:  
     def __init__(self, args, folder_path: str = None):
-        self.calculate_loss = losses_dict[args.model](args)
+        loss_type = get_model_spec(args.model).loss_type
+        try:
+            loss_class = LOSS_REGISTRY[loss_type]
+        except KeyError as exc:
+            supported = ", ".join(sorted(LOSS_REGISTRY))
+            raise ValueError(
+                f"Unsupported loss type '{loss_type}' for model "
+                f"'{args.model}'. Supported loss types: {supported}."
+            ) from exc
+        self.calculate_loss = loss_class(args)
         self.args = args
     
         
@@ -504,48 +514,56 @@ class STDTAEm_Loss(BaseLoss):
             print(f'Recon Loss: {self.mean_recon_loss:.4f}, Triplet Loss: {self.mean_triplet_loss:.4f}')
         else:
             print(f'Regression Loss: {self.mean_regression_loss:.4f}')
+
+
+class FASConvAELSTM_Loss(BaseLoss):
+    def __init__(self, args):
+        super().__init__(args)
+        self.stage = getattr(args, 'model_stage', 'finetune')
+        self.MSEloss = nn.MSELoss(reduction='mean')
+        self._register_loss_list('loss')
+        self._register_loss_list('recon_loss')
+
+    @property
+    def mean_recon_loss(self):
+        return np.mean(self._loss_lists['recon_loss'])
+
+    def forward(self, preds, true, flag: str = 'train'):
+        if not self.stage.startswith('pretrain'):
+            loss = self.MSEloss(preds, true)
+            if flag == 'train':
+                self._append_loss('loss', loss.item())
+                self._append_loss('recon_loss', 0.0)
+            return loss
+
+        branches = preds['fa_sconvae']
+        if isinstance(branches, dict):
+            loss = self.MSEloss(branches['rec'], branches['target'])
+        else:
+            recon_losses = [
+                self.MSEloss(branch['rec'], branch['target'])
+                for branch in branches
+            ]
+            loss = torch.stack(recon_losses).mean()
+        if flag == 'train':
+            self._append_loss('loss', loss.item())
+            self._append_loss('recon_loss', loss.item())
+        return loss
+
+    def print_loss_details(self):
+        if self.stage.startswith('pretrain'):
+            print(f'Recon Loss: {self.mean_recon_loss:.4f}')
     
-losses_dict = {
-    'Nystroformer': MSE_Loss,
-    'DAGRU': MSE_Loss,
-    'DMVAER': DMVAER_Loss,
-    'VRNN': VRNN_Loss,
-    'TCVAE': TCVAE_Loss,
-    'iTransformer': MSE_Loss,
-    'Transformer': MSE_Loss,
-    'EnvFormer': MSE_Loss,
-    'Fredformer': MSE_Loss,
-    'HSAM_dGRUs': HuberLoss,
-    'PatchTST': MSE_Loss,
-    'Autoformer': MSE_Loss,
-    'DLinear': MSE_Loss,
-    'ARDNN': MSE_Loss,
-    'MSACNN': MSE_Loss,
-    'CVAESMC': CVAESMC_Loss,
-    'LDCNN': MSE_Loss,
-    'Nonstationary_Transformer': MSE_Loss,
-    'DMRIFormer': MSE_Loss,
-    'Informer': MSE_Loss,
-    'VALSTM': MSE_Loss,
-    'Crossformer': MSE_Loss,
-    'LSTM': MSE_Loss,
-    'TimeMixer': MSE_Loss,
-    'TimesNet': MSE_Loss,
-    'GTFTS': GTFTS_Loss,
-    'SparseTSF': MSE_Loss,
-    'TCN': MSE_Loss,
-    'TimeFilter': MSE_Loss,
-    'STALSTM': MSE_Loss,
-    'Koopa': MSE_Loss,
-    'TimeKAN': MSE_Loss,
-    'MSGNet': MSE_Loss,
-    'DLSTM': MSE_Loss,
-    'GCT': MSE_Loss,
-    'SOFTS': MSE_Loss,
-    'FEDformer': MSE_Loss,
-    'STDTAEm': STDTAEm_Loss,
-    'GraphSAGE_IMATCN': MSE_Loss,
-    
+LOSS_REGISTRY = {
+    'mse': MSE_Loss,
+    'huber': HuberLoss,
+    'cvaesmc': CVAESMC_Loss,
+    'dmvaer': DMVAER_Loss,
+    'vrnn': VRNN_Loss,
+    'tcvae': TCVAE_Loss,
+    'gtfts': GTFTS_Loss,
+    'stdtaem': STDTAEm_Loss,
+    'fasconvaelstm': FASConvAELSTM_Loss,
 }
 
 

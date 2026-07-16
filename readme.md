@@ -15,10 +15,6 @@
   </a>
 </p>
 
-<p align="center">
-  <a href="readme_cn.md">简体中文介绍</a>
-</p>
-
 ---
 
 **Industrial Time-Series Soft Sensor (InduTS-SS)** is an open-source library designed for researchers working on time-series data analysis and soft sensor modeling for complex industrial processes.
@@ -46,7 +42,9 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 
 ## 📢 What's New
 
-**Update - 2026/6/21:** We now have built-in support for **agent coding** workflows such as **Codex** and **Claude Code** skills. These skills help agents better understand benchmark tasks and help users get started more easily. Features include environment creation, dataset onboarding, model integration, smoke tests, and full-loop model performance reporting. Please see the sections below for details and git clone `codex` branch.
+**Update - 2026/7/15:** We have added two soft-sensor models: **FA-SConvAE-LSTM**, a feature-aligned convolutional autoencoder with layer-wise pretraining and LSTM regression, and **TS-λ-GRUs**, a two-stream recurrent model that separately captures temporal quality correlations and dynamic causal relationships. Model registration, dedicated losses and configuration fields, and reproducible DC/SRU YAML scripts are included. We also fixed several training-pipeline issues, including empty validation loaders and `NaN` validation losses when the validation set is smaller than the batch size, model-specific optimizer parameter groups, metric and checkpoint saving, stable experiment-setting names for list/float parameters, and checkpoint handoff across pretraining and fine-tuning stages.
+
+**Update - 2026/6/21:** We now have built-in support for **agent coding** workflows such as **Codex** and **Claude Code** skills. These skills help agents better understand benchmark tasks and help users get started more easily. Features include environment creation, dataset onboarding, model integration, smoke tests, and full-loop model performance reporting. Please see the sections below for details. Please see the `Codex` branch.
 
 **Update - 2026/6/15:** We have added the **Mining Process (MP)** dataset to InduTS-SS. We sincerely thank **Mr. Eduardo Magalhaes Oliveira** for releasing this valuable real-world industrial dataset and confirming its authenticity.
 
@@ -65,6 +63,8 @@ To bridge this gap, we introduce **InduTS-SS**, an open-source library that prov
 <a id="getting-started"></a>
 
 ## 🚀 Getting Started
+
+For the complete tutorial—including environment setup, datasets, standard and staged runs, model integration, loss functions, and experiment internals—see **[Getting Started with InduTS-SS](docs/Getting_started.md)**. The [Chinese version](docs/Getting_started_cn.md) is also available.
 
 InduTS-SS provides three primary entry points for running experiments.
 
@@ -103,19 +103,22 @@ Then run:
 python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml
 ```
 
-You can also choose stages from the command line:
+The full mode reads the required pretraining stages from the model's
+`ModelSpec.pretrain_stages`, then runs finetuning and testing:
 
 ```bash
-python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --stages pretrain finetune --test_stages finetune
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --mode full
 ```
 
-To skip pretraining and directly finetune from an existing checkpoint, pass `--initial_ckpt`:
+To skip pretraining and directly finetune from an existing pretrained
+checkpoint, use `--mode finetune` and `--checkpoint`:
 
 ```bash
-python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --initial_ckpt ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
+python run_pretrain_finetune.py --yaml ./scripts/SS_task/SRU_scripts/yaml/STDTAEm.yaml --mode finetune --checkpoint ./results/STDTAEm/your_pretrain_setting/checkpoint.pth
 ```
 
-When `initial_ckpt` is not empty, the runner will use only the finetuning stage.
+Use `--no_test` to finish after training, or `--checkpoint_dir` to select the
+shared directory used for archived pretraining checkpoints.
 
 ### 3. Command-Line Execution (`run.py`)
 
@@ -337,9 +340,10 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | NeurIPS 2015 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter and Schmidhuber) | Neural Computation 1997 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | IEEE TC 2026 |  | Yes | CNN-based time-series soft sensor model | Available |
-| [STDTAEm]() | IEEE TII 2026 | | Yes | MLP-based time-series soft sensor model | Unavailable |
+| [STDTAEm]() | IEEE TII 2026 | | Yes | MLP-based time-series soft sensor model | available |
+| [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354) (Wu et al.) | EAAI 2025 |  | Yes | CNN-based pretrained time-series soft sensor model | Available |
 | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | IEEE Sensors Journal 2025 | Yes |  | MLP-based time-series soft sensor model | Available |
-| [Envformer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
+| [EnvFormer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | IEEE TIM 2024 | Yes |  | Transformer-based time-series soft sensor model | Available |
 | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | IEEE TC 2024 |  | Yes | CNN-based time-series soft sensor model | Available |
 | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | IEEE TC 2024 | Yes |  | GNN-based time-series soft sensor model | Available |
 | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | IEEE TASE 2024 |  | Yes | RNN-based time-series soft sensor model | Available |
@@ -351,7 +355,55 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al.) | IEEE TII 2021 | Yes | Yes | RNN-based time-series soft sensor model | Available |
 | [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (Yuan et al.) | IEEE TII 2021 |  | Yes | RNN-based time-series soft sensor model | Available |
 | [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | IEEE TNNLS 2020 |  | Yes | RNN-based time-series soft sensor model | Available |
+| [TS-lambda-GRUs](https://doi.org/10.1109/TIE.2019.2927197) (Xie et al.) | IEEE TIE 2020 |  | Yes | Two-stream lambda-GRU soft sensor model | Available |
 | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | CJCE 2019 |  | Yes | RNN-based time-series soft sensor model | Available |
+
+### Models by Architecture
+
+The table is grouped by model architecture. Within each architecture, models are ordered by publication year from newest to oldest.
+
+| Architecture | Model | Year | Journal/Conference | F | R | Status |
+| --- | --- | ---: | --- | :-: | :-: | --- |
+| **Autoencoder / Generative** | STDTAEm | 2026 | IEEE TII |  | Yes | Available |
+| **Autoencoder / Generative** | [CVAE-SMC](https://ieeexplore.ieee.org/document/10264786) (Sun et al.) | 2023 | IEEE TII | Yes |  | Available |
+| **Autoencoder / Generative** | [DMVAER](https://ieeexplore.ieee.org/document/9797056) (Yao et al.) | 2022 | IEEE TII |  | Yes | Available |
+| **Autoencoder / Generative** | [TCVAE](https://www.ijcai.org/Proceedings/2019/727) (Wang et al.) | 2019 | IJCAI | Yes |  | Available |
+| **Autoencoder / Generative** | [VRNN](https://arxiv.org/abs/1506.02216) (Chung et al.) | 2015 | NeurIPS | Yes | Yes | Available |
+| **CNN ** | [LDCNN](https://ieeexplore.ieee.org/document/11408874) (Liu et al.) | 2026 | IEEE TC |  | Yes | Available |
+| **CNN**                      | [FA-SconvAE-LSTM](https://www.sciencedirect.com/science/article/abs/pii/S0952197625005354) (Wu et al.) | 2025 | EAAI                 |      | Yes  | Available |
+| **CNN**                      | [MSACNN](https://ieeexplore.ieee.org/document/10465636) (Yuan et al.) | 2024 | IEEE TC              |      | Yes  | Available |
+| **CNN **                     | [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al.) | 2023 | ICLR                 | Yes  | Yes  | Available |
+| **CNN **                     | [TCN](https://arxiv.org/abs/1803.01271) (Bai et al.)         | 2018 | arXiv                | Yes  | Yes  | Available |
+| **GNN**                      | [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al.)   | 2025 | ICML                 | Yes  | Yes  | Available |
+| **GNN**                      | [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al.) | 2024 | AAAI                 | Yes  | Yes  | Available |
+| **GNN**                      | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | 2024 | IEEE TC              | Yes  |      | Available |
+| **GNN**                      | [GraphSAGE-IMATCN](https://www.sciencedirect.com/science/article/abs/pii/S0957582024009959?via%3Dihub=) (Tuo et al.) | 2024 | PSER | Yes | Yes | Available |
+| **MLP **                     | [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al.) | 2026 | IEEE TPAMI           | Yes  |      | Available |
+| **MLP ** | [ARDNN](https://ieeexplore.ieee.org/document/11122404) (Chen et al.) | 2025 | IEEE Sensors Journal | Yes |  | Available |
+| **MLP** | [TimeMixer](https://openreview.net/pdf?id=7oLshfEIC2) (Wang et al.) | 2024 | ICLR | Yes | Yes | Available |
+| **MLP** | [DLinear](https://arxiv.org/abs/2205.13504) (Zeng et al.) | 2023 | AAAI | Yes | Yes | Available |
+| **RNN** | [HSAM-dGRUs](https://ieeexplore.ieee.org/abstract/document/10237000) (He et al.) | 2024 | IEEE TASE |  | Yes | Available |
+| **RNN** | [DLSTM](https://ieeexplore.ieee.org/document/9531471) (Zhou et al.) | 2021 | IEEE TII | Yes | Yes | Available |
+| **RNN** | [STALSTM](https://ieeexplore.ieee.org/abstract/document/9062588) (Yuan et al.) | 2021 | IEEE TII |  | Yes | Available |
+| **RNN** | [DAGRU](https://ieeexplore.ieee.org/document/9174767) (Feng et al.) | 2020 | IEEE TNNLS |  | Yes | Available |
+| **RNN** | [TS-lambda-GRUs](https://doi.org/10.1109/TIE.2019.2927197) (Xie et al.) | 2020 | IEEE TIE |  | Yes | Available |
+| **RNN** | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | 2019 | CJCE |  | Yes | Available |
+| **RNN** | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter et al) | 1997 | Neural Computation | Yes | Yes | Available |
+| **Transformer** | [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al.) | 2024 | NeurIPS | Yes | Yes | Available |
+| **Transformer** | [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al.) | 2024 | ICLR | Yes | Yes | Available |
+| **Transformer** | [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al.) | 2024 | KDD | Yes | Yes | Available |
+| **Transformer** | [EnvFormer](https://ieeexplore.ieee.org/document/10699388) (Xie et al.) | 2024 | IEEE TIM | Yes |  | Available |
+| **Transformer** | [Crossformer](https://openreview.net/pdf?id=vSVLM2j9eie) (Zhang et al.) | 2023 | ICLR | Yes | Yes | Available |
+| **Transformer** | [PatchTST](https://arxiv.org/abs/2211.14730) (Nie et al.) | 2023 | ICLR | Yes | Yes | Available |
+| **Transformer** | [Nonstationary Transformer](https://arxiv.org/abs/2205.14415) (Liu et al.) | 2022 | NeurIPS | Yes | Yes | Available |
+| **Transformer** | [FEDformer](https://proceedings.mlr.press/v162/zhou22g.html) (Zhou et al.) | 2022 | ICML | Yes | Yes | Available |
+| **Transformer** | [DMRIFormer](https://doi.org/10.1109/TII.2022.3227731) (Liu et al.) | 2022 | IEEE TII | Yes |  | Available |
+| **Transformer** | [Autoformer](https://arxiv.org/abs/2106.13008) (Wu et al.) | 2021 | NeurIPS | Yes | Yes | Available |
+| **Transformer** | [Nystromformer](https://arxiv.org/abs/2102.03902) (Xiong et al.) | 2021 | AAAI | Yes |  | Available |
+| **Transformer** | [GCT](https://ieeexplore.ieee.org/abstract/document/9447941) (Geng et al.) | 2021 | IEEE TII | Yes | Yes | Available |
+| **Transformer** | [Transformer](https://arxiv.org/abs/1706.03762) (Vaswani et al.) | 2017 | NeurIPS | Yes | Yes | Available |
+| **Other** | [Koopa](https://arxiv.org/pdf/2305.18803) (Liu et al.) | 2023 | NeurIPS | Yes |  | Available |
+| **Other** | [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al.)   | 2025 | ICLR                 | Yes  | Yes | Available |
 
 
 
@@ -359,7 +411,7 @@ Some models have been adapted to support both tasks. Please refer to the files i
 
 ## 🏭 Available Datasets
 
-We provide two classic benchmarks and three public or local industrial datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, and **Power Plant Gas Turbine (PPGAS)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
+We provide two classic benchmarks and four public or local industrial datasets: **Debutanizer Column (DC)**, **Sulfur Recovery Unit (SRU)**, **Ironmaking (IM)**, **Mining Process (MP)**, **Power Plant Gas Turbine (PPGAS)**, and **Tennessee Eastman Process (TE)**. We are grateful to the providers of these open datasets. If you use these datasets, please cite the relevant papers.
 
 ### Debutanizer Column (DC)
 
@@ -430,7 +482,9 @@ If you use this dataset or the related code in your research, please cite the fo
 
 **[1]** Kaya H., Tufekci P., and Uzun E. Predicting CO and NOx emissions from gas turbines: Novel data and a benchmark PEMS. *Turkish Journal of Electrical Engineering and Computer Sciences*, 2019, 27(6): 4783-4796.
 
+### Tennessee Eastman Process (TE)
 
+The **Tennessee Eastman Process** dataset is provided locally as `data/TE/TEP.csv`. This repository uses `xmeas_38` as the soft sensor target. The current file contains **10,000 samples** and **17 numeric columns**, including 16 process/manipulated variables and one target variable.
 
 ### Dataset Citation Notice
 
@@ -464,41 +518,14 @@ Example prompts for Codex or Claude Code:
 
 ```text
 Create a conda environment for this project and choose the correct PyTorch wheel for my GPU.
-```
-
-```text
 帮我创建适配这个项目和本机 GPU 的 conda 环境。（可自行定义镜像源）
-```
-
-```text
 Analyze all local datasets and generate stationarity, outlier, correlation, and visualization reports.
-```
-
-```text
 帮我分析所有本地数据集，生成平稳性、异常值、相关性和可视化报告。
-```
-
-```text
 Add {file_path}/你的数据集.csv as a new dataset. The target variable is xmeas_38. Generate soft-sensor YAML and run a smoke check.
-```
-
-```text
 帮我把 {file_path}/你的数据集.csv 加到仓库中，target 变量是 xmeas_38，并生成软测量 YAML 后跑 smoke 检查。
-```
-
-```text
 Add my new model in {file_path}/VALSTM.py to the model library, register it, create a DC YAML, and run a CPU smoke test.
-```
-
-```text
 这是我的新模型 {file_path}/VALSTM.py，帮我加入模型库，完成注册，创建 DC YAML，并跑一个 CPU smoke test。
-```
-
-```text
 Summarize the best soft-sensor results for PatchTST, ARDNN, HSAM_dGRUs, and iTransformer by MSE, and export a report.
-```
-
-```text
 帮我整理 PatchTST、ARDNN、HSAM_dGRUs、iTransformer 在软测量任务上的最好结果，按 MSE 排序并导出报告。
 ```
 
@@ -536,13 +563,24 @@ Industrial-Time-Series-Soft-Sensor/
 |   |-- exp_soft_sensor.py
 |   |-- losses.py
 |-- layers/                       # Neural network layers
-|-- models/                       # Model implementations
+|-- models/                       # Self-contained model packages
+|   |-- base/                     # Shared Config and ModelSpec schemas
+|   |-- registry.py               # Canonical model registry and aliases
+|   |-- <Model>/
+|       |-- model_arch.py         # Model architecture
+|       |-- model_config.py       # Model-owned configuration dataclass
+|       |-- model_spec.py         # Benchmark integration capabilities
+|       |-- __init__.py           # Public model package exports
+|-- runner/                       # Experiment orchestration
+|   |-- builder.py                # Config/Experiment/Logger builders
+|   |-- train_test.py             # Standard training and testing
+|   |-- test_checkpoint.py        # Evaluation of an existing checkpoint
+|   |-- pretrain_finetune.py      # Full pipeline and finetune-only workflows
 |-- scripts/
 |   |-- SS_task/                  # Soft sensor regression scripts
 |   |-- LSF_task/                 # Soft sensor forecasting scripts
 |-- utils/                        # Utility functions
 |   |-- configs.py
-|   |-- ExpConfigs.py
 |   |-- logger.py
 |   |-- metrics.py
 |   |-- scaler.py
@@ -552,6 +590,7 @@ Industrial-Time-Series-Soft-Sensor/
 |-- CLAUDE.md                     # Claude Code entry instructions
 |-- run.py                        # Command-line entry point
 |-- run_with_yaml.py              # YAML-based entry point
+|-- run_pretrain_finetune.py      # Pretraining/finetuning entry point
 |-- requirements.txt
 |-- LICENSE.txt
 |-- readme.md
@@ -573,7 +612,13 @@ This directory contains neural network building blocks, including attention mech
 
 #### `models/`
 
-This directory contains model implementations, such as `ARDNN.py`, `Autoformer.py`, `PatchTST.py`, `DMVAER.py`, `VALSTM.py`, and `iTransformer.py`.
+Each model is a self-contained package with its architecture, configuration,
+and benchmark capability card. `models/registry.py` provides canonical model
+names and loads the package exports `Model`, `MODEL_CONFIG`, and `MODEL_SPEC`.
+
+`MODEL_SPEC` declares stable framework integration such as supported tasks,
+dataset representation, loss type, and optional pretraining stages. Model
+hyperparameters remain in the model-owned `MODEL_CONFIG` dataclass and YAML.
 
 #### `scripts/`
 
@@ -634,15 +679,3 @@ We gratefully acknowledge the contributions of the open-source community. This c
 ## License
 
 This project is released under the Apache License 2.0. See [LICENSE.txt](LICENSE.txt) for details.
-
-
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=YuAn-06%2FIndustrial-Time-Series-Soft-Sensor&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=YuAn-06/Industrial-Time-Series-Soft-Sensor&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=YuAn-06/Industrial-Time-Series-Soft-Sensor&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=YuAn-06/Industrial-Time-Series-Soft-Sensor&type=date&legend=top-left" />
- </picture>
-</a>

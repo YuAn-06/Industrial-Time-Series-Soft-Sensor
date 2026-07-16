@@ -11,8 +11,6 @@ params:
   data_aug: True
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0
 
   # Model Config
   enc_in: 13
@@ -26,7 +24,6 @@ params:
 
   embed: 'TimeF'
   freq: 's'
-  factor: 1
 
   # LDCNN-specific / shared model parameters
   d_model: 128
@@ -34,11 +31,6 @@ params:
   dropout: 0.2
 
   # The following params are kept for framework compatibility
-  n_components: 5
-  n_heads: 8
-  d_layers: 1
-  d_ff: 128
-  activation: 'gelu'
 
   # Train Config
   batch_size: 64

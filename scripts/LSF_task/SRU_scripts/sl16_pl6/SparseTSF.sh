@@ -27,7 +27,6 @@
                         --batch_size 64 \
                         --learning_rate 0.001 \
                         --epoch 300 \
-                        --if_valid False \
                         --patience 10 \
                         --lradj 'cosine' \
                         --inverse \

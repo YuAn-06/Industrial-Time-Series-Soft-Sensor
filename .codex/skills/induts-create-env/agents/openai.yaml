@@ -1,0 +1,4 @@
+interface:
+  display_name: "InduTS Create Env"
+  short_description: "Detect hardware and set up benchmark env."
+  default_prompt: "Use $induts-create-env to inspect my hardware and prepare the InduTS-SS conda environment."

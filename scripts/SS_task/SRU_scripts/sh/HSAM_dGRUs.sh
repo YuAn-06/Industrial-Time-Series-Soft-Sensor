@@ -21,7 +21,6 @@
                          --d_model 128 \
                          --n_heads 3\
                          --hidden_dim 1 \
-                         --num_layers 1 \
                          --dropout 0.05 \
                          --activation 'GELU' \
                          --batch_size 64 \

@@ -1,0 +1,4 @@
+interface:
+  display_name: "InduTS Best Results Export"
+  short_description: "Export best InduTS model results to Excel and artifacts."
+  default_prompt: "Use $induts-results-best-export to summarize the best model results for a prediction task and collect their configs and predictions."

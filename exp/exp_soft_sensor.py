@@ -39,6 +39,11 @@ class Exp_Soft_Sensor(Exp_basic):
         return data_set, data_loader
     
     def _select_optimizer(self) -> optim.Optimizer:
+        model = self.model.module if isinstance(self.model, torch.nn.DataParallel) else self.model
+        if hasattr(model, "optimizer_param_groups"):
+            param_groups = model.optimizer_param_groups(self.args.learning_rate, self.args.weight_decay)
+            if param_groups is not None:
+                return optim.Adam(param_groups)
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         return model_optim
 
@@ -153,7 +158,7 @@ class Exp_Soft_Sensor(Exp_basic):
             
         logger.info("Training time: {:.4f}".format(train_time))
  
-        best_model_path = self.args.save_dir + '/' + 'checkpoint.pth'
+        best_model_path = os.path.join(self.args.save_dir, 'checkpoint.pth')
         self.model.load_state_dict(torch.load(best_model_path))
 
         return self.model
@@ -214,9 +219,17 @@ class Exp_Soft_Sensor(Exp_basic):
       
         print('test shape:', preds.shape, 'trues shape:', trues.shape)
         
-        mae,mse,rmse,mape,mspe,wape,corr = metric(preds, trues, self.args.task)
-        logger.info(f"mae:{mae:.4f}, mse:{mse:.4f}, rmse:{rmse:.4f}, mape:{mape:.4f}, mspe:{mspe:.4f}, wape:{wape:.4f}, corr:{corr:.4f}")
-        np.save(self.args.save_dir + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe, wape, corr]))
+        mae, mse, rmse, mape, mspe, wape, r2 = metric(
+            preds, trues, self.args.task
+        )
+        logger.info(
+            f"mae:{mae:.4f}, mse:{mse:.4f}, rmse:{rmse:.4f}, "
+            f"mape:{mape:.4f}, mspe:{mspe:.4f}, wape:{wape:.4f}, r2:{r2:.4f}"
+        )
+        np.save(
+            self.args.save_dir + 'metrics.npy',
+            np.array([mae, mse, rmse, mape, mspe, wape, r2]),
+        )
         np.save(self.args.save_dir + 'pred.npy', preds)
         np.save(self.args.save_dir + 'true.npy', trues)
         
@@ -230,7 +243,7 @@ class Exp_Soft_Sensor(Exp_basic):
                 'mape/test': float(mape),
                 'mspe/test': float(mspe),
                 'wape/test': float(wape),
-                'corr/test': float(corr),
+                'r2/test': float(r2),
             }
             self.writer.add_hparams(hparams, metrics)
 
@@ -249,5 +262,5 @@ class Exp_Soft_Sensor(Exp_basic):
         plt.savefig(self.args.save_dir + 'test.png')  # 
         logger.info(f"Saved plot as 'test.png' in {self.args.save_dir}")
 
-        plt.show()
+        plt.close()
         return

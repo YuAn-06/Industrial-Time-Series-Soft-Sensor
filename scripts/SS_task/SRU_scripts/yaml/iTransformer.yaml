@@ -8,8 +8,6 @@ params:
   data_aug: True
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0.0
 
   # Model Config
   enc_in: 20

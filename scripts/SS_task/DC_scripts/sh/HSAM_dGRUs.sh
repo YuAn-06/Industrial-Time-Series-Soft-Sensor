@@ -28,7 +28,6 @@ python -u run.py \
     --d_model 32 \
     --n_heads 4 \
     --e_layers 1 \
-    --d_layers 1 \
     --dropout 0.05 \
     --activation 'GELU' \
     --batch_size 128 \

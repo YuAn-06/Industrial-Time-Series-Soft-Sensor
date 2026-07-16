@@ -26,8 +26,6 @@ python -u run.py \
     --pred_len 1 \
     --embed 'TimeF' \
     --freq 's' \
-    --factor 1 \
-    --kernel_size 4 \
     --top_k 5 \
     --conv_channel 32 \
     --skip_channel 32 \
@@ -37,10 +35,8 @@ python -u run.py \
     --d_model 128 \
     --n_heads 8 \
     --e_layers 2 \
-    --d_layers 1 \
     --d_ff 128 \
     --dropout 0.05 \
-    --activation 'gelu' \
     --batch_size 64 \
     --learning_rate 0.001 \
     --epoch 300 \

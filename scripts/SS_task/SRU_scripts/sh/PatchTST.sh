@@ -22,7 +22,6 @@
                          --d_ff 256 \
                          --n_heads 4 \
                          --e_layers 1 \
-                         --d_layers 1 \
                          --dropout 0.05 \
                          --activation 'gelu' \
                          --batch_size 64 \

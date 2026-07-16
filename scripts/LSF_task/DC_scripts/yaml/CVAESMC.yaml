@@ -10,8 +10,6 @@ params:
   data_aug: False # type: bool, default: False, help: If use data augmentation for Deb and SRU dataset Augmentation Options #
   use_amp: False # type: bool, default: False, help: If use automatic mixed precision training
   num_workers: 0 # Windows is more stable with a single-process DataLoader
-  if_missing: False # type: bool, default: False, help: If exists Missing Data
-  missing_rate: 0 # type: float, default: 0, help: Missing data rate [0:0.5]
   use_tensorboard: True
    # type: bool, default: False, help: If use mode variable for multi_mode dataset
 
@@ -24,7 +22,6 @@ params:
   seq_len: 5 
   label_len: 5
   pred_len: 5
-  e_layers: 3
   activation: 'LeakyReLU'
   num_samples: 100
   hidden_dim: 64

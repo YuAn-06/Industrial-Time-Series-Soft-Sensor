@@ -6,10 +6,7 @@ python -u run.py --model 'iTransformer' \
                  --data_name "PPGAS2011" \
                  --data_path './data/PPGAS/gt_2011.csv' \
                  --target 'NOX' \
-                 --data_aug False \
-                 --use_amp False \
                  --num_workers 1 \
-                 --if_missing False \
                  --missing_rate 0 \
                  --enc_in 10 \
                  --dec_in 10 \
@@ -25,21 +22,16 @@ python -u run.py --model 'iTransformer' \
                  --d_ff 256 \
                  --n_heads 8 \
                  --e_layers 1 \
-                 --d_layers 1 \
                  --dropout 0.05 \
                  --activation 'gelu' \
                  --batch_size 64 \
                  --learning_rate 0.001 \
                  --epoch 200 \
-                 --if_valid False \
                  --patience 10 \
                  --lradj 'cosine' \
-                 --inverse False \
-                 --use_cuda False \
                  --device "cuda" \
                  --gpu 0 \
                  --seed 2021 \
-                 --use_multi_gpu False
 
 
 # d_model 256, dff 512
@@ -48,10 +40,7 @@ python -u run.py --model 'iTransformer' \
                  --data_name "PPGAS2011" \
                  --data_path './data/PPGAS/gt_2011.csv' \
                  --target 'NOX' \
-                 --data_aug False \
-                 --use_amp False \
                  --num_workers 1 \
-                 --if_missing False \
                  --missing_rate 0 \
                  --enc_in 10 \
                  --dec_in 10 \
@@ -67,19 +56,14 @@ python -u run.py --model 'iTransformer' \
                  --d_ff 512 \
                  --n_heads 8 \
                  --e_layers 1 \
-                 --d_layers 1 \
                  --dropout 0.05 \
                  --activation 'gelu' \
                  --batch_size 64 \
                  --learning_rate 0.001 \
                  --epoch 200 \
-                 --if_valid False \
                  --patience 10 \
                  --lradj 'cosine' \
-                 --inverse False \
-                 --use_cuda False \
                  --device "cuda" \
                  --gpu 0 \
                  --seed 2021 \
-                 --use_multi_gpu False
 

@@ -8,8 +8,6 @@ params:
   data_aug: False
   use_amp: False
   num_workers: 1
-  if_missing: False
-  missing_rate: 0
   
 
   # Model Config
@@ -30,7 +28,6 @@ params:
   d_model: 64
   n_heads: 4
   e_layers: 1
-  d_layers: 1
   d_ff: 128
   dropout: 0.05
   activation: 'gelu'

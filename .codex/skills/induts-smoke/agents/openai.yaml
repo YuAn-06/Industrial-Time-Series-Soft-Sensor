@@ -1,0 +1,4 @@
+interface:
+  display_name: "InduTS Smoke"
+  short_description: "Fast CPU smoke tests for benchmark models."
+  default_prompt: "Use $induts-smoke with conda env time_series_v2 to run a one-epoch CPU smoke test for my InduTS-SS model YAML."
