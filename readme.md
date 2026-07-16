@@ -15,6 +15,10 @@
   </a>
 </p>
 
+<p align="center">
+  English | <a href="readme_cn.md">简体中文</a>
+</p>
+
 ---
 
 **Industrial Time-Series Soft Sensor (InduTS-SS)** is an open-source library designed for researchers working on time-series data analysis and soft sensor modeling for complex industrial processes.
