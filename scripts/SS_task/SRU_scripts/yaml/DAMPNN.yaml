@@ -1,0 +1,47 @@
+# DAMPNN soft-sensor configuration for the sulfur recovery unit dataset.
+
+params:
+  # Data configuration (consistent with the existing augmented SRU benchmark).
+  model: 'DAMPNN'
+  task: 'soft_sensor'
+  data_name: 'SRU'
+  data_path: './data/SRU/SRU_data.csv'
+  target: 'SO2'
+  data_aug: True
+  use_amp: False
+  num_workers: 1
+
+  enc_in: 20
+  dec_in: 20
+  C_in: 20
+  C_out: 1
+  seq_len: 30
+  label_len: 30
+  pred_len: 1
+
+  # Paper settings: hidden=20, threshold=0.8, beta=0.01, lambda=30,
+  # self-attention projection=40.
+  d_model: 20
+  graph_projection_dim: 40
+  attention_dim: 40
+  message_passing_layers: 2
+  graph_threshold: 0.8
+  graph_beta: 0.01
+  graph_lambda: 30.0
+  dropout: 0.0
+
+  batch_size: 40
+  learning_rate: 0.002
+  epoch: 200
+  patience: 10
+  lradj: 'cosine'
+  weight_decay: 0.0
+  use_tensorboard: False
+
+  inverse: True
+  use_cuda: True
+  device: 'cuda'
+  gpu: 0
+  seed: 2021
+  device_ids: [0]
+  use_multi_gpu: False
