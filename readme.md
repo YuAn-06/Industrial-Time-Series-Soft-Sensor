@@ -25,6 +25,8 @@
 
 InduTS-SS provides a unified framework for industrial soft sensing, including dataset loading, preprocessing, model training, evaluation, and benchmarking. It is intended to make model comparison more fair, reproducible, and convenient.
 
+We warmly welcome users to try the library and [open an issue](https://github.com/YuAn-06/Industrial-Time-Series-Soft-Sensor/issues) with questions, bug reports, or suggestions. If you would like to contribute your own model to InduTS-SS, please contact us through an issue—we would be happy to help integrate it into the library.
+
 ## Table of Contents
 
 - [What's New](#whats-new)
@@ -45,6 +47,8 @@ InduTS-SS provides a unified framework for industrial soft sensing, including da
 <a id="whats-new"></a>
 
 ## 📢 What's New
+
+**Update - 2026/7/23:** We have added two new models to InduTS-SS: **DAMPNN**, a GNN-based model that uses dynamic adaptive message passing for industrial soft sensing, and **PETC_TNet**, a CNN-based model for industrial time-series modeling.
 
 **Update - 2026/7/16 (v1.1.0):** InduTS-SS has been upgraded from **v1.0.0** to **v1.1.0** with a modular model architecture. Each model is now a self-contained package that separates its implementation (`model_arch.py`), configuration (`model_config.py`), and benchmark capabilities (`model_spec.py`). A centralized model registry and reusable experiment runners now handle model discovery, configuration validation, standard training/testing, checkpoint evaluation, and pretraining/fine-tuning workflows. This redesign makes model integration and maintenance clearer while preserving the benchmark's task definitions, dataset splits, metrics, and fairness settings.
 
@@ -324,6 +328,8 @@ Some models have been adapted to support both tasks. Please refer to the files i
 | Model | Journal/Conference | F | R | Remark | Status |
 | ----- | ------------------ | - | - | ------ | ------ |
 | [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354) (Lin et al.) | IEEE TPAMI 2026 | Yes |  | MLP-based time-series foundation model | Available |
+| [PETC-TNet](https://doi.org/10.1109/JSEN.2025.3615736) (He et al.) | IEEE Sensors Journal 2025 | Yes |  | Patch-decomposition-enhanced TCN-Transformer soft sensor forecasting model | Available |
+| [DAMPNN](https://doi.org/10.1109/TII.2024.3475419) (Yan et al.) | IEEE TII 2025 |  | Yes | Dynamic adaptive message-passing GNN for industrial soft sensing | Available |
 | [TimeKAN](https://arxiv.org/abs/2502.06910) (Huang et al.) | ICLR 2025 | Yes | Yes | KAN-based time-series foundation model | Available |
 | [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al.) | ICML 2025 | Yes | Yes | GNN-based time-series foundation model | Available |
 | [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al.) | NeurIPS 2024 | Yes | Yes | Transformer-based foundation model | Available |
@@ -381,6 +387,7 @@ The table is grouped by model architecture. Within each architecture, models are
 | **CNN**                     | [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq) (Wu et al.) | 2023 | ICLR                 | Yes  | Yes  | Available |
 | **CNN**                     | [TCN](https://arxiv.org/abs/1803.01271) (Bai et al.)         | 2018 | arXiv                | Yes  | Yes  | Available |
 | **GNN**                      | [TimeFilter](https://arxiv.org/abs/2501.13041) (Hu et al.)   | 2025 | ICML                 | Yes  | Yes  | Available |
+| **GNN** | [DAMPNN](https://doi.org/10.1109/TII.2024.3475419) (Yan et al.) | 2025 | IEEE TII |  | Yes | Available |
 | **GNN**                      | [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991) (Cai et al.) | 2024 | AAAI                 | Yes  | Yes  | Available |
 | **GNN**                      | [GTFTS](https://ieeexplore.ieee.org/document/10664532) (Yan et al.) | 2024 | IEEE TC              | Yes  |      | Available |
 | **GNN**                      | [GraphSAGE-IMATCN](https://www.sciencedirect.com/science/article/abs/pii/S0957582024009959?via%3Dihub=) (Tuo et al.) | 2024 | PSER | Yes | Yes | Available |
@@ -395,6 +402,7 @@ The table is grouped by model architecture. Within each architecture, models are
 | **RNN** | [TS-lambda-GRUs](https://doi.org/10.1109/TIE.2019.2927197) (Xie et al.) | 2020 | IEEE TIE |  | Yes | Available |
 | **RNN** | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665) (Yuan et al.) | 2019 | CJCE |  | Yes | Available |
 | **RNN** | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963) (Hochreiter et al) | 1997 | Neural Computation | Yes | Yes | Available |
+| **Transformer** | [PETC-TNet](https://doi.org/10.1109/JSEN.2025.3615736) (He et al.) | 2025 | IEEE Sensors Journal | Yes |  | Available |
 | **Transformer** | [SOFTS](https://arxiv.org/pdf/2404.14197) (Lu et al.) | 2024 | NeurIPS | Yes | Yes | Available |
 | **Transformer** | [iTransformer](https://arxiv.org/abs/2310.06625) (Liu et al.) | 2024 | ICLR | Yes | Yes | Available |
 | **Transformer** | [FredFormer](https://arxiv.org/abs/2406.09009) (Piao et al.) | 2024 | KDD | Yes | Yes | Available |

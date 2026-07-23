@@ -21,6 +21,8 @@
 
 InduTS-SS 为工业软测量提供统一框架，涵盖数据集加载、预处理、模型训练、评估和基准测试，旨在让模型比较更加公平、可复现且便捷。
 
+我们诚挚欢迎使用者体验本项目，并通过 [GitHub Issue](https://github.com/YuAn-06/Industrial-Time-Series-Soft-Sensor/issues) 提出问题、报告错误或分享建议。如果您希望将自己的模型加入 InduTS-SS，也欢迎通过 Issue 联系我们，我们很乐意协助您将模型集成到本工具库中。
+
 ## 目录
 
 - [最新动态](#whats-new)
@@ -41,6 +43,8 @@ InduTS-SS 为工业软测量提供统一框架，涵盖数据集加载、预处�
 <a id="whats-new"></a>
 
 ## 📢 最新动态
+
+**更新 - 2026/7/23：** InduTS-SS 新增了两个模型：基于 GNN 的 **DAMPNN**，通过动态自适应消息传递实现工业软测量；以及面向工业时间序列建模、基于 CNN 的 **PETC_TNet**。
 
 **更新 - 2026/7/16（v1.1.0）：** InduTS-SS 已从 **v1.0.0** 升级至 **v1.1.0**，并完成模型架构的模块化重构。每个模型现已拆分为独立的自包含包，分别管理模型实现（`model_arch.py`）、模型配置（`model_config.py`）和基准能力声明（`model_spec.py`）。新增的统一模型注册表和可复用实验运行器负责模型发现、配置校验、标准训练与测试、检查点评估，以及预训练/微调流程。此次升级使模型接入和维护更加清晰，同时保持任务定义、数据集划分、评价指标及公平性设置不变。
 
@@ -311,6 +315,8 @@ $$
 | 模型 | 期刊/会议 | F | R | 说明 | 状态 |
 | ----- | --------- | - | - | ---- | ---- |
 | [SparseTSF](https://ieeexplore.ieee.org/abstract/document/11141354)（Lin 等） | IEEE TPAMI 2026 | 是 |  | 基于 MLP 的时间序列基础模型 | 可用 |
+| [PETC-TNet](https://doi.org/10.1109/JSEN.2025.3615736)（He 等） | IEEE Sensors Journal 2025 | 是 |  | 基于 Patch 分解增强 TCN-Transformer 的软测量预测模型 | 可用 |
+| [DAMPNN](https://doi.org/10.1109/TII.2024.3475419)（Yan 等） | IEEE TII 2025 |  | 是 | 面向工业软测量的动态自适应消息传递图神经网络 | 可用 |
 | [TimeKAN](https://arxiv.org/abs/2502.06910)（Huang 等） | ICLR 2025 | 是 | 是 | 基于 KAN 的时间序列基础模型 | 可用 |
 | [TimeFilter](https://arxiv.org/abs/2501.13041)（Hu 等） | ICML 2025 | 是 | 是 | 基于 GNN 的时间序列基础模型 | 可用 |
 | [SOFTS](https://arxiv.org/pdf/2404.14197)（Lu 等） | NeurIPS 2024 | 是 | 是 | 基于 Transformer 的基础模型 | 可用 |
@@ -367,6 +373,7 @@ $$
 | **CNN / TCN** | [TimesNet](https://openreview.net/pdf?id=ju_Uqw384Oq)（Wu 等） | 2023 | ICLR | 是 | 是 | 可用 |
 | **CNN / TCN** | [TCN](https://arxiv.org/abs/1803.01271)（Bai 等） | 2018 | arXiv | 是 | 是 | 可用 |
 | **GNN** | [TimeFilter](https://arxiv.org/abs/2501.13041)（Hu 等） | 2025 | ICML | 是 | 是 | 可用 |
+| **GNN** | [DAMPNN](https://doi.org/10.1109/TII.2024.3475419)（Yan 等） | 2025 | IEEE TII |  | 是 | 可用 |
 | **GNN** | [MSGNet](https://dl.acm.org/doi/10.1609/aaai.v38i10.28991)（Cai 等） | 2024 | AAAI | 是 | 是 | 可用 |
 | **GNN** | [GTFTS](https://ieeexplore.ieee.org/document/10664532)（Yan 等） | 2024 | IEEE TC | 是 |  | 可用 |
 | **GNN** | [GraphSAGE-IMATCN](https://www.sciencedirect.com/science/article/abs/pii/S0957582024009959?via%3Dihub=)（Tuo 等） | 2024 | PSER |  | 是 | 暂不可用 |
@@ -382,6 +389,7 @@ $$
 | **RNN** | [TS-lambda-GRUs](https://doi.org/10.1109/TIE.2019.2927197) (Xie 等) | 2020 | IEEE TIE | | 是 | Available |
 | **RNN** | [VALSTM](https://onlinelibrary.wiley.com/doi/10.1002/cjce.23665)（Yuan 等） | 2019 | CJCE |  | 是 | 可用 |
 | **RNN** | [LSTM](https://ieeexplore.ieee.org/abstract/document/6795963)（Hochreiter 和 Schmidhuber） | 1997 | Neural Computation | 是 | 是 | 可用 |
+| **Transformer** | [PETC-TNet](https://doi.org/10.1109/JSEN.2025.3615736)（He 等） | 2025 | IEEE Sensors Journal | 是 |  | 可用 |
 | **Transformer** | [SOFTS](https://arxiv.org/pdf/2404.14197)（Lu 等） | 2024 | NeurIPS | 是 | 是 | 可用 |
 | **Transformer** | [iTransformer](https://arxiv.org/abs/2310.06625)（Liu 等） | 2024 | ICLR | 是 | 是 | 可用 |
 | **Transformer** | [FredFormer](https://arxiv.org/abs/2406.09009)（Piao 等） | 2024 | KDD | 是 | 是 | 可用 |

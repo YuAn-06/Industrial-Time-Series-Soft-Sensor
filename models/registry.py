@@ -4,6 +4,8 @@ import importlib
 
 
 MODEL_REGISTRY = {
+    "DAMPNN": "models.DAMPNN",
+    "PETC_TNet": "models.PETC_TNet",
     "Nystromformer": "models.Nystromformer",
     "DAGRU": "models.DAGRU",
     "DMVAER": "models.DMVAER",
@@ -48,6 +50,7 @@ MODEL_REGISTRY = {
 }
 
 MODEL_ALIASES = {
+    "PETC-TNet": "PETC_TNet",
     "Envformer": "EnvFormer",
     "Nystroformer": "Nystromformer",
 }
